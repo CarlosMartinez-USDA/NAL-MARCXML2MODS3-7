@@ -32,11 +32,7 @@
 	│ MODS 3.7 │  
 	└ ━ ━ ━ ━ ━ ┘
 	Revision 1.183 - An attribute node (displayLabel) cannot be created after a child of the containing elementResolved fatal erroor"Added <marc:datafield> "" - 20230615
-	                  1.183 - 
-
-Description: Cannot create an attribute node (altRepGroup) whose p1.1arent is a document node
-Cannot create an attribute node (xlink:href) whose parent is a document node
-An attribute node (nameTitleGroup) cannot be created after a child of the containing element
+    Revision 1.182 - An attribute node (nameTitleGroup) cannot be created after a child of the containing element
 	Revision 1.181 - Simplified marcCountry and f:decodeMARCCountry functions. Regex updated 20230615
 	Revision 1.180 - Added conditional statement to prevent physicalDescription from appearing in article records
 	Revision 1.179 - Added conditional statement to prevent issuance from appearing in article records
@@ -2550,8 +2546,8 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                             </xsl:for-each>
                         </xsl:if>
                         <!--Call names  -->
-                        <xsl:apply-templates select="marc:subfield[@code = 'a']" mode="relatedItem"
-                        />
+                       <!-- <xsl:apply-templates select="marc:subfield[@code = 'a']" mode="relatedItem"
+                        />-->
                     </xsl:for-each>
                 </relatedItem>
             </xsl:if>
@@ -3944,6 +3940,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             <xsl:if test="@ind2 != ' '">
                 <xsl:if test="@ind2 != '8'">
                     <xsl:if test="@ind2 != '9'">
+                        <xsl:element name="{name()}">
                         <xsl:attribute name="authority">
                             <xsl:choose>
                                 <xsl:when test="@ind2 = '0'">lcsh</xsl:when>
@@ -3958,6 +3955,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                                 </xsl:when>
                             </xsl:choose>
                         </xsl:attribute>
+                        </xsl:element>
                     </xsl:if>
                 </xsl:if>
             </xsl:if>
