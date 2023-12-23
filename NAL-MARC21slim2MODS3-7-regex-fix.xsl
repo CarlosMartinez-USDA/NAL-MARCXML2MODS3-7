@@ -26,11 +26,12 @@
     <!-- Maintenance note: For each revision, change the content of <recordInfo><recordOrigin> to reflect the new revision number.
 	MARC21slim2MODS3-7
 	┌ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┐ 
-	│  NAL Revisions (Revision 1.183) 20230216   |    
+	│  NAL Revisions (Revision 1.184) 20231223    |    
 	└ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┘ 	
 	┌ ━ ━ ━ ━ ━ ┐ 
 	│ MODS 3.7 │  
 	└ ━ ━ ━ ━ ━ ┘ 
+    Revision 1.184 - Encodes publisher provided DOI URL into a valid URI value for 'anyURI'. 20231223 cm3
 	Revision 1.183 - An attribute node (displayLabel) cannot be created after a child of the containing elementResolved fatal erroor"Added <marc:datafield> "" - 20230615
     Revision 1.182 - An attribute node (nameTitleGroup) cannot be created after a child of the containing element
 	Revision 1.181 - Simplified marcCountry and f:decodeMARCCountry functions. Regex updated 20230615
@@ -3185,7 +3186,7 @@
                 <xsl:variable name="dateTime"
                     select="format-dateTime(current-dateTime(), '[M01]/[D01]/[Y0001] at [h1]:[m01] [P]')"/>
                 <xsl:value-of
-                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.183 20230615 cm3),'))"/>
+                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.184 20231223 cm3),'))"/>
                 <xsl:text>&#160;</xsl:text>
                 <xsl:value-of select="normalize-space(concat('Transformed on: ', $dateTime))"/>
             </recordOrigin>
@@ -7025,12 +7026,8 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
 
     <xd:doc>
         <xd:desc>createLocationFrom856</xd:desc>
-        <xd:param name="doi"/>
     </xd:doc>
     <xsl:template name="createLocationFrom856">
-        <xsl:param name="doi">
-            <xsl:value-of select="encode-for-uri(marc:datafield[@tag='024']/marc:subfield[@tag='a'])"/>
-        </xsl:param>
         <xsl:if test="//marc:datafield[@tag = '856'][@ind2 != '2'][marc:subfield[@code = 'u']]">
             <location>
                 <!-- 1.121 -->
@@ -7042,11 +7039,9 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                             <xsl:when
                                 test="@ind2 = '0' and count(preceding-sibling::marc:datafield[@tag = '856'][@ind2 = '0']) = 0"
                                 >true</xsl:when>
-
                             <xsl:when
                                 test="@ind2 = '1' and count(ancestor::record//marc:datafield[@tag = '856'][@ind2 = '0']) = 0 and count(preceding-sibling::marc:datafield[@tag = '856'][@ind2 = '1']) = 0"
                                 >true</xsl:when>
-
                             <xsl:when
                                 test="@ind2 != '1' and @ind2 != '0' and @ind2 != '2' and count(ancestor::record//marc:datafield[@tag = '856' and @ind2 = '0']) = 0 and count(ancestor::record//marc:datafield[@tag = '856' and @ind2 = '1']) = 0 and count(preceding-sibling::marc:datafield[@tag = '856'][@ind2]) = 0"
                                 >true</xsl:when>
@@ -7056,8 +7051,6 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                     <xsl:if test="$primary = 'true'">
                         <xsl:attribute name="usage">primary display</xsl:attribute>
                     </xsl:if>
-                    
-
                     <xsl:if test="marc:subfield[@code = 'y' or @code = '3']">
                         <xsl:attribute name="displayLabel">
                             <xsl:call-template name="subfieldSelect">
@@ -7072,9 +7065,9 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                             </xsl:call-template>
                         </xsl:attribute>
                     </xsl:if>
+                    <!-- 1.184 -->
                     <xsl:analyze-string select="marc:subfield[@code = 'u']" regex="^(https?://(dx.)?doi.org)/(10.\d{{4,9}})(\S+)\s?$">
                         <xsl:matching-substring>
-                            <xsl:variable name="chars" select="concat('(',')','[',']',';')"/>
                             <xsl:choose>
                                 <xsl:when test="matches(regex-group(4),'/(\d+\-\d+X?)\((\d+)\)\d+(%5b|\[)(\S+)(%5d|\])2.0.CO;2')">
                                     <xsl:value-of select="concat(regex-group(1), regex-group(2),regex-group(3), encode-for-uri(regex-group(4)))"/>	
