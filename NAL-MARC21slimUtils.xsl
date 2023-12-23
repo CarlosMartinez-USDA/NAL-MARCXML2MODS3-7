@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
     xmlns:f="http://functions" xmlns:isolang="http://isolanguages"
-    xmlns:local="http://wwww.local.gov/namespace"
+    xmlns:local="http://www.local.gov/namespace"
     xmlns:marc="http://www.loc.gov/MARC21/slim"
     xmlns:marccountry="http://www.local.gov/marc/countries"
     xmlns:nalsubcat="http://nal-subject-category-codes"

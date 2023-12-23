@@ -7072,14 +7072,19 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                             </xsl:call-template>
                         </xsl:attribute>
                     </xsl:if>
-                    <xsl:choose>
-                        <xsl:when test="contains(marc:subfield[@code = 'u'],'()[];')">                        
-                            <xsl:value-of select="concat('https://dx.doi.org/', $doi)"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:value-of select="marc:subfield[@code = 'u']"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
+                    <xsl:analyze-string select="marc:subfield[@code = 'u']" regex="^(https?://(dx.)?doi.org)/(10.\d{{4,9}})(\S+)\s?$">
+                        <xsl:matching-substring>
+                            <xsl:variable name="chars" select="concat('(',')','[',']',';')"/>
+                            <xsl:choose>
+                                <xsl:when test="matches(regex-group(4),'/(\d+\-\d+X?)\((\d+)\)\d+(%5b|\[)(\S+)(%5d|\])2.0.CO;2')">
+                                    <xsl:value-of select="concat(regex-group(1), regex-group(2),regex-group(3), encode-for-uri(regex-group(4)))"/>	
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="."/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:matching-substring>
+                    </xsl:analyze-string>
                 </url>
             </location>
         </xsl:if>

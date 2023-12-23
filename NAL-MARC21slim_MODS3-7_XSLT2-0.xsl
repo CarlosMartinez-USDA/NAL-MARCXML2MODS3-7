@@ -4441,6 +4441,7 @@
 	<xsl:template
 		match="marc:datafield[@tag = '856'] | marc:datafield[@tag = '880'][starts-with(marc:subfield[@code = '6'], '856')]"
 		mode="location">
+		<xsl:param name="doi" select="marc:subfield[@code='u']"/>
 		<xsl:if test="@ind2 != '2' and marc:subfield[@code = 'u']">
 			<location>
 				<!-- Template checks for altRepGroup - 880 $6 -->
@@ -4478,7 +4479,21 @@
 							<xsl:value-of select="local:subfieldSelect(., 'z')"/>
 						</xsl:attribute>
 					</xsl:if>
-					<xsl:value-of select="marc:subfield[@code = 'u']"/>
+					<xsl:analyze-string select="marc:subfield[@code = 'u']" regex="^(https?://(dx.)?doi.org)/(10.\d{{4,9}})(\S+)\s?$">
+						<xsl:matching-substring>
+							<xsl:variable name="chars" select="concat('(',')','[',']',';')"/>
+							<xsl:choose>
+								<xsl:when test="matches(regex-group(4),'/(\d+\-\d+X?)\((\d+)\)\d+(%5b|\[)(\S+)(%5d|\])2.0.CO;2')">
+									<xsl:value-of select="concat(regex-group(1), regex-group(2),regex-group(3), encode-for-uri(regex-group(4)))"/>	
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="'nothing happened'"/>
+<!--									<xsl:value-of select="$doi"/>-->
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:matching-substring>
+					</xsl:analyze-string>
+<!--					<xsl:value-of select="marc:subfield[@code = 'u']"/>	-->
 				</url>
 			</location>
 		</xsl:if>
