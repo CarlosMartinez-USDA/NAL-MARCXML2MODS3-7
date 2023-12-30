@@ -16,8 +16,7 @@
 
 
     <!-- outputs -->
-    <xsl:output encoding="UTF-8" indent="yes" method="xml" name="original"
-        saxon:next-in-chain="fix_characters.xsl"/>
+    <xsl:output encoding="UTF-8" indent="yes" method="xml" name="original" saxon:next-in-chain="fix_characters.xsl"/>
 
     <!-- whitespace control -->
     <xsl:strip-space elements="*"/>
@@ -26,12 +25,12 @@
     <!-- Maintenance note: For each revision, change the content of <recordInfo><recordOrigin> to reflect the new revision number.
 	MARC21slim2MODS3-7
 	┌ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┐ 
-	│  NAL Revisions (Revision 1.184) 20231223    |    
+	│  NAL Revisions (Revision ) 20231223    |    
 	└ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┘ 	
 	┌ ━ ━ ━ ━ ━ ┐ 
 	│ MODS 3.7 │  
 	└ ━ ━ ━ ━ ━ ┘ 
-    Revision 1.184 - Encodes publisher provided DOI URL into a valid URI value for 'anyURI'. 20231223 cm3
+    Revision  - Encodes publisher provided DOI URL into a valid URI value for 'anyURI'. 20231223 cm3
 	Revision 1.183 - An attribute node (displayLabel) cannot be created after a child of the containing elementResolved fatal erroor"Added <marc:datafield> "" - 20230615
     Revision 1.182 - An attribute node (nameTitleGroup) cannot be created after a child of the containing element
 	Revision 1.181 - Simplified marcCountry and f:decodeMARCCountry functions. Regex updated 20230615
@@ -3186,7 +3185,7 @@
                 <xsl:variable name="dateTime"
                     select="format-dateTime(current-dateTime(), '[M01]/[D01]/[Y0001] at [h1]:[m01] [P]')"/>
                 <xsl:value-of
-                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.184 20231223 cm3),'))"/>
+                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision  20231223 cm3),'))"/>
                 <xsl:text>&#160;</xsl:text>
                 <xsl:value-of select="normalize-space(concat('Transformed on: ', $dateTime))"/>
             </recordOrigin>
@@ -6593,7 +6592,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        
     </xd:doc>
     <xsl:template name="createSubFrom656">
         <subject>
@@ -6616,7 +6615,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        
     </xd:doc>
     <xsl:template name="createSubGeoFrom662752">
         <subject>
@@ -6684,7 +6683,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        
     </xd:doc>
     <xsl:template name="createSubTemFrom045">
         <xsl:if
@@ -6886,7 +6885,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        
     </xd:doc>
     <xsl:template name="createClassificationFrom084">
         <classification>
@@ -6901,7 +6900,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        
     </xd:doc>
     <xsl:template name="createClassificationFrom086">
         <xsl:for-each select="marc:datafield[@tag = '086'][@ind1 = '0']">
@@ -7065,7 +7064,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                             </xsl:call-template>
                         </xsl:attribute>
                     </xsl:if>
-                    <!-- 1.184 -->
+                    <!--  -->
                     <xsl:analyze-string select="marc:subfield[@code = 'u']" regex="^(https?://(dx.)?doi.org)/(10.\d{{4,9}})(\S+)\s?$">
                         <xsl:matching-substring>
                             <xsl:choose>
@@ -7104,7 +7103,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        
     </xd:doc>
     <xsl:template name="createAccessConditionFrom540">
         <accessCondition type="use and reproduction">
@@ -7263,7 +7262,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        
     </xd:doc>
     <xsl:template name="reformattingQuality">
         <xsl:for-each select="marc:controlfield[@tag = '007'][substring(text(), 1, 1) = 'c']">
@@ -7303,7 +7302,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
     </xsl:template>
     
     <xd:doc>
-        <xd:desc/>
+        
         <xd:param name="controlField008"/>
         <xd:param name="typeOf008"/>
         <xd:param name="marcLeader6"/>
@@ -7773,7 +7772,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
         <xsl:param name="controlField008"/>
         <xsl:param name="typeOf008"/>
         <xsl:variable name="dataField260c">
-            <!--1.184-->
+            <!---->
             <xsl:call-template name="chopPunctuationStrings">
                 <xsl:with-param name="chopStrings"
                     select="marc:datafield[@tag = '260']/marc:subfield[@code = 'c']"/>
@@ -7782,8 +7781,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
         <!--1.166 -->
         <!-- variable name originInfoShared-->
         <xsl:variable name="originInfoShared">
-            <!-- MARC Country Codes -->
-
+            <!-- MARC Country Codes --> 
             <place>
                 <xsl:analyze-string select="$controlField008"
                     regex="\d{{6}}[a-z]\d+(\\{{2,4}}|\s{{2,4}})?(xx|[a-z]{{2,3}}).*">
@@ -7828,8 +7826,6 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                 </xsl:analyze-string>
             </place>
 
-
-
             <!-- 1.177 for journal publisher to appear with article -->
             <xsl:for-each select="marc:datafield[@tag = '773']">
                 <publisher>
@@ -7871,10 +7867,9 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
             </xsl:if>
             <!-- 2022-11-23 CM3, added NALcontrolField008 variable -->
             <xsl:choose>
-                <!--YYYYMMDD -->
+               
                 <xsl:when
                     test="($controlField008-6 = 'e' or $controlField008-6 = 'p' or $controlField008-6 = 'r' or $controlField008-6 = 's' or $controlField008-6 = 't') and not($marcLeader6 = 'd' or $marcLeader6 = 'f' or $marcLeader6 = 'p' or $marcLeader6 = 't')">
-                    <!-- use substring to limit for dates-->
                     <xsl:variable name="NALcontrolfield008"
                         select="substring(marc:controlfield[@tag = '008'], 1, 15)"/>
                     <xsl:choose>
@@ -7884,25 +7879,22 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                                 <xsl:matching-substring>
                                     <dateIssued encoding="w3cdtf" keyDate="yes">
                                         <xsl:choose>
+                                            <!--YYYY-MM-DD -->
                                             <xsl:when test="matches(regex-group(3), '\d{8}')">
-                                                <!--YYYY-->
                                                 <xsl:number value="substring(regex-group(3), 1, 4)"
                                                   format="0001"/>
                                                 <xsl:text>-</xsl:text>
-                                                <!--MM-->
                                                 <xsl:number value="substring(regex-group(3), 5, 2)"
                                                   format="01"/>
                                                 <xsl:text>-</xsl:text>
-                                                <!--DD-->
                                                 <xsl:number value="substring(regex-group(3), 7, 2)"
                                                   format="01"/>
                                             </xsl:when>
                                             <xsl:when test="matches(regex-group(3), '\d{6}')">
-                                                <!--YYYY-->
+                                                <!--YYYY-MM-->
                                                 <xsl:number value="substring(regex-group(3), 1, 4)"
                                                   format="0001"/>
                                                 <xsl:text>-</xsl:text>
-                                                <!--MM-->
                                                 <xsl:number value="substring(regex-group(3), 5, 2)"
                                                   format="01"/>
                                             </xsl:when>
