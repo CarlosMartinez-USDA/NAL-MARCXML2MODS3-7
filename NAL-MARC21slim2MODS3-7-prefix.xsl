@@ -7051,7 +7051,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                         <xsl:matching-substring>
                             <xsl:choose>
                                 <xsl:when test="matches(regex-group(5), '\d+\-\d+X?(%28|\()\d+(%29|\))\d+(%5b|\[)\S+(%5d|\])2\.0\.CO;2')">
-                                    <xsl:value-of select="concat(regex-group(1), regex-group(2), regex-group(3),'/',regex-group(4),'/' ,encode-for-uri(regex-group(5)))"/>
+                                    <xsl:value-of select="concat(regex-group(1), regex-group(2), regex-group(3), string('/'),regex-group(4), string('/'),encode-for-uri(regex-group(5)))"/>
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <xsl:value-of select="."/>
