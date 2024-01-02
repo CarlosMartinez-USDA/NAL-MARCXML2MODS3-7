@@ -1,12 +1,6 @@
 <?xml version='1.0'?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
-    xmlns:f="http://functions" xmlns:isolang="http://isolanguages"
-    xmlns:local="http://www.local.gov/namespace"
-    xmlns:marc="http://www.loc.gov/MARC21/slim"
-    xmlns:marccountry="http://www.local.gov/marc/countries"
-    xmlns:nalsubcat="http://nal-subject-category-codes"
-    xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    exclude-result-prefixes="f isolang local marc marccountry nalsubcat xd xs">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0" xmlns:err="http://www.w3.org/2005/xqt-errors" xmlns:f="http://functions" xmlns:info="info:lc/xmlns/codelist-v1" xmlns:isolang="http://isolanguages" xmlns:local="http://www.local.gov/namespace" xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:marccountry="http://www.local.gov/marc/countries" xmlns:nalsubcat="http://nal-subject-category-codes" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    exclude-result-prefixes="err f info isolang local marc marccountry nalsubcat xd xs">
     <xd:doc scope="stylesheet" id="Institution-id-LC">
         <xd:desc>
             <xd:p><xd:b>MARC 21 </xd:b></xd:p>
@@ -106,7 +100,7 @@
         <xd:param name="str"/>
         <xd:param name="pcodes"/>
     </xd:doc>
-    <xsl:function name="local:stripPunctuation">
+    <xsl:function name="f:stripPunctuation">
         <xsl:param name="str"/>
         <xsl:param name="pcodes"/>
         <xsl:variable name="punctuation">
@@ -157,7 +151,7 @@
         <xd:param name="datafield"/>
         <xd:param name="codes"/>
     </xd:doc>
-    <xsl:function name="local:subfieldSelect">
+    <xsl:function name="f:subfieldSelect">
         <xsl:param name="datafield" as="node()"/>
         <xsl:param name="codes"/>
         <!-- Selects and prints out datafield -->
@@ -539,6 +533,7 @@
 <scenarios/><MapperInfo srcSchemaPath="" srcSchemaRoot="" srcSchemaPathIsRelative="yes" srcSchemaInterpretAsXML="no" destSchemaPath="" destSchemaRoot="" destSchemaPathIsRelative="yes" destSchemaInterpretAsXML="no"/>
 </metaInformation>
 -->
+  
 
     <!--NAL Custom Functions by Carlos Martinez III-->
 
@@ -554,46 +549,38 @@
             <xd:p>
                 <xd:ul>
                     <xd:li>
-                        <xd:i>1.<xd:ref name="f:add-namespace-prefix" type="function"
-                            />f:add-namespace-prefix</xd:i>
+                        <xd:i>1.<xd:ref name="f:add-namespace-prefix" type="function"/>f:add-namespace-prefix</xd:i>
                     </xd:li>
                     <xd:li>
                         <xd:i>2.<xd:ref name="f:subjCatCode" type="function"/>f:subjCatCode</xd:i>
                     </xd:li>
                     <xd:li>
-                        <xd:i>3.<xd:ref name="f:decodeMARCCountry" type="function"
-                            />f:decodeMARCCountry</xd:i>
+                        <xd:i>3.<xd:ref name="info:marcCountry">info:marcCountry</xd:ref>
+                            <xd:note name="f:decodeMARCCountry" type="function">Revised f:decodeMARCCountry to reference  revised custom function to reference https://www.loc.gov/standards/codelists/countries.xml</xd:note></xd:i>
                     </xd:li>
                     <xd:li>
-                        <xd:i>4.<xd:ref name="f:f:isoTwo2Lang" type="function"
-                            />f:isoTwo2Lang</xd:i>
+                        <xd:i>4.<xd:ref name="f:f:isoTwo2Lang" type="function"/>f:isoTwo2Lang</xd:i>
                     </xd:li>
                     <xd:li>
                         <xd:i>5.<xd:ref name="f:isoOne2Two" type="function"/>f:isoOne2Two</xd:i>
                     </xd:li>
                     <xd:li>
-                        <xd:i>6.<xd:ref name="f:capitalize-first" type="function"
-                            />f:capitalize-first</xd:i>
+                        <xd:i>6.<xd:ref name="f:capitalize-first" type="function"/>f:capitalize-first</xd:i>
                     </xd:li>
                     <xd:li>
-                        <xd:i>7.<xd:ref name="f:sentence-case" type="function"
-                            />f:sentence-case</xd:i>
+                        <xd:i>7.<xd:ref name="f:sentence-case" type="function"/>f:sentence-case</xd:i>
                     </xd:li>
                     <xd:li>
-                        <xd:i>8.<xd:ref name="f:f:proper-case" type="function"
-                            />f:f:proper-case</xd:i>
+                        <xd:i>8.<xd:ref name="f:f:proper-case" type="function"/>f:f:proper-case</xd:i>
                     </xd:li>
                     <xd:li>
-                        <xd:i>9.<xd:ref name="f:substring-before-match" type="function"
-                        />f:substring-before-match</xd:i>
+                        <xd:i>9.<xd:ref name="f:substring-before-match" type="function"/>f:substring-before-match</xd:i>
                     </xd:li>
                     <xd:li>
-                        <xd:i>10.<xd:ref name="f:nameIdentifier" type="function"
-                            />f:nameIdentifier</xd:i>
+                        <xd:i>10.<xd:ref name="f:nameIdentifier" type="function"/>f:nameIdentifier</xd:i>
                     </xd:li>
                     <xd:li>
-                        <xd:i>11.<xd:ref name="f:isNumber" type="function"
-                        />f:isNumber</xd:i>
+                        <xd:i>11.<xd:ref name="f:isNumber" type="function"/>f:isNumber</xd:i>
                     </xd:li>
                 </xd:ul>
             </xd:p>
@@ -650,7 +637,7 @@
 
 
     <!-- f:subjCatCode -->
-    <xd:doc scope="component">
+    <xd:doc id="f:subjCatCode" scope="component">
         <xd:desc>
             <xd:p><xd:b>Function: </xd:b>f:subjCatCode</xd:p>
             <xd:p><xd:b>Usage: </xd:b>f:subjCatCode(xpath)</xd:p>
@@ -658,27 +645,27 @@
                 ind2=0, subfield a) to it's respective term found in Appendix D: NAL Subject
                 Categrory Codes</xd:p>
         </xd:desc>
-        <xd:param name="code">Convert subject category codes into NAL Subject Categories.</xd:param>
+        <xd:param name="subjCode">Convert subject category codes (MARC 072$a) into NAL Subject Categories.</xd:param>
     </xd:doc>
     <xsl:function name="f:subjCatCode" as="xs:string">
-        <xsl:param name="code" as="xs:string"/>
-        <xsl:variable name="subjCode">
+        <xsl:param name="subjCode" as="xs:string"/>
+        <xsl:variable name="subject_name">
             <xsl:variable name="nodes">
                 <xsl:copy-of select="document('commons/xml/nalSubjCat.xml')"/>
             </xsl:variable>
             <xsl:choose>
-                <xsl:when test="$code = ''"/>
+                <xsl:when test="$subjCode = ''"/>
                 <xsl:otherwise>
                     <xsl:sequence
-                        select="$nodes/nalsubcat:agricola/nalsubcat:subject[nalsubcat:code = $code]/nalsubcat:category"
+                        select="$nodes/nalsubcat:agricola/nalsubcat:subject[nalsubcat:code = $subjCode]/nalsubcat:category"
                     />
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-        <xsl:sequence select="$subjCode"/>
+        <xsl:sequence select="$subject_name"/>
     </xsl:function>
 
-
+    <!-- f:decodeMARCCountry 
     <xd:doc id="f:decodeMARCCountry" scope="component">
         <xd:desc>
             <xd:p><xd:b>Function: </xd:b>f:decodeMARCCountry</xd:p>
@@ -708,8 +695,37 @@
             </xsl:choose>
         </xsl:variable>
         <xsl:sequence select="$MARCcode"/>
+    </xsl:function>-->
+    
+    <!-- info:marcCountry -->
+    <xd:doc id="info:marcCountry" scope="component">
+        <xd:desc>
+            <xd:p><xd:b>Function: </xd:b>info:MARCCountry</xd:p>
+            <xd:p><xd:b>Usage: </xd:b>info:decodeMARCCountry($marcCountryCode)</xd:p>
+            <xd:p><xd:b>Purpose:</xd:b>Uses LC's countries.xml as lookup file to match MARC Country Code</xd:p>
+            <xd:p><xd:b>Returns:</xd:b> the proper state or country name from the controlfield[@tag='008']</xd:p>
+        </xd:desc>
+        <xd:b>parameters &amp; variables</xd:b>        
+        <xd:param name="controlField008-15-17">marcCountry code variable passes the two or three letter valued to the $marcCode parameter</xd:param>
+        <xd:variable name="country_name">variable declared from the stylesheet.</xd:variable>
+    </xd:doc>
+      <xsl:function name="info:marcCountry" as="xs:string" xmlns="info:lc/xmlns/codelist-v1">
+          <xsl:param name="controlField008-15-17" as="xs:string"/><!-- control field 008, position 15-17--> 
+        <xsl:variable name="country_name">
+            <xsl:variable name="nodes">
+                <xsl:copy-of select="document('https://www.loc.gov/standards/codelists/countries.xml')"/>
+            </xsl:variable>
+            <xsl:choose>
+                <xsl:when test="$controlField008-15-17='xx' or 'xx '"/>
+                <xsl:when test="$controlField008-15-17 = ''"/><!-- if empty, do not process --> 
+                <xsl:otherwise>
+                    <xsl:value-of select="$nodes/info:codelist/info:countries/info:country[info:code = $controlField008-15-17]/info:name"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:sequence select="$country_name"/>
     </xsl:function>
-
+    
     <!-- f:isoTwo2Lang -->
     <xd:doc scope="component">
         <xd:desc>

@@ -1,19 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
-    xmlns="http://www.loc.gov/mods/v3" xmlns:f="http://functions"
-    xmlns:marc="http://www.loc.gov/MARC21/slim"
-    xmlns:marccountry="http://www.local.gov/marc/countries" xmlns:mods="http://www.loc.gov/mods/v3"
-    xmlns:nalsubcat="http://nal-subject-category-codes" xmlns:saxon="http://saxon.sf.net/"
-    xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:xlink="http://www.w3.org/1999/xlink"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    exclude-result-prefixes="f marc marccountry nalsubcat saxon xd xlink xs xsi">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0" xmlns="http://www.loc.gov/mods/v3" xmlns:f="http://functions" xmlns:info="info:lc/xmlns/codelist-v1" xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:nalsubcat="http://nal-subject-category-codes" xmlns:saxon="http://saxon.sf.net/" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exclude-result-prefixes="f info marc nalsubcat saxon xd xlink xs xsi">
     <!-- includes -->
     <xsl:include href="NAL-MARC21slimUtils.xsl"/>
     <xsl:include href="commons/functions.xsl"/>
     <!-- outputs -->
-    <xsl:output encoding="UTF-8" indent="yes" method="xml" name="original"
-        saxon:next-in-chain="fix_characters.xsl"/>
+    <xsl:output encoding="UTF-8" indent="yes" method="xml" name="original" saxon:next-in-chain="fix_characters.xsl"/>
     <!-- whitespace control -->
     <xsl:strip-space elements="*"/>
 
@@ -21,11 +12,12 @@
     <!-- Maintenance note: For each revision, change the content of <recordInfo><recordOrigin> to reflect the new revision number.
 	MARC21slim2MODS3-7
 	┌ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┐ 
-	│  NAL Revisions (Revision 1.184) 20231222   |    
+	│  NAL Revisions (Revision 1.185) 20240102    |    
 	└ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┘ 	
 	┌ ━ ━ ━ ━ ━ ┐ 
 	│ MODS 3.7 │  
 	└ ━ ━ ━ ━ ━ ┘ 
+	Revision 1.185 - Revised function references authoritative resource https://www.loc.gov/standards/codelists/countries.xml  
     Revision 1.184 - Encodes publisher provided DOI URL into a valid URI value for 'anyURI'. 20231222 cm3
 	Revision 1.183 - An attribute node (displayLabel) cannot be created after a child of the containing elementResolved fatal erroor"Added <marc:datafield>. 20230615 cm3
     Revision 1.182 - An attribute node (nameTitleGroup) cannot be created after a child of the containing element. 20230615 cm3
@@ -3157,7 +3149,7 @@
                 <xsl:variable name="dateTime"
                     select="format-dateTime(current-dateTime(), '[M01]/[D01]/[Y0001] at [h1]:[m01] [P]')"/>
                 <xsl:value-of
-                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.184 20231222 cm3),'))"/>
+                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.185 20240102 cm3),'))"/>
                 <xsl:text>&#160;</xsl:text>
                 <xsl:value-of select="normalize-space(concat('Transformed on: ', $dateTime))"/>
             </recordOrigin>
@@ -7058,9 +7050,9 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xsl:matching-substring>
-                       <xsl:non-matching-substring>
-                           <xsl:value-of select="."/>  
-                       </xsl:non-matching-substring>
+                        <xsl:non-matching-substring>
+                            <xsl:value-of select="."/>  
+                        </xsl:non-matching-substring>
                     </xsl:analyze-string>
                 </url>
             </location>
@@ -7792,6 +7784,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
         <xsl:param name="controlField008"/>
         <xsl:param name="typeOf008"/>
         <xsl:variable name="dataField260c">
+            <!--1.184-->
             <xsl:call-template name="chopPunctuationStrings">
                 <xsl:with-param name="chopStrings"
                     select="marc:datafield[@tag = '260']/marc:subfield[@code = 'c']"/>
@@ -7802,44 +7795,21 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
         <xsl:variable name="originInfoShared">
             <!-- MARC Country Codes -->
             <place>
-                <xsl:analyze-string select="$controlField008"
-                    regex="\d{{6}}[a-z]\d+(\\{{2,4}}|\s{{2,4}})?(xx|[a-z]{{2,3}}).*">
-                    <xsl:matching-substring>
-                        <xsl:choose>
-                            <xsl:when test="contains(regex-group(2), 'xx')"/>
-                            <xsl:when test="matches(regex-group(2), '[a-z]{2,3}')">
-                                <!-- marccountry code -->
-                                <placeTerm>
-                                    <xsl:attribute name="type">code</xsl:attribute>
-                                    <xsl:attribute name="authority">marccountry</xsl:attribute>
-                                    <xsl:value-of select="regex-group(2)"/>
-                                </placeTerm>
-                                <!--1.167 -->
-                                <placeTerm>
-                                    <xsl:attribute name="type">text</xsl:attribute>
-                                    <xsl:value-of select="f:decodeMARCCountry(regex-group(2))"/>
-                                </placeTerm>
-                            </xsl:when>
-                        </xsl:choose>
-                    </xsl:matching-substring>
-                    <xsl:non-matching-substring>
-                        <!-- $MARCpublicationCode substring of controlfield 008 -->
-                        <xsl:variable name="MARCpublicationCode"
-                            select="normalize-space(substring($controlField008, 16, 3))"/>
-                        <xsl:if test="contains(regex-group(2), 'xx')"/>
-                        <xsl:if test="translate($MARCpublicationCode, '|', '')">
-                            <placeTerm>
-                                <xsl:attribute name="type">code</xsl:attribute>
-                                <xsl:attribute name="authority">marccountry</xsl:attribute>
-                                <xsl:value-of select="$MARCpublicationCode"/>
-                            </placeTerm>
-                            <placeTerm>
-                                <xsl:attribute name="type">text</xsl:attribute>
-                                <xsl:value-of select="f:decodeMARCCountry($MARCpublicationCode)"/>
-                            </placeTerm>
-                        </xsl:if>
-                    </xsl:non-matching-substring>
-                </xsl:analyze-string>
+               <!-- $controlfield008-15-17: Place of publication, production, or execution -->
+                <xsl:variable name="controlField008-15-17" select="normalize-space(substring($controlField008, 16, 3))"/>
+                <xsl:if test="contains(regex-group(2), 'xx')"/>
+                <xsl:if test="translate($controlField008-15-17, '|', '')">
+                    <placeTerm>
+                        <xsl:attribute name="type">code</xsl:attribute>
+                        <xsl:attribute name="authority">marccountry</xsl:attribute>
+                        <xsl:value-of select="$controlField008-15-17"/>
+                    </placeTerm>
+                    <!-- 1.185 -->
+                    <placeTerm>
+                        <xsl:attribute name="type">text</xsl:attribute>
+                        <xsl:value-of select="info:marcCountry($controlField008-15-17)"/>
+                    </placeTerm>
+                </xsl:if>
             </place>
             <!-- 1.177 for journal publisher to appear with article -->
             <xsl:for-each select="marc:datafield[@tag = '773']">
