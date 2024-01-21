@@ -556,7 +556,7 @@
                     </xd:li>
                     <xd:li>
                         <xd:i>3.<xd:ref name="info:marcCountry">info:marcCountry</xd:ref>
-                            <xd:note name="f:decodeMARCCountry" type="function">Revised f:decodeMARCCountry to reference  revised custom function to reference https://www.loc.gov/standards/codelists/countries.xml</xd:note></xd:i>
+                            <xd:note name="f:decodeMARCCountry" type="function">Revised f:decodeMARCCountry to reference https://www.loc.gov/standards/codelists/countries.xml</xd:note></xd:i>
                     </xd:li>
                     <xd:li>
                         <xd:i>4.<xd:ref name="f:f:isoTwo2Lang" type="function"/>f:isoTwo2Lang</xd:i>
@@ -581,6 +581,9 @@
                     </xd:li>
                     <xd:li>
                         <xd:i>11.<xd:ref name="f:isNumber" type="function"/>f:isNumber</xd:i>
+                    </xd:li>
+                    <xd:li>
+                        <xd:i>12.<xd:ref name="f:" type="function"/>f:modsTotalPages</xd:i>
                     </xd:li>
                 </xd:ul>
             </xd:p>
@@ -665,7 +668,7 @@
         <xsl:sequence select="$subject_name"/>
     </xsl:function>
 
-    <!-- f:decodeMARCCountry 
+     <!--f:decodeMARCCountry--> 
     <xd:doc id="f:decodeMARCCountry" scope="component">
         <xd:desc>
             <xd:p><xd:b>Function: </xd:b>f:decodeMARCCountry</xd:p>
@@ -695,7 +698,7 @@
             </xsl:choose>
         </xsl:variable>
         <xsl:sequence select="$MARCcode"/>
-    </xsl:function>-->
+    </xsl:function>
     
     <!-- info:marcCountry -->
     <xd:doc id="info:marcCountry" scope="component">
@@ -713,10 +716,10 @@
           <xsl:param name="controlField008-15-17" as="xs:string"/><!-- control field 008, position 15-17--> 
         <xsl:variable name="country_name">
             <xsl:variable name="nodes">
-                <xsl:copy-of select="document('https://www.loc.gov/standards/codelists/countries.xml')"/>
+                <xsl:copy-of select="document('http://www.loc.gov/standards/codelists/countries.xml')"/>
             </xsl:variable>
             <xsl:choose>
-                <xsl:when test="$controlField008-15-17='xx' or 'xx '"/>
+<!--                <xsl:when test="$controlField008-15-17='xx' or 'xx '"/>-->
                 <xsl:when test="$controlField008-15-17 = ''"/><!-- if empty, do not process --> 
                 <xsl:otherwise>
                     <xsl:value-of select="$nodes/info:codelist/info:countries/info:country[info:code = $controlField008-15-17]/info:name"/>
@@ -926,6 +929,24 @@
         <xsl:param name="value" as="xs:anyAtomicType?"/>
         <xsl:sequence select="string(abs(number($value))) != 'NaN'"/>
     </xsl:function>
-
-
+    <xd:doc scope="component">
+        <xd:desc>
+            <xd:p><xd:b>Function: </xd:b>f:modsTotalPages</xd:p>
+            <xd:p><xd:b>Usage: </xd:b>f:modsTotalPages([xpath/value for first page], [xpath/value for last page])</xd:p>
+            <xd:p><xd:b>Purpose: </xd:b>Calculate the total page count if the first and last pages are present and are integers</xd:p>
+        </xd:desc>
+        <xd:param name="fpage">value or XPath for the first page</xd:param>
+        <xd:param name="lpage">value or XPath for the last page</xd:param>
+    </xd:doc>
+    <xsl:function name="f:modsTotalPgs">
+        <xsl:param name="fpage"/>
+        <xsl:param name="lpage"/>
+        <xsl:if test="(string(number($fpage)) != 'NaN' and string(number($lpage)) != 'NaN')">
+            <total>
+                <xsl:value-of select="number($lpage) - number($fpage) + 1"/>
+            </total>
+        </xsl:if>
+    </xsl:function>
+    
+   
 </xsl:stylesheet>

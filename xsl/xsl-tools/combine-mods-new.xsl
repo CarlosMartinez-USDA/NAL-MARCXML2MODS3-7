@@ -22,7 +22,7 @@
     <xsl:template match="/">  
                 <xsl:result-document exclude-result-prefixes="xd xlink xs xsi" 
                     method="xml" version="1.0" encoding="UTF-8" indent="yes" 
-                    format="combine" href="{substring-before(base-uri(), tokenize(base-uri(), '/')[last()])}/recompile/{replace(base-uri(), '(.*/)(.*)(\.xml)', '$2')}.mods.xml"> 
+                    format="combine" href="{substring-before(base-uri(), tokenize(base-uri(), '/')[last()])}/recompile/N-{replace(base-uri(), '(.*/)(.*)(\.xml)', '$2')}.mods.xml"> 
                     <modsCollection xmlns="http://www.loc.gov/mods/v3" 
                         xmlns:mods="http://www.loc.gov/mods/v3"
                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

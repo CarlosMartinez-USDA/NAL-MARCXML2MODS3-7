@@ -20,7 +20,8 @@
             <xd:p>*For information on constructing the collections-index.xml, please refer to the
                 README.md</xd:p>
         </xd:desc>
-        <xd:param name="fileName">
+    </xd:doc>
+<!--        <xd:param name="fileName">
             <xd:p>Tokenizes forward slashes found within the base-uri()'s file/directory path
                 structure. Upon reaching the last forward slash, the expath processes the
                 instruction subract 4 directories backwards. This original file name from part fo
@@ -34,20 +35,17 @@
                 file.</xd:p>
         </xd:param>
         <xd:param name="workingDir"/>
-    </xd:doc>
+    </xd:doc>-->
     <xsl:template match="/">
         <xsl:result-document exclude-result-prefixes="xd xlink xs xsi" method="xml" version="1.0"
             encoding="UTF-8" indent="yes" format="combine"
             href="{substring-before(base-uri(),tokenize(base-uri(),'/')[last()])}/recompile/{replace(base-uri(),'(.*/)(.*)(\.xml)','$2')}.mods.xml">
             <modsCollection xmlns="http://www.loc.gov/mods/v3"
                 xmlns:mods="http://www.loc.gov/mods/v3"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
                 xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-7.xsd">
-                <xsl:copy-of copy-namespaces="no" select="document(collection/doc/@href)//mods:mods"
-                />
+                <xsl:copy-of copy-namespaces="no" select="document(collection/doc/@href)/mods:modsCollection/mods:mods"/>
             </modsCollection>
         </xsl:result-document>
-        <!--   </xsl:otherwise>
-        </xsl:choose>     -->
     </xsl:template>
 </xsl:stylesheet>

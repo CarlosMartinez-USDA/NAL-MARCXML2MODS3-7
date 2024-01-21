@@ -2,7 +2,6 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0" xmlns="http://www.loc.gov/mods/v3" xmlns:f="http://functions" xmlns:info="info:lc/xmlns/codelist-v1" xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:nalsubcat="http://nal-subject-category-codes" xmlns:saxon="http://saxon.sf.net/" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exclude-result-prefixes="f info marc nalsubcat saxon xd xlink xs xsi">
     <!-- includes -->
     <xsl:include href="NAL-MARC21slimUtils.xsl"/>
-    <xsl:include href="commons/functions.xsl"/>
     <!-- outputs -->
     <xsl:output encoding="UTF-8" indent="yes" method="xml" name="original" saxon:next-in-chain="fix_characters.xsl"/>
     <!-- whitespace control -->
@@ -12,12 +11,13 @@
     <!-- Maintenance note: For each revision, change the content of <recordInfo><recordOrigin> to reflect the new revision number.
 	MARC21slim2MODS3-7
 	┌ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┐ 
-	│  NAL Revisions (Revision 1.185) 20240102    |    
+	│  NAL Revisions (Revision 1.186) 20240118    |    
 	└ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┘ 	
 	┌ ━ ━ ━ ━ ━ ┐ 
 	│ MODS 3.7 │  
 	└ ━ ━ ━ ━ ━ ┘ 
-	Revision 1.185 - Revised function references authoritative resource https://www.loc.gov/standards/codelists/countries.xml  
+	Revision 1.186 - Elsevier's electronic page numbers. 20240118 cm3
+	Revision 1.185 - Revised function references authoritative resource https://www.loc.gov/standards/codelists/countries.xml. 20240102 cm3  
     Revision 1.184 - Encodes publisher provided DOI URL into a valid URI value for 'anyURI'. 20231222 cm3
 	Revision 1.183 - An attribute node (displayLabel) cannot be created after a child of the containing elementResolved fatal erroor"Added <marc:datafield>. 20230615 cm3
     Revision 1.182 - An attribute node (nameTitleGroup) cannot be created after a child of the containing element. 20230615 cm3
@@ -253,7 +253,7 @@
             select="substring-before(base-uri(), tokenize(base-uri(), '/')[last()])"/>
         <xsl:result-document encoding="UTF-8" version="1.0" method="xml" media-type="text/xml"
             indent="yes" format="original"
-            href="{$workingDirectory}/after/mods/N-{$originalFile}_{position()}.xml">
+            href="{$workingDirectory}/mods/N-{$originalFile}_{position()}.xml">
             <xsl:choose>
                 <xsl:when test="//marc:collection/marc:record">
                     <modsCollection xmlns="http://www.loc.gov/mods/v3"
@@ -2412,38 +2412,25 @@
                                             <xsl:choose>
                                                 <!-- extent (pages) -->
                                                 <xsl:when
-                                                  test="matches(substring-after(regex-group(4), 'p'), '(\d+\.e\d+)\-(\d+\.e\d+)')">
-                                                  <!--   Elsevier's electronic page numbers -->
-                                                  <xsl:variable name="eStartPage"
-                                                  select="replace(substring-after(regex-group(4), 'p'), '(\d+\.e\d+)\-(\d+\.e\d+)', '$1')"/>
-                                                  <xsl:variable name="eEndPage"
-                                                  select="replace(substring-after(regex-group(4), 'p'), '(\d+\.e\d+)\-(\d+\.e\d+)', '$2')"/>
-                                                  <xsl:variable name="eStartPageForTotal"
-                                                  select="replace($eStartPage, '(\d+\.e)(\d+)', '$2')"/>
-                                                  <xsl:variable name="eEndPageForTotal"
-                                                  select="replace($eEndPage, '(\d+\.e)(\d+)', '$2')"/>
+                                                  test="matches(substring-after(regex-group(4), 'p.'), '(\d+\.e\d+)\-(\d+\.e\d+)')">
+                                                  <!-- 1.186 -->
+                                                  <xsl:variable name="eStartPage" select="substring-before(substring-after(regex-group(4), 'p.'), '-')"/>
+                                                  <xsl:variable name="eEndPage" select="substring-after(substring-after(regex-group(4), 'p'), '-')"/>                                                  
+                                                  <xsl:variable name="eStartPageForTotal" select="replace($eStartPage, '(\S+)(\d+)','$2')"/>
+                                                  <xsl:variable name="eEndPageForTotal" select="replace($eEndPage, '(\S+)(\d+)','$2')"/>
                                                   <extent unit="pages">
                                                   <start>
                                                   <xsl:value-of select="$eStartPage"/>
                                                   </start>
                                                   <end>
                                                   <xsl:value-of select="$eEndPage"/>
-                                                  </end>
-                                                  <xsl:choose>
-                                                  <xsl:when
-                                                  test="not(f:calculateTotalPgs($eStartPageForTotal, $eEndPageForTotal) castable as xs:double)"/>
-                                                  <xsl:otherwise>
-                                                  <xsl:if
-                                                  test="$eStartPageForTotal >= $eStartPageForTotal">
+                                                  </end>                                                  
+                                                  <xsl:if test="(f:modsTotalPgs($eStartPageForTotal, $eEndPageForTotal) castable as xs:double) and ($eEndPageForTotal >= $eStartPageForTotal)">
                                                   <total>
-                                                  <xsl:value-of
-                                                  select="translate(f:calculateTotalPgs($eStartPageForTotal, $eStartPageForTotal), $alpha, '')"
-                                                  />
+                                                  <xsl:value-of select="f:modsTotalPgs($eStartPageForTotal, $eEndPageForTotal)"/>
                                                   </total>
-                                                  </xsl:if>
-                                                  </xsl:otherwise>
-                                                  </xsl:choose>
-                                                  </extent>
+                                                </xsl:if>
+                                                 </extent>
                                                 </xsl:when>
                                                 <xsl:when
                                                   test="matches(substring-after(regex-group(4), 'p.'), '\d+\-\d+')">
@@ -2460,12 +2447,12 @@
                                                   </end>
                                                   <xsl:choose>
                                                   <xsl:when
-                                                  test="not(f:calculateTotalPgs($startPage, $endPage) castable as xs:double)"/>
+                                                  test="not(f:modsTotalPgs($startPage, $endPage) castable as xs:double)"/>
                                                   <xsl:otherwise>
                                                   <xsl:if test="$endPage >= $startPage">
                                                   <total>
                                                   <xsl:value-of
-                                                  select="translate(f:calculateTotalPgs($startPage, $endPage), $alpha, '')"
+                                                  select="translate(f:modsTotalPgs($startPage, $endPage), $alpha, '')"
                                                   />
                                                   </total>
                                                   </xsl:if>
@@ -3149,7 +3136,7 @@
                 <xsl:variable name="dateTime"
                     select="format-dateTime(current-dateTime(), '[M01]/[D01]/[Y0001] at [h1]:[m01] [P]')"/>
                 <xsl:value-of
-                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.185 20240102 cm3),'))"/>
+                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.186 20240118 cm3),'))"/>
                 <xsl:text>&#160;</xsl:text>
                 <xsl:value-of select="normalize-space(concat('Transformed on: ', $dateTime))"/>
             </recordOrigin>
@@ -7038,8 +7025,8 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                             </xsl:call-template>
                         </xsl:attribute>
                     </xsl:if>
-                    <!-- 1.184 -->
-                    <xsl:analyze-string select="marc:subfield[@code = 'u']" regex="^(https?://)(dx.)?(doi.org)/(10\.\d+)/(\S+)\s?$">
+                    <xsl:for-each select="marc:subfield[@code='u']">                    <!-- 1.184 -->
+                        <xsl:analyze-string select="marc:subfield[@code = 'u']" regex="^(https?://)(dx.)?(doi.org)/(10\.\d+)/(\S+)\s?$">
                         <xsl:matching-substring>
                             <xsl:choose>
                                 <xsl:when test="matches(regex-group(5), '\d+\-\d+X?(%28|\()\d+(%29|\))\d+(%5b|\[)\S+(%5d|\])2\.0\.CO;2')">
@@ -7054,6 +7041,8 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                             <xsl:value-of select="."/>  
                         </xsl:non-matching-substring>
                     </xsl:analyze-string>
+                        <xsl:value-of select="."/> 
+                    </xsl:for-each>
                 </url>
             </location>
         </xsl:if>
@@ -7768,7 +7757,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
     </xsl:template>
 
     <xd:doc>
-        <xd:desc> originInfo</xd:desc>
+        <xd:desc> originInfo </xd:desc>
         <xd:param name="marcLeader6"/>
         <xd:param name="marcLeader7"/>
         <xd:param name="marcLeader19"/>
@@ -7797,8 +7786,9 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
             <place>
                <!-- $controlfield008-15-17: Place of publication, production, or execution -->
                 <xsl:variable name="controlField008-15-17" select="normalize-space(substring($controlField008, 16, 3))"/>
-                <xsl:if test="contains(regex-group(2), 'xx')"/>
-                <xsl:if test="translate($controlField008-15-17, '|', '')">
+                <xsl:choose>
+                    <xsl:when test="contains($controlField008-15-17, 'xx')"/>
+                    <xsl:when test="translate($controlField008-15-17, '|', '')">
                     <placeTerm>
                         <xsl:attribute name="type">code</xsl:attribute>
                         <xsl:attribute name="authority">marccountry</xsl:attribute>
@@ -7809,7 +7799,33 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                         <xsl:attribute name="type">text</xsl:attribute>
                         <xsl:value-of select="info:marcCountry($controlField008-15-17)"/>
                     </placeTerm>
-                </xsl:if>
+                </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:if test="translate($controlField008-15-17, '|', '')">
+                        <xsl:analyze-string select="$controlField008"
+                            regex="\d{{6}}[a-z]\d+(\\{{2,4}}|\s{{2,4}})?(xx|[a-z]{{2,3}}).*">
+                            <xsl:matching-substring>
+                                <xsl:choose>
+                                    <xsl:when test="contains(regex-group(2), 'xx')"/>
+                                    <xsl:when test="matches(regex-group(2), '[a-z]{2,3}')">
+                                        <!-- marc country code -->
+                                        <placeTerm>
+                                            <xsl:attribute name="type">code</xsl:attribute>
+                                            <xsl:attribute name="authority">marccountry</xsl:attribute>
+                                            <xsl:value-of select="regex-group(2)"/>
+                                        </placeTerm>
+                                        <!--1.167 -->
+                                        <placeTerm>
+                                            <xsl:attribute name="type">text</xsl:attribute>
+                                            <xsl:value-of select="f:decodeMARCCountry(regex-group(2))"/>
+                                        </placeTerm>                                        
+                                    </xsl:when>
+                                </xsl:choose>
+                            </xsl:matching-substring>
+                        </xsl:analyze-string>
+                        </xsl:if>
+                    </xsl:otherwise>
+                </xsl:choose>
             </place>
             <!-- 1.177 for journal publisher to appear with article -->
             <xsl:for-each select="marc:datafield[@tag = '773']">
@@ -7851,8 +7867,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                 <xsl:when
                     test="($controlField008-6 = 'e' or $controlField008-6 = 'p' or $controlField008-6 = 'r' or $controlField008-6 = 's' or $controlField008-6 = 't') and not($marcLeader6 = 'd' or $marcLeader6 = 'f' or $marcLeader6 = 'p' or $marcLeader6 = 't')">
                     <!-- use substring to limit for dates-->
-                    <xsl:variable name="NALcontrolfield008"
-                        select="substring(marc:controlfield[@tag = '008'], 1, 15)"/>
+                    <xsl:variable name="NALcontrolfield008" select="substring(marc:controlfield[@tag = '008'], 1, 15)"/>
                     <xsl:choose>
                         <xsl:when test="matches($NALcontrolfield008, '(\d+)(\w)(.*)')">
                             <xsl:analyze-string select="substring($NALcontrolfield008, 1, 15)"
