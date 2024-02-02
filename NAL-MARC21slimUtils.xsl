@@ -100,7 +100,7 @@
         <xd:param name="str"/>
         <xd:param name="pcodes"/>
     </xd:doc>
-    <xsl:function name="f:stripPunctuation">
+    <xsl:function name="f:stripPunctuation" xmlns:f="http://functions">
         <xsl:param name="str"/>
         <xsl:param name="pcodes"/>
         <xsl:variable name="punctuation">
@@ -151,7 +151,7 @@
         <xd:param name="datafield"/>
         <xd:param name="codes"/>
     </xd:doc>
-    <xsl:function name="f:subfieldSelect">
+    <xsl:function name="f:subfieldSelect" xmlns:f="http://functions">
         <xsl:param name="datafield" as="node()"/>
         <xsl:param name="codes"/>
         <!-- Selects and prints out datafield -->
@@ -583,7 +583,10 @@
                         <xd:i>11.<xd:ref name="f:isNumber" type="function"/>f:isNumber</xd:i>
                     </xd:li>
                     <xd:li>
-                        <xd:i>12.<xd:ref name="f:" type="function"/>f:modsTotalPages</xd:i>
+                        <xd:i>12.<xd:ref name="f:modsTotalPages" type="function"/>f:modsTotalPages</xd:i>
+                    </xd:li>
+                    <xd:li>
+                        <xd:i>13.<xd:ref name="f:percentEncode" type="function"/>f:percentEncode</xd:i>
                     </xd:li>
                 </xd:ul>
             </xd:p>
@@ -594,10 +597,8 @@
     <xd:doc id="f:add-namespace-prefix" scope="component">
         <xd:desc>
             <xd:p><xd:b>Function: </xd:b>f:add-namespace-prefix</xd:p>
-            <xd:p><xd:b>Usage: </xd:b>f:add-namespace-prefix([nodes],[namespace to add],[added
-                namespace prefix])</xd:p>
-            <xd:p><xd:b>Purpose: </xd:b>Calculate the total page count if the first and last pages
-                are present and are integers</xd:p>
+            <xd:p><xd:b>Usage: </xd:b>f:add-namespace-prefix([nodes],[namespace to add],[added namespace prefix])</xd:p>
+            <xd:p><xd:b>Purpose: </xd:b>Calculate the total page count if the first and last pages are present and are integers</xd:p>
         </xd:desc>
         <xd:param name="elements">the nodes to change the element prefix</xd:param>
         <xd:param name="add-namespace">declare no namespace</xd:param>
@@ -626,8 +627,7 @@
                     <xsl:document>
                         <xsl:sequence select="
                                 f:add-namespace-prefix(
-                                $element/node(), $add-namespace, $add-prefix)"
-                        />
+                                $element/node(), $add-namespace, $add-prefix)"/>
                     </xsl:document>
                 </xsl:when>
                 <xsl:otherwise>
@@ -635,7 +635,6 @@
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:for-each>
-
     </xsl:function>
 
 
@@ -718,13 +717,14 @@
             <xsl:variable name="nodes">
                 <xsl:copy-of select="document('http://www.loc.gov/standards/codelists/countries.xml')"/>
             </xsl:variable>
-            <xsl:choose>
-<!--                <xsl:when test="$controlField008-15-17='xx' or 'xx '"/>-->
-                <xsl:when test="$controlField008-15-17 = ''"/><!-- if empty, do not process --> 
-                <xsl:otherwise>
-                    <xsl:value-of select="$nodes/info:codelist/info:countries/info:country[info:code = $controlField008-15-17]/info:name"/>
-                </xsl:otherwise>
-            </xsl:choose>
+          <xsl:choose>
+              <xsl:when test="$controlField008-15-17 = ''"/><!-- if empty, do not process --> 
+              <xsl:otherwise>
+                  <xsl:value-of
+                      select="$nodes/info:codelist/info:countries/info:country[info:code = $controlField008-15-17]/info:name"
+                  />
+              </xsl:otherwise>
+          </xsl:choose>
         </xsl:variable>
         <xsl:sequence select="$country_name"/>
     </xsl:function>
@@ -737,9 +737,37 @@
             <xd:p><xd:b>Purpose: </xd:b>Convert ISO 639-2b three-letter codes into the corresponding
                 languages.</xd:p>
         </xd:desc>
+        <xd:param name="langParam">three-letter language code to match against</xd:param>
+    </xd:doc>
+    <xsl:function name="info:langCode" as="xs:string" xmlns="info:lc/xmlns/codelist-v1">
+        <xsl:param name="langParam"/>
+        <xsl:variable name="langVar">
+            <xsl:variable name="nodes">
+                <xsl:copy-of select="document('https://www.loc.gov/standards/codelists/languages.xml')"/>
+            </xsl:variable>
+            <xsl:choose>
+                <xsl:when test="$langParam = ''"/>
+                <xsl:otherwise>
+                    <xsl:sequence
+                        select="$nodes/info:codelist/info:languages/info:language[info:code = $langParam]/info:name"
+                    />
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:sequence select="$langVar"/>
+    </xsl:function>
+    
+    <!-- f:isoTwo2Lang -->
+    <xd:doc scope="component">
+        <xd:desc>
+            <xd:p><xd:b>Function: </xd:b>f:isoTwo2Lang</xd:p>
+            <xd:p><xd:b>Usage: </xd:b>f:isoTwo2Lang(iso 639-2b code)</xd:p>
+            <xd:p><xd:b>Purpose: </xd:b>Convert ISO 639-2b three-letter codes into the corresponding
+                languages.</xd:p>
+        </xd:desc>
         <xd:param name="iso_639-2">three-letter language code to match against</xd:param>
     </xd:doc>
-    <xsl:function name="f:isoTwo2Lang" as="xs:string">
+    <xsl:function name="f:isoTwo2Lang" as="xs:string" xmlns:f="http://functions">
         <xsl:param name="iso_639-2"/>
         <xsl:variable name="iso639-2b">
             <xsl:variable name="nodes">
@@ -790,7 +818,7 @@
         </xd:desc>
         <xd:param name="arg"/>
     </xd:doc>
-    <xsl:function name="f:capitalize-first" as="xs:string?">
+    <xsl:function name="f:capitalize-first" as="xs:string?" xmlns:f="http://functions">
         <xsl:param name="arg" as="xs:string?"/>
         <xsl:sequence select="
                 concat(upper-case(substring($arg, 1, 1)),
@@ -811,7 +839,7 @@
         </xd:desc>
         <xd:param name="arg"/>
     </xd:doc>
-    <xsl:function name="f:sentence-case" as="xs:string?">
+    <xsl:function name="f:sentence-case" as="xs:string?" xmlns:f="http://functions">
         <xsl:param name="arg" as="xs:string?"/>
         <xsl:sequence select="
                 concat(upper-case(substring($arg, 1, 1)),
@@ -835,7 +863,7 @@
         </xd:desc>
         <xd:param name="arg"/>
     </xd:doc>
-    <xsl:function name="f:proper-case">
+    <xsl:function name="f:proper-case" xmlns:f="http://functions">
         <xsl:param name="arg" as="xs:string?"/>
         <xsl:variable name="otherChars" as="item()*" select="f:substring-before-match($arg,'\-|[A-Z].[A-Z].|\s')"/>
         <xsl:variable name="white-space" as="xs:string" select="(' ')"/>
@@ -857,7 +885,7 @@
         <xd:param name="arg"/>
         <xd:param name="regex"/>
     </xd:doc>
-    <xsl:function name="f:substring-before-match" as="xs:string">
+    <xsl:function name="f:substring-before-match" as="xs:string" xmlns:f="http://functions">
         <xsl:param name="arg" as="xs:string?"/>
         <xsl:param name="regex" as="xs:string"/>
         <xsl:sequence select="tokenize($arg, $regex)[1]"/>
@@ -879,7 +907,7 @@
         </xd:desc>
          <xd:param name="args"/>
     </xd:doc>
-        <xsl:function name="f:nameIdentifier" as="xs:string">
+    <xsl:function name="f:nameIdentifier" as="xs:string" xmlns:f="http://functions">
             <xsl:param name="args" as="xs:string"/>
           <!--  <xsl:choose>
                 <xsl:when test=". =''"/>
@@ -916,7 +944,7 @@
               <!-- </xsl:for-each>-->
     </xsl:function>
     
-    
+    <!-- f:isNumber -->
     <xd:doc>
         <xd:desc>
             <xd:p><xd:b>Function: </xd:b>f:isNumber</xd:p>
@@ -925,10 +953,12 @@
             <xd:p><xd:b>Returns: </xd:b>True or False</xd:p></xd:desc>
         <xd:param name="value"/>
     </xd:doc>
-    <xsl:function name="f:isNumber" as="xs:boolean">
+    <xsl:function name="f:isNumber" as="xs:boolean" xmlns:f="http://functions">
         <xsl:param name="value" as="xs:anyAtomicType?"/>
         <xsl:sequence select="string(abs(number($value))) != 'NaN'"/>
     </xsl:function>
+    
+    <!-- f:modsTotalPages -->
     <xd:doc scope="component">
         <xd:desc>
             <xd:p><xd:b>Function: </xd:b>f:modsTotalPages</xd:p>
@@ -938,7 +968,7 @@
         <xd:param name="fpage">value or XPath for the first page</xd:param>
         <xd:param name="lpage">value or XPath for the last page</xd:param>
     </xd:doc>
-    <xsl:function name="f:modsTotalPgs">
+    <xsl:function name="f:modsTotalPgs" xmlns:f="http://functions">
         <xsl:param name="fpage"/>
         <xsl:param name="lpage"/>
         <xsl:if test="(string(number($fpage)) != 'NaN' and string(number($lpage)) != 'NaN')">
@@ -946,6 +976,25 @@
                 <xsl:value-of select="number($lpage) - number($fpage) + 1"/>
             </total>
         </xsl:if>
+    </xsl:function>
+    
+    <!-- f:percentEncode -->
+    <xd:doc>
+        <xd:desc>
+            <xd:p><xd:b>Function: </xd:b>f:percentEncode</xd:p>
+            <xd:p><xd:b>Usage: </xd:b>f:percentEncode($uri parameter])</xd:p>
+            <xd:p><xd:b>Purpose: </xd:b>When the $uri parameter contains brackets, they are percent encoded to avoid invalid uri errors.</xd:p>
+        </xd:desc>
+        
+        <xd:param name="uri"/>
+    </xd:doc>
+    <xsl:function name="f:percentEncode" xmlns:f="http://functions">
+        <xsl:param name="uri"/>
+        <xsl:variable name="sub1" select="replace($uri, '\[','%5B')"/>
+        <xsl:variable name="sub2" select="replace($sub1, '\]','%5D')"/>
+        <xsl:sequence select="if (contains($uri, '[') or (contains($uri, ']')))
+            then ($sub2) 
+            else $uri"/>
     </xsl:function>
     
    
