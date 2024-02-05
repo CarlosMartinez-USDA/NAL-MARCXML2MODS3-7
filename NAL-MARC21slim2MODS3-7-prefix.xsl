@@ -2,19 +2,22 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0" xmlns="http://www.loc.gov/mods/v3" xmlns:f="http://functions" xmlns:info="info:lc/xmlns/codelist-v1" xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:nalsubcat="http://nal-subject-category-codes" xmlns:saxon="http://saxon.sf.net/" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exclude-result-prefixes="f info marc nalsubcat saxon xd xlink xs xsi">
     <!-- includes -->
     <xsl:include href="NAL-MARC21slimUtils.xsl"/>
+    <xsl:include href="remove_ending_punctuation.xsl"/>
     <!-- outputs -->
     <xsl:output encoding="UTF-8" indent="yes" method="xml" name="original" saxon:next-in-chain="fix_characters.xsl"/>
     <!-- whitespace control -->
     <xsl:strip-space elements="*"/>
     
     <!-- Maintenance note: For each revision, change the content of <recordInfo><recordOrigin> to reflect the new revision number.
-	MARC21slim2MODS3-7
+	NAL-MARC21slim2MODS3-7-prefix.xsl
 	┌ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┐ 
-	│  NAL Revisions (Revision 1.186) 20240118    |    
+	│  NAL Revisions (Revision 1.189) 20240202    |    
 	└ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┘ 	
 	┌ ━ ━ ━ ━ ━ ┐ 
 	│ MODS 3.7 │  
 	└ ━ ━ ━ ━ ━ ┘ 
+	Revision 1.189 - Added if test to subject name/term templates(i.e., 600-653) in order to prevent attribute creation error. 20240202 cm3
+	Revision 1.188 - Created and added remove_ending_punctuation.xsl to produce a cleaner result document 20240202 cm3
 	Revision 1.187 - Revised function references authoritative resource https://www.loc.gov/standards/codelists/languages.xml. 20240201 cm3  
 	Revision 1.186 - Elsevier's electronic page numbers. 20240118 cm3
 	Revision 1.185 - Revised function references authoritative resource https://www.loc.gov/standards/codelists/countries.xml. 20240102 cm3  
@@ -1298,7 +1301,7 @@
                             marc:datafield[@tag = '337'][marc:subfield[@code = '6']]/child::*[@code = 'a'] |
                             marc:datafield[@tag = '338'][marc:subfield[@code = '6']]/child::*[@code = 'a'] |
                             marc:datafield[@tag = '300'][marc:subfield[@code = '6']] |
-                            marc:datafield[@tag = '856'][marc:subfield[@code = '6']]/child::*[@code = 'q']">
+                            marc:datafield[@tag = ''][marc:subfield[@code = '6']]/child::*[@code = 'q']">
                         <physicalDescription>
                             <!--  880 field -->
                             <xsl:choose>
@@ -2333,7 +2336,6 @@
                                             </xsl:call-template>
                                         </publisher>
                                     </xsl:for-each>-->
-
                                 <xsl:for-each select="marc:subfield[@code = 'b']">
                                     <edition>
                                         <xsl:apply-templates/>
@@ -3130,10 +3132,11 @@
                 <xsl:variable name="dateTime"
                     select="format-dateTime(current-dateTime(), '[M01]/[D01]/[Y0001] at [h1]:[m01] [P]')"/>
                 <xsl:value-of
-                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.187 20240201 cm3),'))"/>
+                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.189 20240202 cm3),'))"/>
                 <xsl:text>&#160;</xsl:text>
                 <xsl:value-of select="normalize-space(concat('Transformed on: ', $dateTime))"/>
             </recordOrigin>
+            
             <!--040-->
             <xsl:for-each select="marc:datafield[@tag = '040']/marc:subfield[@code = 'b']">
                 <languageOfCataloging>
@@ -3889,7 +3892,6 @@
             <xsl:if test="@ind2 != ' '">
                 <xsl:if test="@ind2 != '8'">
                     <xsl:if test="@ind2 != '9'">
-<!--                        <xsl:element name="{name()}">-->
                             <xsl:attribute name="authority">
                                 <xsl:choose>
                                     <xsl:when test="@ind2 = '0'">lcsh</xsl:when>
@@ -3904,7 +3906,6 @@
                                     </xsl:when>
                                 </xsl:choose>
                             </xsl:attribute>
-                        <!--</xsl:element>-->
                     </xsl:if>
                 </xsl:if>
             </xsl:if>
@@ -6216,6 +6217,8 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
         <xd:desc>name createSubNameFrom600</xd:desc>
     </xd:doc>
     <xsl:template name="createSubNameFrom600">
+        <!-- 1.189 -->
+        <xsl:if test="marc:datafield[@tag = '600']">
         <subject>
             <xsl:call-template name="xxx880"/>
             <xsl:call-template name="subjectAuthority"/>
@@ -6252,15 +6255,20 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
             </xsl:if>
             <xsl:call-template name="subjectAnyOrder"/>
         </subject>
+        </xsl:if>
     </xsl:template>
 
     <xd:doc>
         <xd:desc>name createSubNameFrom610</xd:desc>
     </xd:doc>
     <xsl:template name="createSubNameFrom610">
+        <!-- 1.189 -->
+        <xsl:if test="marc:datafield[@tag='610']">
         <subject>
+            <xsl:attribute name="authority">
             <xsl:call-template name="xxx880"/>
             <xsl:call-template name="subjectAuthority"/>
+            </xsl:attribute>
             <!-- 1.122 -->
             <xsl:apply-templates select="marc:subfield[@code = '0']" mode="xlink"/>
             <name type="corporate">
@@ -6303,12 +6311,15 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
             </xsl:if>
             <xsl:call-template name="subjectAnyOrder"/>
         </subject>
+        </xsl:if>
     </xsl:template>
 
     <xd:doc>
         <xd:desc>name createSubNameFrom611</xd:desc>
     </xd:doc>
     <xsl:template name="createSubNameFrom611">
+        <!-- 1.189 -->
+        <xsl:if test="marc:datafield[@tag = '611']">
         <subject>
             <xsl:call-template name="xxx880"/>
             <xsl:call-template name="subjectAuthority"/>
@@ -6348,12 +6359,15 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
             </xsl:if>
             <xsl:call-template name="subjectAnyOrder"/>
         </subject>
+        </xsl:if>
     </xsl:template>
 
     <xd:doc>
         <xd:desc>name createSubTitleFrom630</xd:desc>
     </xd:doc>
     <xsl:template name="createSubTitleFrom630">
+        <!-- 1.189 -->
+        <xsl:if test="marc:datafield[@tag = '630']">
         <subject>
             <xsl:call-template name="xxx880"/>
             <xsl:call-template name="subjectAuthority"/>
@@ -6377,6 +6391,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
             </titleInfo>
             <xsl:call-template name="subjectAnyOrder"/>
         </subject>
+        </xsl:if>
     </xsl:template>
 
 
@@ -6384,6 +6399,8 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
         <xd:desc>name createSubChronFrom648</xd:desc>
     </xd:doc>
     <xsl:template name="createSubChronFrom648">
+        <!-- 1.189 -->
+        <xsl:if test="marc:datafield[@tag='648']">
         <subject>
             <xsl:call-template name="xxx880"/>
             <xsl:if test="marc:subfield[@ind2='7'][@code='2']">
@@ -6404,12 +6421,15 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
             </temporal>
             <xsl:call-template name="subjectAnyOrder"/>
         </subject>
+        </xsl:if>
     </xsl:template>
 
     <xd:doc>
         <xd:desc>name createSubTopFrom650</xd:desc>
     </xd:doc>
     <xsl:template name="createSubTopFrom650">
+        <!-- 1.189 -->
+        <xsl:if test="marc:datafield[@tag='650']">
         <subject>
             <xsl:call-template name="xxx880"/>
             <xsl:call-template name="subjectAuthority"/>
@@ -6426,12 +6446,15 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
             </topic>
             <xsl:call-template name="subjectAnyOrder"/>
         </subject>
+        </xsl:if>
     </xsl:template>
 
     <xd:doc>
         <xd:desc>name createSubGeoFrom651</xd:desc>
     </xd:doc>
     <xsl:template name="createSubGeoFrom651">
+        <!-- 1.189 -->
+        <xsl:if test="marc:datafield[@tag='651']">
         <subject>
             <xsl:call-template name="xxx880"/>
             <xsl:call-template name="subjectAuthority"/>
@@ -6446,14 +6469,14 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
             </xsl:for-each>
             <xsl:call-template name="subjectAnyOrder"/>
         </subject>
+        </xsl:if>
     </xsl:template>
 
     <xd:doc>
         <xd:desc>name createSubFrom653</xd:desc>
     </xd:doc>
     <xsl:template name="createSubFrom653">
-
-        <xsl:if test="@ind2 = ' '">
+            <xsl:if test="marc:datafield[@tag='653'][@ind2 = ' ']">
             <subject>
                 <!-- 1.121 -->
                 <xsl:call-template name="xxx880"/>
@@ -6550,6 +6573,8 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
         <xd:desc>name createSubFrom656</xd:desc>
     </xd:doc>
     <xsl:template name="createSubFrom656">
+        <!-- 1.189 -->
+        <xsl:if test="marc:datafield[@tag='656']">        
         <subject>
             <xsl:call-template name="xxx880"/>
             <!-- 1.122 -->
@@ -6567,12 +6592,15 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                 </xsl:call-template>
             </occupation>
         </subject>
+        </xsl:if>
     </xsl:template>
 
     <xd:doc>
         <xd:desc>name createSubGeoFrom662752</xd:desc>
     </xd:doc>
     <xsl:template name="createSubGeoFrom662752">
+        <!-- 1.189 -->
+        <xsl:if test="marc:datafield[@tag='662' or @tag='752']">
         <subject>
             <xsl:call-template name="xxx880"/>
             <!-- 1.139 -->
@@ -6635,14 +6663,14 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                 </xsl:for-each>
             </hierarchicalGeographic>
         </subject>
+        </xsl:if>
     </xsl:template>
 
     <xd:doc>
         <xd:desc>name createSubTemFrom045</xd:desc>
     </xd:doc>
     <xsl:template name="createSubTemFrom045">
-        <xsl:if
-            test="//marc:datafield[@tag = '045' and @ind1 = '2'][marc:subfield[@code = 'b' or @code = 'c']]">
+        <xsl:if test="//marc:datafield[@tag = '045' and @ind1 = '2'][marc:subfield[@code = 'b' or @code = 'c']]">
             <subject>
                 <xsl:call-template name="xxx880"/>
                 <temporal encoding="iso8601" point="start">
@@ -7021,7 +7049,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                     </xsl:if>
                     <!-- 1.184 -->
                     <xsl:if test="marc:subfield[@code='u']">
-                        <xsl:apply-templates select="f:percentEncode(marc:subfield[@code='u'])"/>
+                        <xsl:value-of select="f:percentEncode(marc:subfield[@code='u'])"/>
                     </xsl:if>
                 </url>
             </location>

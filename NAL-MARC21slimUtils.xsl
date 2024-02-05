@@ -235,7 +235,8 @@
     </xsl:function>
     
 
-<!-- datafield -->
+
+    <!-- builds datafield template-->
     <xd:doc>
         <xd:desc>datafield</xd:desc>
         <xd:param name="tag"/>
@@ -270,27 +271,26 @@
             </xsl:when>
             <!-- non-prefixed-->
             <xsl:otherwise>
-        <xsl:element name="datafield">
-            <xsl:attribute name="tag">
-                <xsl:value-of select="$tag"/>
-            </xsl:attribute>
-            <xsl:attribute name="ind1">
-                <xsl:value-of select="$ind1"/>
-            </xsl:attribute>
-            <xsl:attribute name="ind2">
-                <xsl:value-of select="$ind2"/>
-            </xsl:attribute>
-            <xsl:copy-of select="$subfields"/>
-        </xsl:element>
+                <xsl:element name="datafield">
+                    <xsl:attribute name="tag">
+                        <xsl:value-of select="$tag"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="ind1">
+                        <xsl:value-of select="$ind1"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="ind2">
+                        <xsl:value-of select="$ind2"/>
+                    </xsl:attribute>
+                    <xsl:copy-of select="$subfields"/>
+                </xsl:element>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
-
+<!-- builds subfield select -->
     <xd:doc>
         <xd:desc/>
-        <xd:param name="codes"/>
-    
+        <xd:param name="codes"/>    
         <xd:param name="delimiter"/>
     </xd:doc>
     <xsl:template name="subfieldSelect">
@@ -982,20 +982,20 @@
     <xd:doc>
         <xd:desc>
             <xd:p><xd:b>Function: </xd:b>f:percentEncode</xd:p>
-            <xd:p><xd:b>Usage: </xd:b>f:percentEncode($uri parameter])</xd:p>
-            <xd:p><xd:b>Purpose: </xd:b>When the $uri parameter contains brackets, they are percent encoded to avoid invalid uri errors.</xd:p>
+            <xd:p><xd:b>Usage: </xd:b>f:percentEncode($uris parameter])</xd:p>
+            <xd:p><xd:b>Purpose: </xd:b>When the $uris parameter contains brackets, they are percent encoded to avoid invalid uri errors.</xd:p>
         </xd:desc>
-        
-        <xd:param name="uri"/>
+        <xd:param name="uris"/>
     </xd:doc>
     <xsl:function name="f:percentEncode" xmlns:f="http://functions">
-        <xsl:param name="uri"/>
-        <xsl:variable name="sub1" select="replace($uri, '\[','%5B')"/>
-        <xsl:variable name="sub2" select="replace($sub1, '\]','%5D')"/>
+        <xsl:param name="uris"/>
+        <xsl:for-each select="$uris">
+            <xsl:variable name="uri" select="."/>
+            <xsl:variable name="sub1" select="replace($uri, '\[','%5B')"/>
+            <xsl:variable name="sub2" select="replace($sub1, '\]','%5D')"/>
         <xsl:sequence select="if (contains($uri, '[') or (contains($uri, ']')))
             then ($sub2) 
             else $uri"/>
+        </xsl:for-each>
     </xsl:function>
-    
-   
 </xsl:stylesheet>
