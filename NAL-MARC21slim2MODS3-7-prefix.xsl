@@ -6427,8 +6427,8 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
         <xd:desc>name createSubTopFrom650</xd:desc>
     </xd:doc>
     <xsl:template name="createSubTopFrom650">
-        <!-- 1.189 -->
-        <xsl:if test="marc:datafield[@tag='650']">
+        <!-- 1.189 
+        <xsl:if test="marc:datafield[@tag='650']">-->
         <subject>
             <xsl:call-template name="xxx880"/>
             <xsl:call-template name="subjectAuthority"/>
@@ -6445,15 +6445,15 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
             </topic>
             <xsl:call-template name="subjectAnyOrder"/>
         </subject>
-        </xsl:if>
+    <!-- </xsl:if>-->
     </xsl:template>
 
     <xd:doc>
         <xd:desc>name createSubGeoFrom651</xd:desc>
     </xd:doc>
     <xsl:template name="createSubGeoFrom651">
-        <!-- 1.189 -->
-        <xsl:if test="marc:datafield[@tag='651']">
+        <!-- 1.189 
+        <xsl:if test="marc:datafield[@tag='651']">-->
         <subject>
             <xsl:call-template name="xxx880"/>
             <xsl:call-template name="subjectAuthority"/>
@@ -6468,7 +6468,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
             </xsl:for-each>
             <xsl:call-template name="subjectAnyOrder"/>
         </subject>
-        </xsl:if>
+     <!-- </xsl:if> -->
     </xsl:template>
 
     <xd:doc>
