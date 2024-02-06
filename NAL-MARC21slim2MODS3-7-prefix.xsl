@@ -1681,13 +1681,12 @@
 
         <!-- 1.155 -->
         <xsl:for-each select="marc:datafield[@tag = '072'][@ind2 = '0']">
-            <xsl:if test="matches(., '[A-Z]\d{3}')">
-                <subject authority="agricola">
+            <xsl:if test="matches(marc:subfield[@code = 'a'],'[A-Z]\d{3}')">
+            <subject authority="agricola">
                     <topic>
-                        <xsl:value-of
-                            select="f:subjCatCode(normalize-space(marc:subfield[@code = 'a']))"/>
+                        <xsl:value-of select="f:subjCatCode(marc:subfield[@code = 'a'])"/>
                     </topic>
-                </subject>
+              </subject>
             </xsl:if>
         </xsl:for-each>
 
