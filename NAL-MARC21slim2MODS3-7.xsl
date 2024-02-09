@@ -1,58 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
     xmlns="http://www.loc.gov/mods/v3" xmlns:f="http://functions"
-    xmlns:marc="http://www.loc.gov/MARC21/slim"
-    xmlns:marccountry="http://www.local.gov/marc/countries" xmlns:mods="http://www.loc.gov/mods/v3"
-    xmlns:nalsubcat="http://nal-subject-category-codes" xmlns:saxon="http://saxon.sf.net/"
-    xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:xlink="http://www.w3.org/1999/xlink"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:info="info:lc/xmlns/codelist-v1" xmlns:marc="http://www.loc.gov/MARC21/slim"
+    xmlns:mods="http://www.loc.gov/mods/v3" xmlns:nalsubcat="http://nal-subject-category-codes"
+    xmlns:saxon="http://saxon.sf.net/" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl"
+    xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    exclude-result-prefixes="f marc marccountry mods nalsubcat saxon xd xlink xs xsi">
-
-
+    exclude-result-prefixes="f info marc nalsubcat saxon xd xlink xs xsi">
     <!-- includes -->
     <xsl:include href="NAL-MARC21slimUtils.xsl"/>
-    <xsl:include href="commons/functions.xsl"/>
-
-
+    <xsl:include href="remove_ending_punctuation.xsl"/>
     <!-- outputs -->
     <xsl:output encoding="UTF-8" indent="yes" method="xml" name="original"
         saxon:next-in-chain="fix_characters.xsl"/>
-
     <!-- whitespace control -->
     <xsl:strip-space elements="*"/>
 
-
     <!-- Maintenance note: For each revision, change the content of <recordInfo><recordOrigin> to reflect the new revision number.
-	MARC21slim2MODS3-7
+	NAL-MARC21slim2MODS3-7-prefix.xsl
 	┌ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┐ 
-	│  NAL Revisions (Revision 1.180) 20230216   |    
+	│  NAL Revisions (Revision 1.190) 20240206    |    
 	└ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┘ 	
 	┌ ━ ━ ━ ━ ━ ┐ 
 	│ MODS 3.7 │  
-	└ ━ ━ ━ ━ ━ ┘
-	Revision 1.183 - An attribute node (displayLabel) cannot be created after a child of the containing elementResolved fatal erroor"Added <datafield> "" - 20230615
-	                  1.183 - 
-
-Description: Cannot create an attribute node (altRepGroup) whose parent is a document node
-Cannot create an attribute node (xlink:href) whose parent is a document node
-An attribute node (nameTitleGroup) cannot be created after a child of the containing element
-	Revision 1.181 - Simplified marcCountry and f:decodeMARCCountry functions. Regex updated 20230615
-	Revision 1.180 - Added conditional statement to prevent physicalDescription from appearing in article records
-	Revision 1.179 - Added conditional statement to prevent issuance from appearing in article records
-	Revision 1.178 - Commented out because genre authority does not equal 7" 
-	Revision 1.177 - Added for-each-group to get publisher within originInfo
-	Revision 1.176 - Added if tests to text type date fields to avoid empty elements
-	Revision 1.175 - Commented out LC's call-template, replaced with NAL's access condition statement (line 7004)
-	Revision 1.174 - Commented out marc encoded date because w3cdtf is preferred
-	Revision 1.173 - Inserted NAL related part to parse out relatedpart info
+	└ ━ ━ ━ ━ ━ ┘ 
+	Revision 1.190 - Added document node to scriptCode template in order to prevent attribute creation error. 20240206 cmc3
+	Revision 1.189 - Added if test to subject name/term templates(i.e., 600-653) in order to prevent attribute creation error. 20240202 cm3
+	Revision 1.187 - Revised function references authoritative resource https://www.loc.gov/standards/codelists/languages.xml. 20240201 cm3  
+	Revision 1.186 - Elsevier's electronic page numbers. 20240118 cm3
+	Revision 1.185 - Revised function references authoritative resource https://www.loc.gov/standards/codelists/countries.xml. 20240102 cm3  
+    Revision 1.184 - Percent encodes brackets. 20231222 cm3
+	Revision 1.183 - An attribute node (displayLabel) cannot be created after a child of the containing elementResolved fatal erroor"Added <datafield>. 20230615 cm3
+    Revision 1.182 - An attribute node (nameTitleGroup) cannot be created after a child of the containing element. 20230615 cm3
+	Revision 1.181 - Simplified marcCountry and f:decodeMARCCountry functions. Regex updated. 20230615 cm3
+	Revision 1.180 - Added conditional statement to prevent physicalDescription from appearing in article records. 20230615 cm3
+	Revision 1.179 - Added conditional statement to prevent issuance from appearing in article records. 20230615 cm3
+	Revision 1.178 - Commented out because genre authority does not equal 7". 20230615 cm3 
+	Revision 1.177 - Added for-each-group to get publisher within originInfo. 20230615 cm3
+	Revision 1.176 - Added if tests to text type date fields to avoid empty elements. 20230615 cm3
+	Revision 1.175 - Commented out LC's call-template, replaced with NAL's access condition statement (line 7004). 20230615 cm3
+	Revision 1.174 - Commented out marc encoded date because w3cdtf is preferred. 20230615 cm3
+	Revision 1.173 - Inserted NAL related part to parse out relatedpart info. 20230615 cm3
 	Revision 1.172 - Changed identifer configuration in order to match journal article representations. 20230123 cm3
-	Revision 1.171 - Added $controlField008-35-07 as alternative to language of cataloging 20230123 
+	Revision 1.171 - Added $controlField008-35-07 as alternative to language of cataloging. 20230123 cm3
 	Revision 1.170 - Added $controlField008-0-14 variable to get correct dates is "w3cdtf" format 20221123 cm3
 	Revision 1.169 - Added $this variables to <title>, <subtitle>, <abstract>, <relatedItem><title> , etc. (any lenthy text field to resolve MODS Schema whitespace error. 20230108 cm3
-	Revision 1.168 - Added conditional statement to get datafield[@tag='914']/subfield[@code='a'] when $w is not present
-	Revision 1.167 - Custom function f:decodeMARCCountry($marcCode) returns the country/state name
-	Revision 1.166 - Filters 008 field for 2 or 3 letter country/state codes 
+	Revision 1.168 - Added conditional statement to get datafield[@tag='914']/subfield[@code='a'] when $w is not present. 20230108 cm3
+	Revision 1.167 - Custom function f:decodeMARCCountry($marcCode) returns the country/state name. 20230108 cm3
+	Revision 1.166 - Filters 008 field for 2 or 3 letter country/state codes. 20230108 cm3
 	Revision 1.165 - Remnamed displayForm template, added specialSubfieldSelect from 1.164 as variable, parsed it as output. 20230106 cm3
 	Revision 1.164 - moved specialSubfieldSelect to NAL-MARC21slimUtils.xsl 20230106 cm3
 	Revision 1.163 - "agid:" mapped from createNoteFrom974 into local identifier; removed from extension. 20220105 cm3
@@ -60,27 +55,27 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
 	Revision 1.161 - NAL Agricola accession number (e.g.,CAT87882125) mapped to local identifier. 20230105 cm3		
 	Revision 1.160 - NAL Classification number mapped to local identifier. 20230104 cm3
 	Revision 1.159 - Added if test to prevent extra whitespace. 20221223 cm3
-	Revision 1.158 - Added conditional statement above issuance to focus on monographs, single part items and multipart monographs cm3 12/08/2022
-	Revision 1.157 - Added condtional statement if agid:# is empty from 773, use 914 subfield a cm3 12/09/2022
-	Revision 1.156 - Added condtional statement if ISSN is empty from 773, use 914 subfield b cm3 12/09/2022
-    Revision 1.155 - Added custom function to map category code to subject. cm3 2022/12/08
-    Revision 1.154 - Commented out conditional statements within issuance element for serials, continuing resources, and integrating resources. cm3 2022/12/08	
-    Revision 1.153 - Used subtring-before function to get subfield b (ie., publisher) and subfield c (i.e., dateIssued). cm3 2022/12/08
-	Revision 1.152 - Added conditional statement outside of issuance element to allow monographs, multipart monographs, and single items only. cm3 2022/12/08 
+	Revision 1.158 - Added conditional statement above issuance to focus on monographs, single part items and multipart monographs. 20221210 cm3
+	Revision 1.157 - Added condtional statement if agid:# is empty from 773, use 914 subfield a. 20221209 cm3
+	Revision 1.156 - Added condtional statement if ISSN is empty from 773, use 914 subfield b. 20221209 cm3
+    Revision 1.155 - Added custom function to map category code to subject. 20221208 cm3
+    Revision 1.154 - Commented out conditional statements within issuance element for serials, continuing resources, and integrating resources. 20221208 cm3	
+    Revision 1.153 - Used subtring-before function to get subfield b (ie., publisher) and subfield c (i.e., dateIssued). 20221208 cm3
+	Revision 1.152 - Added conditional statement outside of issuance element to allow monographs, multipart monographs, and single items only. 20221208 cm3 
 	Revision 1.151 - $controlField008-35-37replace, uses replace function and regex to capture 3 letter string. cm3 2022/12/05
-	Revision 1.150 - Updated recordOrigin to reflect the XSLT filename Used in transform. cm3 2022/12/08
-	Revision 1.150 - Added if tests to originInfo producer elements to avoid empty tag cm3 2022/11/10
-	Revision 1.149 - Used analyze-string function 008 to pull out 2-3 letter text and apply custom marc country conversion function
-	Revision 1.148 - Removed prefix from XSLT to accomodate prefix-less elements from Alma.
-	Revision 1.147 - Added NAL subject code from 072, created custom function to convert 072 code into the subject term cm3 20221023
-	Revision 1.146 - Reworked LC's MARC21slimUtils.xsl, created NAL-MARC21slimUtils.xsl to accomdate non-prefixed files. cm3 20221017
-	Revision 1.145 - Includes functions.xsl and params.xsl and applied to output as needed 20221016 
-	Revision 1.144 - Upgraded stylesheet to use XSLT 2.0 20221005 cm3 
+	Revision 1.150 - Updated recordOrigin to reflect the XSLT filename Used in transform. 20221208 cm3
+	Revision 1.150 - Added if tests to originInfo producer elements to avoid empty tag. 20221110 cm3
+	Revision 1.149 - Used analyze-string function 008 to pull out 2-3 letter text and apply custom marc country conversion function. 20221110 cm3
+	Revision 1.148 - Removed prefix from XSLT to accomodate prefix-less elements from Alma. 20221110 cm3
+	Revision 1.147 - Added NAL subject code from 072, created custom function to convert 072 code into the subject term. 20221023 cm3 
+	Revision 1.146 - Reworked LC's MARC21slimUtils.xsl, created NAL-MARC21slimUtils.xsl to accomdate non-prefixed files. 20221017 cm3
+	Revision 1.145 - Includes functions.xsl and params.xsl and applied to output as needed. 20221016 cm3
+	Revision 1.144 - Upgraded stylesheet to use XSLT 2.0. 20221005 cm3 
 	Revision 1.143 - Fixed dateIssued to include year only date from the 008  20141216 JG
 	Revision 1.142 - Fixed dateIssued to include month and date from the 008  20140818 JG
 	Revision 1.141 - Added displayForm to 700 JG 2014/05/29
 	┌ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┐ 
-	│ NAL Staff Revisions Begin (Revision 1.141  |    
+	│ NAL Staff Revisions Begin (Revision 1.141) |    
 	└ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┘ 	
 	┌ ━ ━ ━ ━ ━ ┐ 
 	│ MODS 3.6 │  
@@ -258,8 +253,6 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
 	Revision 1.03 - Additional Changes not related to MODS Version 2.0 by ntra
 	Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
 	-->
-    <!--href="{replace(saxon:system-id(),'(.*/)(.*)(\.xml)','$1')}N-{replace(saxon:system-id(),'(.*/)(.*)(\.xml)','$2')}_{position()}.xml">-->
-
     <xd:doc id="root" scope="stylesheet">
         <xd:desc>Processes the marcRecord template</xd:desc>
         <xd:param name="workingDirectory"/>
@@ -274,13 +267,11 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             href="{$workingDirectory}/mods/N-{$originalFile}_{position()}.xml">
             <xsl:choose>
                 <xsl:when test="//collection/record">
-                    <modsCollection xmlns="http://www.loc.gov/mods/v3">
-                        <xsl:namespace name="mods">http://www.loc.gov/mods/v3</xsl:namespace>
-                        <xsl:namespace name="xsi"
-                            >http://www.w3.org/2001/XMLSchema-instance</xsl:namespace>
-                        <xsl:attribute name="xsi:schemaLocation" select="
-                                normalize-space('http://www.loc.gov/mods/v3
-                            http://www.loc.gov/standards/mods/v3/mods-3-7.xsd')"/>
+                    <modsCollection xmlns="http://www.loc.gov/mods/v3"
+                        xmlns:mods="http://www.loc.gov/mods/v3"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                        <xsl:attribute name="xsi:schemaLocation"
+                            select="normalize-space('http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-7.xsd')"/>
                         <xsl:for-each select="//collection/record">
                             <mods version="3.7">
                                 <xsl:call-template name="marcRecord"/>
@@ -290,9 +281,10 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                 </xsl:when>
                 <xsl:otherwise>
                     <mods xmlns="http://www.loc.gov/mods/v3" xmlns:mods="http://www.loc.gov/mods/v3"
-                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                        xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-7.xsd"
-                        version="3.7">
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                        <xsl:attribute name="xsi:schemaLocation"
+                            select="normalize-space('http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-7.xsd')"/>
+                        <xsl:attribute name="version">3.7</xsl:attribute>
                         <xsl:for-each select="//record">
                             <xsl:call-template name="marcRecord"/>
                         </xsl:for-each>
@@ -685,7 +677,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                 <genre authority="marcgt">folktale</genre>
             </xsl:if>
             <xsl:if test="contains($controlField008-30-31, 'h')">
- 
+
                 <genre authority="marcgt">history</genre>
             </xsl:if>
             <xsl:if test="contains($controlField008-30-31, 'k')">
@@ -775,7 +767,6 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
         </xsl:if>
 
         <!-- 111$n, 711$n 1.103 -->
-
         <xsl:if test="$typeOf008 = 'BK'">
             <xsl:variable name="controlField008-28" select="substring($controlField008, 29, 1)"/>
             <xsl:choose>
@@ -812,11 +803,8 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                 <xsl:when test="contains($controlField008-28, 'z')">
                     <genre authority="marcgt">government publication</genre>
                 </xsl:when>
-                <!--<xsl:when test="contains($controlField008-28, '|')">
-                    <genre authority="marcgt">government publication</genre>
-                </xsl:when>-->
                 <xsl:when test="contains($controlField008-28, '|')"/>
-                <xsl:otherwise/>
+                <!-- No attempt to code -->
             </xsl:choose>
         </xsl:if>
         <xsl:if test="$typeOf008 = 'CF'">
@@ -855,9 +843,8 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                 <xsl:when test="contains($controlField008-28, 'z')">
                     <genre authority="marcgt">government publication</genre>
                 </xsl:when>
-                <xsl:when test="contains($controlField008-28, '|')">
-                    <genre authority="marcgt">government publication</genre>
-                </xsl:when>
+                <xsl:when test="contains($controlField008-28, '|')"/>
+                <!-- No attempt to code -->
             </xsl:choose>
         </xsl:if>
         <xsl:if test="$typeOf008 = 'CR'">
@@ -896,9 +883,8 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                 <xsl:when test="contains($controlField008-28, 'z')">
                     <genre authority="marcgt">government publication</genre>
                 </xsl:when>
-                <xsl:when test="contains($controlField008-28, '|')">
-                    <genre authority="marcgt">government publication</genre>
-                </xsl:when>
+                <xsl:when test="contains($controlField008-28, '|')"/>
+                <!-- No attempt to code -->
             </xsl:choose>
         </xsl:if>
         <xsl:if test="$typeOf008 = 'MP'">
@@ -937,9 +923,8 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                 <xsl:when test="contains($controlField008-28, 'z')">
                     <genre authority="marcgt">government publication</genre>
                 </xsl:when>
-                <xsl:when test="contains($controlField008-28, '|')">
-                    <genre authority="marcgt">government publication</genre>
-                </xsl:when>
+                <xsl:when test="contains($controlField008-28, '|')"/>
+                <!-- No attempt to code -->
             </xsl:choose>
         </xsl:if>
         <xsl:if test="$typeOf008 = 'VM'">
@@ -978,12 +963,10 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                 <xsl:when test="contains($controlField008-28, 'z')">
                     <genre authority="marcgt">government publication</genre>
                 </xsl:when>
-                <xsl:when test="contains($controlField008-28, '|')">
-                    <genre authority="marcgt">government publication</genre>
-                </xsl:when>
+                <xsl:when test="contains($controlField008-28, '|')"/>
+                <!-- No attempt to code -->
             </xsl:choose>
         </xsl:if>
-
 
         <!-- genre -->
         <!-- 1.121 -->
@@ -1113,6 +1096,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             </originInfo>
         </xsl:for-each>
         <!-- 1.121 -->
+
         <xsl:for-each
             select="datafield[@tag = '264'][@ind2 = '2'] | datafield[@tag = '880'][starts-with(subfield[@code = '6'], '264')][@ind2 = '2']">
             <!-- 1.120 - @264/ind2 -->
@@ -1206,26 +1190,24 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
         <!-- 1.130 depreciated datafield[@tag=880] for <originInfo> (archived) -->
 
         <!-- 1.171 languageTerm adds controlfield-008-35-37 -->
+        <!-- 1.187 -->
         <!-- language from 008-->
         <xsl:variable name="controlField008-35-37"
             select="normalize-space(translate(substring($controlField008, 36, 3), '|#', ''))"/>
-        <xsl:if test="$controlField008-35-37">
+        <xsl:if test="matches($controlField008-35-37, '[a-z]{3}')">
             <language>
                 <xsl:choose>
-                    <xsl:when test="ends-with($controlField008-35-37, 'ng')">
-                        <languageTerm authority="iso639-2b" type="code">
-                            <xsl:value-of select="string('eng')"/>
-                        </languageTerm>
-                        <languageTerm type="text">
-                            <xsl:value-of select="f:isoTwo2Lang(string('eng'))"/>
-                        </languageTerm>
+                    <xsl:when
+                        test="starts-with($controlField008-35-37, 'e') and ends-with($controlField008-35-37, 'ng')">
+                        <languageTerm authority="iso639-2b" type="code">eng</languageTerm>
+                        <languageTerm type="text">English</languageTerm>
                     </xsl:when>
                     <xsl:when test="matches($controlField008-35-37, '[a-z]{3}')">
                         <languageTerm authority="iso639-2b" type="code">
                             <xsl:value-of select="string($controlField008-35-37)"/>
                         </languageTerm>
                         <languageTerm type="text">
-                            <xsl:value-of select="f:isoTwo2Lang(string($controlField008-35-37))"/>
+                            <xsl:value-of select="info:langCode(string($controlField008-35-37))"/>
                         </languageTerm>
                     </xsl:when>
                     <xsl:otherwise/>
@@ -1306,7 +1288,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
         </xsl:variable>
         <!-- 1.180 -->
         <xsl:if
-            test="datafield[@tag = '655']/subfield[@code = 'a'] != 'article' and not(matches(datafield[@tag = '773']/subfield[@code = 'x'][current()], '\d{4}\-\d{3}.'))">
+            test="datafield[@tag = '655']/subfield[@code = 'a'] != 'article' and not(matches(datafield[@tag = '773'][1]/subfield[@code = 'x'][1], '\d{4}\-\d{3}.'))">
             <xsl:choose>
                 <xsl:when test="
                         datafield[@tag = '130'][subfield[@code = '6']][child::*[@code = 'h']] or
@@ -1331,7 +1313,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                             datafield[@tag = '337'][subfield[@code = '6']]/child::*[@code = 'a'] |
                             datafield[@tag = '338'][subfield[@code = '6']]/child::*[@code = 'a'] |
                             datafield[@tag = '300'][subfield[@code = '6']] |
-                            datafield[@tag = '856'][subfield[@code = '6']]/child::*[@code = 'q']">
+                            datafield[@tag = ''][subfield[@code = '6']]/child::*[@code = 'q']">
                         <physicalDescription>
                             <!--  880 field -->
                             <xsl:choose>
@@ -1711,11 +1693,10 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
 
         <!-- 1.155 -->
         <xsl:for-each select="datafield[@tag = '072'][@ind2 = '0']">
-            <xsl:if test="matches(., '[A-Z]\d{3}')">
+            <xsl:if test="matches(subfield[@code = 'a'], '[A-Z]\d{3}')">
                 <subject authority="agricola">
                     <topic>
-                        <xsl:value-of
-                            select="f:subjCatCode(normalize-space(subfield[@code = 'a']))"/>
+                        <xsl:value-of select="f:subjCatCode(subfield[@code = 'a'])"/>
                     </topic>
                 </subject>
             </xsl:if>
@@ -1759,7 +1740,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             <xsl:call-template name="createClassificationFrom086"/>
         </xsl:for-each>
 
-        <!--	location	-->
+        <!-- location -->
         <!-- 1.121 -->
         <xsl:for-each
             select="datafield[@tag = '852'] | datafield[@tag = '880'][starts-with(subfield[@code = '6'], '852')]">
@@ -2366,7 +2347,6 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                                             </xsl:call-template>
                                         </publisher>
                                     </xsl:for-each>-->
-
                                 <xsl:for-each select="subfield[@code = 'b']">
                                     <edition>
                                         <xsl:apply-templates/>
@@ -2439,16 +2419,16 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                                             <xsl:choose>
                                                 <!-- extent (pages) -->
                                                 <xsl:when
-                                                  test="matches(substring-after(regex-group(4), 'p'), '(\d+\.e\d+)\-(\d+\.e\d+)')">
-                                                  <!--   Elsevier's electronic page numbers -->
+                                                  test="matches(substring-after(regex-group(4), 'p.'), '(\d+\.e\d+)\-(\d+\.e\d+)')">
+                                                  <!-- 1.186 -->
                                                   <xsl:variable name="eStartPage"
-                                                  select="replace(substring-after(regex-group(4), 'p'), '(\d+\.e\d+)\-(\d+\.e\d+)', '$1')"/>
+                                                  select="substring-before(substring-after(regex-group(4), 'p.'), '-')"/>
                                                   <xsl:variable name="eEndPage"
-                                                  select="replace(substring-after(regex-group(4), 'p'), '(\d+\.e\d+)\-(\d+\.e\d+)', '$2')"/>
+                                                  select="substring-after(substring-after(regex-group(4), 'p'), '-')"/>
                                                   <xsl:variable name="eStartPageForTotal"
-                                                  select="replace($eStartPage, '(\d+\.e)(\d+)', '$2')"/>
+                                                  select="replace($eStartPage, '(\S+)(\d+)', '$2')"/>
                                                   <xsl:variable name="eEndPageForTotal"
-                                                  select="replace($eEndPage, '(\d+\.e)(\d+)', '$2')"/>
+                                                  select="replace($eEndPage, '(\S+)(\d+)', '$2')"/>
                                                   <extent unit="pages">
                                                   <start>
                                                   <xsl:value-of select="$eStartPage"/>
@@ -2456,20 +2436,14 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                                                   <end>
                                                   <xsl:value-of select="$eEndPage"/>
                                                   </end>
-                                                  <xsl:choose>
-                                                  <xsl:when
-                                                  test="not(f:calculateTotalPgs($eStartPageForTotal, $eEndPageForTotal) castable as xs:double)"/>
-                                                  <xsl:otherwise>
                                                   <xsl:if
-                                                  test="$eStartPageForTotal >= $eStartPageForTotal">
+                                                  test="(f:modsTotalPgs($eStartPageForTotal, $eEndPageForTotal) castable as xs:double) and ($eEndPageForTotal >= $eStartPageForTotal)">
                                                   <total>
                                                   <xsl:value-of
-                                                  select="translate(f:calculateTotalPgs($eStartPageForTotal, $eStartPageForTotal), $alpha, '')"
+                                                  select="f:modsTotalPgs($eStartPageForTotal, $eEndPageForTotal)"
                                                   />
                                                   </total>
                                                   </xsl:if>
-                                                  </xsl:otherwise>
-                                                  </xsl:choose>
                                                   </extent>
                                                 </xsl:when>
                                                 <xsl:when
@@ -2487,12 +2461,12 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                                                   </end>
                                                   <xsl:choose>
                                                   <xsl:when
-                                                  test="not(f:calculateTotalPgs($startPage, $endPage) castable as xs:double)"/>
+                                                  test="not(f:modsTotalPgs($startPage, $endPage) castable as xs:double)"/>
                                                   <xsl:otherwise>
                                                   <xsl:if test="$endPage >= $startPage">
                                                   <total>
                                                   <xsl:value-of
-                                                  select="translate(f:calculateTotalPgs($startPage, $endPage), $alpha, '')"
+                                                  select="translate(f:modsTotalPgs($startPage, $endPage), $alpha, '')"
                                                   />
                                                   </total>
                                                   </xsl:if>
@@ -2550,34 +2524,9 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                                 </part>
                             </xsl:for-each>
                         </xsl:if>
-                        <!--Call names  -->
-                        <xsl:apply-templates select="subfield[@code = 'a']" mode="relatedItem"
-                        />
                     </xsl:for-each>
                 </relatedItem>
             </xsl:if>
-            <!--<!-\- LC's related part -\->
-            <xsl:if test="@tag='773'">
-                <xsl:for-each select="subfield[@code='g']">
-                    <part>
-                        <xsl:call-template name="xxs880"/>
-                        <text>
-                            <xsl:apply-templates/>
-                        </text>
-                    </part>
-                </xsl:for-each>
-                <xsl:for-each select="subfield[@code='q']">
-                    <part>
-                        <xsl:call-template name="xxs880"/>
-                        <xsl:call-template name="parsePart"/>
-                    </part>
-                </xsl:for-each>
-            </xsl:if>
-            <!-\- Call names -\->
-            <xsl:apply-templates select="subfield[@code='a']" mode="relatedItem"/>
-        </xsl:for-each>
-        </relatedItem>
-        </xsl:if>-->
         </xsl:for-each>
 
         <!-- 1.121 -->
@@ -2833,13 +2782,12 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             <xsl:variable name="s6"
                 select="substring(normalize-space(subfield[@code = '6']), 5, 2)"/>
             <xsl:if
-                test="@tag = '856' or (@tag = '880' and not(../datafield[@tag = '856'][@ind2 = '2'][subfield[@code = 'q']][substring(subfield[@code = '6'], 5, 2) = $s6]))">
+                test="@tag = 856 or (@tag = '880' and not(../datafield[@tag = '856'][@ind2 = '2'][subfield[@code = 'q']][substring(subfield[@code = '6'], 5, 2) = $s6]))">
                 <relatedItem>
                     <xsl:for-each
                         select=". | ../datafield[@tag = '880'][starts-with(subfield[@code = '6'], '856')][@ind2 = '2'][substring(subfield[@code = '6'], 5, 2) = $s6]">
                         <!-- 1.120 - @856@ind2=2$q -->
-                        <xsl:if
-                            test="subfield[@code = 'q'] and datafield[@tag = '655']/subfield[@code = 'a'] != 'article' or not(matches(datafield[@tag = '773']/subfield[@code = 'x'], '\d{4}\-\d{3}.'))">
+                        <xsl:if test="subfield[@code = 'q']">
                             <physicalDescription>
                                 <xsl:call-template name="xxx880"/>
                                 <internetMediaType>
@@ -3049,7 +2997,6 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             </identifier>
         </xsl:for-each>
 
-
         <!-- 1.51 tmee 20100129-->
         <xsl:for-each select="datafield[@tag = '856'][subfield[@code = 'u']]">
             <xsl:if
@@ -3096,7 +3043,6 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                 <xsl:value-of select="subfield[@code = 'a']"/>
             </identifier>
         </xsl:for-each>
-
         <!--1.163 agid # -->
         <xsl:for-each select="datafield[@tag = '974']">
             <identifier type="local">
@@ -3104,38 +3050,52 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                 <xsl:value-of select="subfield[@code = 'a']"/>
             </identifier>
         </xsl:for-each>
-
-
-        <!-- 1.121 -->
+        <!-- 1.121 (review) -->
         <xsl:for-each
-            select="datafield[@tag = '856'][@ind2 = '2'][subfield[@code = 'u']] | datafield[@tag = '880'][@ind2 = '2'][subfield[@code = 'u']][starts-with(subfield[@code = '6'], '856')]">
+            select="datafield[@tag = '856'][@ind2 = '2']/subfield[@code = 'q'] | datafield[@tag = '880'][@ind2 = '2'][subfield[@code = 'q']][starts-with(subfield[@code = '6'], '856')]">
             <xsl:variable name="s6"
                 select="substring(normalize-space(subfield[@code = '6']), 5, 2)"/>
             <xsl:if
-                test="@tag = '856' or (@tag = '880' and not(../datafield[@tag = '856'][@ind2 = '2'][subfield[@code = 'u']][substring(subfield[@code = '6'], 5, 2) = $s6]))">
+                test="@tag = 856 or (@tag = '880' and not(../datafield[@tag = '856'][@ind2 = '2'][subfield[@code = 'q']][substring(subfield[@code = '6'], 5, 2) = $s6]))">
                 <relatedItem>
-                    <location>
-                        <url>
-                            <xsl:if test="subfield[@code = 'y' or @code = '3']">
-                                <xsl:attribute name="displayLabel">
-                                    <xsl:call-template name="subfieldSelect">
-                                        <xsl:with-param name="codes">y3</xsl:with-param>
-                                    </xsl:call-template>
-                                </xsl:attribute>
-                            </xsl:if>
-                            <xsl:if test="subfield[@code = 'z']">
-                                <xsl:attribute name="note">
-                                    <xsl:call-template name="subfieldSelect">
-                                        <xsl:with-param name="codes">z</xsl:with-param>
-                                    </xsl:call-template>
-                                </xsl:attribute>
-                            </xsl:if>
-                            <xsl:value-of select="subfield[@code = 'u']"/>
-                        </url>
-                    </location>
+                    <xsl:for-each
+                        select=". | ../datafield[@tag = '880'][starts-with(subfield[@code = '6'], '856')][@ind2 = '2'][substring(subfield[@code = '6'], 5, 2) = $s6]">
+                        <!-- 1.120 - @856@ind2=2$q -->
+                        <xsl:if test="subfield[@code = 'q']">
+                            <physicalDescription>
+                                <xsl:call-template name="xxx880"/>
+                                <internetMediaType>
+                                    <xsl:value-of select="subfield[@code = 'q']"/>
+                                </internetMediaType>
+                            </physicalDescription>
+                        </xsl:if>
+                        <xsl:if test="subfield[@code = 'u']">
+                            <location>
+                                <xsl:call-template name="xxx880"/>
+                                <url>
+                                    <xsl:if test="subfield[@code = 'y' or @code = '3']">
+                                        <xsl:attribute name="displayLabel">
+                                            <xsl:call-template name="subfieldSelect">
+                                                <xsl:with-param name="codes">y3</xsl:with-param>
+                                            </xsl:call-template>
+                                        </xsl:attribute>
+                                    </xsl:if>
+                                    <xsl:if test="subfield[@code = 'z']">
+                                        <xsl:attribute name="note">
+                                            <xsl:call-template name="subfieldSelect">
+                                                <xsl:with-param name="codes">z</xsl:with-param>
+                                            </xsl:call-template>
+                                        </xsl:attribute>
+                                    </xsl:if>
+                                    <xsl:value-of select="subfield[@code = 'u']"/>
+                                </url>
+                            </location>
+                        </xsl:if>
+                    </xsl:for-each>
                 </relatedItem>
             </xsl:if>
         </xsl:for-each>
+
 
         <!--NAL notes 910, 930, 945, 946, 
             '974': removed from extension and placed under 016 Agricola accession numbmer  -->
@@ -3146,11 +3106,11 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             <xsl:call-template name="createNoteFrom946"/>
         </extension>
 
+        <!-- recordInfo 040 005 001 003 -->
         <recordInfo>
             <xsl:for-each select="leader[substring($marcLeader, 19, 1) = 'a']">
                 <descriptionStandard>aacr</descriptionStandard>
             </xsl:for-each>
-
             <xsl:for-each select="datafield[@tag = '040']">
                 <xsl:if test="subfield[@code = 'e']">
                     <descriptionStandard>
@@ -3190,11 +3150,12 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                 <xsl:variable name="dateTime"
                     select="format-dateTime(current-dateTime(), '[M01]/[D01]/[Y0001] at [h1]:[m01] [P]')"/>
                 <xsl:value-of
-                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.183 20230615 cm3),'))"/>
+                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.190 20240206 cm3),'))"/>
                 <xsl:text>&#160;</xsl:text>
                 <xsl:value-of select="normalize-space(concat('Transformed on: ', $dateTime))"/>
             </recordOrigin>
 
+            <!--040-->
             <xsl:for-each select="datafield[@tag = '040']/subfield[@code = 'b']">
                 <languageOfCataloging>
                     <languageTerm authority="iso639-2b" type="code">
@@ -3202,10 +3163,9 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                     </languageTerm>
                 </languageOfCataloging>
             </xsl:for-each>
-
         </recordInfo>
-
     </xsl:template>
+
 
     <!--1.165 -->
     <xd:doc id="personal_name" scope="component">
@@ -3256,52 +3216,48 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                 </xsl:choose>
             </displayForm>
         </xsl:for-each>
-
-        <!-- 1.172 nameIdentifier type="orcID, viaf, lcnaf, etc." -->
-
-        <xsl:for-each-group select="$nameIdentifier" group-by="$name">
+        <xsl:for-each-group select="$name" group-adjacent="$nameIdentifier">
             <nameIdentifier>
-                <xsl:attribute name="type" select="f:nameIdentifier($nameIdentifier)"/>
-                <xsl:value-of select="$nameIdentifier"/>
+                <xsl:for-each select="current-grouping-key()">
+                    <xsl:attribute name="type" select="f:nameIdentifier($nameIdentifier)"/>
+                    <xsl:value-of select="$nameIdentifier"/>
+                </xsl:for-each>
             </nameIdentifier>
         </xsl:for-each-group>
-
-        <xsl:for-each select="datafield[@tag = '100' or @tag = '700']">
-            <xsl:if test="subfield[@code = 'a'] != ''">
-                <nameIdentifier>
-                    <xsl:attribute name="type" select="f:nameIdentifier(subfield[@code = '1'])"/>
-                    <xsl:value-of select="(subfield[@code = '1'])"/>
-                </nameIdentifier>
-            </xsl:if>
-        </xsl:for-each>
-
     </xsl:template>
 
+    <xd:doc>
+        <xd:desc> 1.172 nameIdentifier type="orcID, viaf, lcnaf, etc." </xd:desc>
+        <xd:param name="nameIdentifier"/>
+    </xd:doc>
+
     <xd:doc id="affiliation" scope="component">
-        <xd:desc/>
+        <xd:desc>name affiliation</xd:desc>
     </xd:doc>
     <xsl:template name="affiliation">
         <xsl:for-each select="subfield[@code = 'u']">
             <affiliation>
                 <xsl:value-of select="normalize-space(.)"/>
             </affiliation>
+            <xsl:call-template name="affiliation"/>
+            <!-- make sure this works 1.185 -->
         </xsl:for-each>
     </xsl:template>
     <xd:doc id="uri" scope="component">
-        <xd:desc/>
+        <xd:desc>name uri</xd:desc>
     </xd:doc>
     <xsl:template name="uri">
         <xsl:for-each select="subfield[@code = 'u'] | subfield[@code = '0']">
-            <!-- 1.183 --> 
-                <datafield>
-            <xsl:attribute name="xlink:href">
-                <xsl:value-of select="."/>
-            </xsl:attribute>
-                </datafield>
+            <!-- 1.183 -->
+            <xsl:element name="{name()}">
+                <xsl:attribute name="xlink:href">
+                    <xsl:value-of select="."/>
+                </xsl:attribute>
+            </xsl:element>
         </xsl:for-each>
     </xsl:template>
     <xd:doc id="role" scope="component">
-        <xd:desc/>
+        <xd:desc>name role</xd:desc>
     </xd:doc>
     <xsl:template name="role">
         <xsl:for-each select="subfield[@code = 'e']">
@@ -3325,7 +3281,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
         </xsl:for-each>
     </xsl:template>
     <xd:doc id="part" scope="component">
-        <xd:desc/>
+        <xd:desc>name part</xd:desc>
     </xd:doc>
     <xsl:template name="part">
         <xsl:variable name="partNumber">
@@ -3443,8 +3399,8 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             </xsl:call-template>
         </partNumber>
     </xsl:template>
-    <!-- @800$p NOTE: does not output for 800, check mapping-->
 
+    <!-- @800$p NOTE: does not output for 800, check mapping-->
     <xd:doc id="relatedItem" scope="component">
         <xd:desc>subfield[@code = 'p']: Create related item title part name </xd:desc>
     </xd:doc>
@@ -3465,11 +3421,11 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xd:doc>
     <xsl:template match="subfield[@code = '0']" mode="xlink">
         <!-- 1.183 -->
-        <datafield>
-        <xsl:attribute name="xlink:href">
-            <xsl:value-of select="."/>
-        </xsl:attribute>
-        </datafield>
+        <xsl:element name="{name()}">
+            <xsl:attribute name="xlink:href">
+                <xsl:value-of select="."/>
+            </xsl:attribute>
+        </xsl:element>
     </xsl:template>
 
     <xd:doc id="relatedName" scope="component">
@@ -3497,7 +3453,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc id="relatedForm" scope="component">
-        <xd:desc/>
+        <xd:desc>name relatedForm (physciaDescription)</xd:desc>
     </xd:doc>
     <xsl:template name="relatedForm">
         <xsl:if
@@ -3515,7 +3471,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc id="relatedExtent" scope="component">
-        <xd:desc/>
+        <xd:desc>300 relatedExtent </xd:desc>
     </xd:doc>
     <xsl:template name="relatedExtent">
         <xsl:for-each
@@ -3531,7 +3487,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc id="relatedNote" scope="component">
-        <xd:desc/>
+        <xd:desc>name relatedNote</xd:desc>
     </xd:doc>
     <xsl:template name="relatedNote">
         <xsl:for-each select="subfield[@code = 'n']">
@@ -3544,7 +3500,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc id="relatedSubject" scope="component">
-        <xd:desc/>
+        <xd:desc>name relatedSubject</xd:desc>
     </xd:doc>
     <xsl:template name="relatedSubject">
         <xsl:for-each select="subfield[@code = 'j']">
@@ -3571,27 +3527,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
         </identifier>
     </xsl:template>
 
-    <!-- <xd:doc id="relatedIdentifierISSN-x" scope="component">
-        <xd:desc>
-            <xd:p> 1.120 - @76X-78X$z </xd:p>
-            <xd:p> 1.168 - alt to @773$w is @914$a </xd:p>
-        </xd:desc>
-    </xd:doc>
-    <xsl:template match="subfield[@code = 'x']" mode="relatedItem-x">
-        <identifier type="issn">
-            <!-\- 1.121 -\->
-            <xsl:call-template name="xxs880"/>
-            <xsl:apply-templates/>
-        </identifier>
-        <!-\- 1.168 - @914$a-\->
-        <xsl:if
-            test="count(subfield[@code = 'w']) = 0 and ../datafield[@tag = '914']/subfield[@code = 'a']">
-            <identifier type="local">
-                <xsl:value-of select="../datafield[@tag = '914']/subfield[@code = 'a']"/>
-            </identifier>
-        </xsl:if>
-    </xsl:template>
--->
+
     <xd:doc id="relatedIdentifierLocal" scope="component">
         <xd:desc> 1.120 - @76X-78X$z </xd:desc>
     </xd:doc>
@@ -3602,21 +3538,6 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             <xsl:apply-templates/>
         </identifier>
     </xsl:template>
-
-
-
-
-    <!-- 1.121 -->
-    <!--   <xd:doc id="otherRelatedItem" scope="component">
-        <xd:desc>other relatedItem</xd:desc>
-    </xd:doc>
-   <xsl:template match="subfield[@code = 'o']" mode="relatedItem">
-        <identifier>
-            <xsl:call-template name="xxs880"/>
-            <xsl:apply-templates/>
-        </identifier>
-    </xsl:template>
-    -->
 
     <!-- 1.121 -->
     <xd:doc id="relatedItemNotes" scope="component">
@@ -3682,7 +3603,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
 
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name subjectGeographicZ</xd:desc>
     </xd:doc>
     <xsl:template name="subjectGeographicZ">
         <geographic>
@@ -3691,8 +3612,9 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             </xsl:call-template>
         </geographic>
     </xsl:template>
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name subjectTemporalY</xd:desc>
     </xd:doc>
     <xsl:template name="subjectTemporalY">
         <temporal>
@@ -3701,8 +3623,9 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             </xsl:call-template>
         </temporal>
     </xsl:template>
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name subjectTopic</xd:desc>
     </xd:doc>
     <xsl:template name="subjectTopic">
         <topic>
@@ -3723,7 +3646,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc id="nameABCDN" scope="component">
-        <xd:desc/>
+        <xd:desc>name nameABCDN</xd:desc>
     </xd:doc>
     <xsl:template name="nameABCDN">
         <xsl:for-each select="subfield[@code = 'a']">
@@ -3748,7 +3671,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc id="nameABCDQ" scope="component">
-        <xd:desc/>
+        <xd:desc>name "nameABCDQ"</xd:desc>
     </xd:doc>
     <xsl:template name="nameABCDQ">
         <namePart>
@@ -3761,7 +3684,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
         <xsl:call-template name="nameDate"/>
     </xsl:template>
     <xd:doc id="nameACDEQ" scope="component">
-        <xd:desc/>
+        <xd:desc>name nameACDEQ</xd:desc>
     </xd:doc>
     <xsl:template name="nameACDEQ">
         <namePart>
@@ -3771,7 +3694,10 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
         </namePart>
     </xsl:template>
     <xd:doc id="nameACDENQ" scope="component">
-        <xd:desc>1.104 20141104</xd:desc>
+        <xd:desc>
+            <xd:p>name ACDENQ</xd:p>
+            <xd:p>1.104 20141104</xd:p>
+        </xd:desc>
     </xd:doc>
     <xsl:template name="nameACDENQ">
         <namePart>
@@ -3782,12 +3708,23 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
     <xd:doc id="nameIdentifier" scope="component">
         <xd:desc> 1.116 </xd:desc>
+        <xd:param name="nameIdentifier"/>
     </xd:doc>
     <xsl:template name="nameIdentifier">
-        <xsl:if test="subfield[@code = '0']">
+        <xsl:param name="nameIdentifier"/>
+        <xsl:if test="$nameIdentifier = subfield[@code = '0']">
             <nameIdentifier>
+                <xsl:attribute name="type" select="f:nameIdentifier(.)"/>
                 <xsl:call-template name="subfieldSelect">
                     <xsl:with-param name="codes">0</xsl:with-param>
+                </xsl:call-template>
+            </nameIdentifier>
+        </xsl:if>
+        <xsl:if test="$nameIdentifier = subfield[@code = '1']">
+            <nameIdentifier>
+                <xsl:attribute name="type" select="f:nameIdentifier(.)"/>
+                <xsl:call-template name="subfieldSelect">
+                    <xsl:with-param name="codes">1</xsl:with-param>
                 </xsl:call-template>
             </nameIdentifier>
         </xsl:if>
@@ -3795,7 +3732,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
 
 
     <xd:doc id="constituentOrRelatedType" scope="component">
-        <xd:desc/>
+        <xd:desc>name constituentOrRelatedType</xd:desc>
     </xd:doc>
     <xsl:template name="constituentOrRelatedType">
         <xsl:if test="@ind2 = '2'">
@@ -3803,7 +3740,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
         </xsl:if>
     </xsl:template>
     <xd:doc id="relatedTitle" scope="component">
-        <xd:desc/>
+        <xd:desc>name relatedTitle</xd:desc>
     </xd:doc>
     <xsl:template name="relatedTitle">
         <xsl:for-each select="subfield[@code = 't']">
@@ -3824,8 +3761,9 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             </titleInfo>
         </xsl:for-each>
     </xsl:template>
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name "relatedTitle76X-78X"</xd:desc>
     </xd:doc>
     <xsl:template name="relatedTitle76X-78X">
         <xsl:for-each select="subfield[@code = 't']">
@@ -3891,8 +3829,9 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             </titleInfo>
         </xsl:for-each>
     </xsl:template>
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name "relatedOriginInfo"</xd:desc>
     </xd:doc>
     <xsl:template name="relatedOriginInfo">
         <xsl:if test="subfield[@code = 'b' or @code = 'd'] or subfield[@code = 'f']">
@@ -3922,11 +3861,20 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
         </xsl:if>
     </xsl:template>
     <xd:doc id="relatedOriginInfo510" scope="component">
-        <xd:desc> tmee 1.40 </xd:desc>
+        <xd:desc>relatedOriginInfo510</xd:desc>
     </xd:doc>
+    <xsl:template name="relatedOriginInfo510">
+        <xsl:for-each select="subfield[@code = 'b']">
+            <originInfo>
+                <dateOther type="coverage">
+                    <xsl:value-of select="."/>
+                </dateOther>
+            </originInfo>
+        </xsl:for-each>
+    </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name "relatedLanguage"</xd:desc>
     </xd:doc>
     <xsl:template name="relatedLanguage">
         <xsl:for-each select="subfield[@code = 'e']">
@@ -3937,8 +3885,9 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             </xsl:call-template>
         </xsl:for-each>
     </xsl:template>
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name "nameDate"</xd:desc>
     </xd:doc>
     <xsl:template name="nameDate">
         <xsl:for-each select="subfield[@code = 'd']">
@@ -3952,12 +3901,11 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             </namePart>
         </xsl:for-each>
     </xsl:template>
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name "subjectAuthority"</xd:desc>
     </xd:doc>
     <xsl:template name="subjectAuthority">
-        <!-- 1.184 -->
-        <datafield>
         <xsl:if test="@ind2 != '4'">
             <xsl:if test="@ind2 != ' '">
                 <xsl:if test="@ind2 != '8'">
@@ -3980,7 +3928,6 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                 </xsl:if>
             </xsl:if>
         </xsl:if>
-        </datafield>
     </xsl:template>
     <xd:doc id="subject653Type" scope="component">
         <xd:desc> 1.75 fix </xd:desc>
@@ -4009,11 +3956,10 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                 </xsl:if>
             </xsl:if>
         </xsl:if>
-
-
     </xsl:template>
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name "subjectAnyOrder"</xd:desc>
     </xd:doc>
     <xsl:template name="subjectAnyOrder">
         <xsl:for-each
@@ -4036,9 +3982,9 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <!-- 1.164 (moved specialSubfieldSelect to NAL-MARC21slimUtils.xsl)-->
-    
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>match "datafield[@tag = '656']</xd:desc>
     </xd:doc>
     <xsl:template match="datafield[@tag = '656']">
         <subject>
@@ -4057,8 +4003,9 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             </occupation>
         </subject>
     </xsl:template>
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name "termsOfAddress"</xd:desc>
     </xd:doc>
     <xsl:template name="termsOfAddress">
         <xsl:if test="subfield[@code = 'b' or @code = 'c']">
@@ -4070,8 +4017,9 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             </namePart>
         </xsl:if>
     </xsl:template>
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name "displayLabel"</xd:desc>
     </xd:doc>
     <xsl:template name="displayLabel">
         <xsl:if test="subfield[@code = 'i']">
@@ -4085,7 +4033,6 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             </xsl:attribute>
         </xsl:if>
     </xsl:template>
-
 
     <xd:doc>
         <xd:desc> isInvalid</xd:desc>
@@ -4114,6 +4061,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             </identifier>
         </xsl:if>
     </xsl:template>
+
     <xd:doc id="subtitle" scope="component">
         <xd:desc>subtitle</xd:desc>
     </xd:doc>
@@ -4128,12 +4076,12 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             </subTitle>
         </xsl:if>
     </xsl:template>
+
     <xd:doc id="script" scope="component">
         <xd:desc>script</xd:desc>
         <xd:param name="scriptCode"/>
     </xd:doc>
     <xsl:template name="script">
-
         <xsl:param name="scriptCode"/>
         <xsl:attribute name="script">
             <xsl:choose>
@@ -4150,8 +4098,9 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             </xsl:choose>
         </xsl:attribute>
     </xsl:template>
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name "parsePart"</xd:desc>
     </xd:doc>
     <xsl:template name="parsePart">
         <!-- assumes 773$q= 1:2:3<4
@@ -4381,8 +4330,9 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             </xsl:choose>
         </xsl:for-each>
     </xsl:template>
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name getLanguage</xd:desc>
         <xd:param name="langString"/>
         <xd:param name="controlField008-35-37"/>
     </xd:doc>
@@ -4404,7 +4354,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                         <xsl:value-of select="substring($langString, 1, 3)"/>
                     </languageTerm>
                     <languageTerm type="text">
-                        <xsl:value-of select="f:isoTwo2Lang(substring($langString, 1, 3))"/>
+                        <xsl:value-of select="info:langCode(substring($langString, 1, 3))"/>
                     </languageTerm>
                 </language>
                 <xsl:call-template name="getLanguage">
@@ -4414,8 +4364,9 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>nane isoLanguage</xd:desc>
         <xd:param name="currentLanguage"/>
         <xd:param name="usedLanguages"/>
         <xd:param name="remainingLanguages"/>
@@ -4445,7 +4396,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                         <xsl:value-of select="$currentLanguage"/>
                     </languageTerm>
                     <languageTerm type="text">
-                        <xsl:value-of select="f:isoTwo2Lang($currentLanguage)"/>
+                        <xsl:value-of select="info:langCode($currentLanguage)"/>
                     </languageTerm>
                 </language>
                 <xsl:call-template name="isoLanguage">
@@ -4479,12 +4430,12 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
+
     <xd:doc id="chopBrackets" scope="component">
         <xd:desc>chopBrackets</xd:desc>
         <xd:param name="chopString"/>
     </xd:doc>
     <xsl:template name="chopBrackets">
-
         <xsl:param name="chopString"/>
         <xsl:variable name="string">
             <xsl:call-template name="chopPunctuation">
@@ -4498,8 +4449,9 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             <xsl:value-of select="$string"/>
         </xsl:if>
     </xsl:template>
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name rfcLanguages</xd:desc>
         <xd:param name="nodeNum"/>
         <xd:param name="usedLanguages"/>
         <xd:param name="controlField008-35-37"/>
@@ -4562,33 +4514,33 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name scriptCode</xd:desc>
     </xd:doc>
     <xsl:template name="scriptCode">
-        <xsl:variable name="sf06" select="normalize-space(child::subfield[@code = '6'])"/>
+        <xsl:variable name="sf06" select="normalize-space(child::subfield[@code='6'])"/>
         <xsl:variable name="sf06a" select="substring($sf06, 1, 3)"/>
         <xsl:variable name="sf06b" select="substring($sf06, 5, 2)"/>
         <xsl:variable name="sf06c" select="substring($sf06, 7)"/>
         <xsl:variable name="scriptCode" select="substring($sf06, 8, 2)"/>
-        <!-- 1.182 -->
-        <record>
-            <xsl:if test="//datafield/subfield[@code = '6']">
-                <xsl:attribute name="script">
-                    <xsl:choose>
-                        <xsl:when test="$scriptCode = ''">Latn</xsl:when>
-                        <xsl:when test="$scriptCode = '(3'">Arab</xsl:when>
-                        <xsl:when test="$scriptCode = '(4'">Arab</xsl:when>
-                        <xsl:when test="$scriptCode = '(B'">Latn</xsl:when>
-                        <xsl:when test="$scriptCode = '!E'">Latn</xsl:when>
-                        <xsl:when test="$scriptCode = '$1'">CJK</xsl:when>
-                        <xsl:when test="$scriptCode = '(N'">Cyrl</xsl:when>
-                        <xsl:when test="$scriptCode = '(Q'">Cyrl</xsl:when>
-                        <xsl:when test="$scriptCode = '(2'">Hebr</xsl:when>
-                        <xsl:when test="$scriptCode = '(S'">Grek</xsl:when>
-                    </xsl:choose>
-                </xsl:attribute>
-            </xsl:if>
-        </record>
+        <xsl:if test="//datafield/subfield[@code='6']">
+           <!-- 1.190 -->
+            <mods>
+            <xsl:attribute name="script">
+                <xsl:choose>
+                    <xsl:when test="$scriptCode=''">Latn</xsl:when>
+                    <xsl:when test="$scriptCode='(3'">Arab</xsl:when>
+                    <xsl:when test="$scriptCode='(4'">Arab</xsl:when>
+                    <xsl:when test="$scriptCode='(B'">Latn</xsl:when>
+                    <xsl:when test="$scriptCode='!E'">Latn</xsl:when>
+                    <xsl:when test="$scriptCode='$1'">CJK</xsl:when>
+                    <xsl:when test="$scriptCode='(N'">Cyrl</xsl:when>
+                    <xsl:when test="$scriptCode='(Q'">Cyrl</xsl:when>
+                    <xsl:when test="$scriptCode='(2'">Hebr</xsl:when>
+                    <xsl:when test="$scriptCode='(S'">Grek</xsl:when>
+                </xsl:choose>
+            </xsl:attribute>
+            </mods>
+        </xsl:if>
     </xsl:template>
 
     <!-- tmee 20100927 for 880s & corresponding fields  20101123 scriptCode -->
@@ -4598,18 +4550,15 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xd:doc>
     <xsl:template name="xxx880">
         <!-- Checks for subfield $6 ands linking data -->
-        <xsl:if test="child::subfield[@code = '6']">
-            <xsl:variable name="sf06" select="normalize-space(child::subfield[@code = '6'])"/>
+        <xsl:if test="child::subfield[@code='6']">
+            <xsl:variable name="sf06" select="normalize-space(child::subfield[@code='6'])"/>
             <xsl:variable name="sf06b" select="substring($sf06, 5, 2)"/>
             <xsl:variable name="scriptCode" select="substring($sf06, 8, 2)"/>
             <!-- 1.121 -->
-            <xsl:if test="$sf06b != '00'">
-                <!--1.183 -->
-                <datafield>
+            <xsl:if test="$sf06b != '00'">                
                 <xsl:attribute name="altRepGroup">
                     <xsl:value-of select="$sf06b"/>
-                </xsl:attribute>
-                </datafield>
+                </xsl:attribute>                
             </xsl:if>
             <xsl:call-template name="scriptCode"/>
         </xsl:if>
@@ -4618,30 +4567,31 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     <xd:doc id="xxs880" scope="component">
         <xd:desc> 880 processing when called from subfield </xd:desc>
     </xd:doc>
+    <!--1.121 --><!-- 880 processing when called from subfield -->
     <xsl:template name="xxs880">
         <!-- Checks for subfield $6 ands linking data -->
-        <xsl:if test="preceding-sibling::*[@code = '6']">
-            <xsl:variable name="sf06" select="normalize-space(preceding-sibling::*[@code = '6'])"/>
+        <xsl:if test="preceding-sibling::*[@code='6']">
+            <xsl:variable name="sf06" select="normalize-space(preceding-sibling::*[@code='6'])"/>
             <xsl:variable name="sf06b" select="substring($sf06, 5, 2)"/>
             <xsl:variable name="scriptCode" select="substring($sf06, 8, 2)"/>
             <!-- 1.121 -->
             <xsl:if test="$sf06b != '00'">
                 <xsl:attribute name="altRepGroup">
                     <xsl:value-of select="$sf06b"/>
-                </xsl:attribute>
+                </xsl:attribute>				
             </xsl:if>
             <xsl:attribute name="script">
                 <xsl:choose>
-                    <xsl:when test="$scriptCode = ''">Latn</xsl:when>
-                    <xsl:when test="$scriptCode = '(3'">Arab</xsl:when>
-                    <xsl:when test="$scriptCode = '(4'">Arab</xsl:when>
-                    <xsl:when test="$scriptCode = '(B'">Latn</xsl:when>
-                    <xsl:when test="$scriptCode = '!E'">Latn</xsl:when>
-                    <xsl:when test="$scriptCode = '$1'">CJK</xsl:when>
-                    <xsl:when test="$scriptCode = '(N'">Cyrl</xsl:when>
-                    <xsl:when test="$scriptCode = '(Q'">Cyrl</xsl:when>
-                    <xsl:when test="$scriptCode = '(2'">Hebr</xsl:when>
-                    <xsl:when test="$scriptCode = '(S'">Grek</xsl:when>
+                    <xsl:when test="$scriptCode=''">Latn</xsl:when>
+                    <xsl:when test="$scriptCode='(3'">Arab</xsl:when>
+                    <xsl:when test="$scriptCode='(4'">Arab</xsl:when>
+                    <xsl:when test="$scriptCode='(B'">Latn</xsl:when>
+                    <xsl:when test="$scriptCode='!E'">Latn</xsl:when>
+                    <xsl:when test="$scriptCode='$1'">CJK</xsl:when>
+                    <xsl:when test="$scriptCode='(N'">Cyrl</xsl:when>
+                    <xsl:when test="$scriptCode='(Q'">Cyrl</xsl:when>
+                    <xsl:when test="$scriptCode='(2'">Hebr</xsl:when>
+                    <xsl:when test="$scriptCode='(S'">Grek</xsl:when>
                 </xsl:choose>
             </xsl:attribute>
         </xsl:if>
@@ -4665,7 +4615,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name z2xx880</xd:desc>
     </xd:doc>
     <xsl:template name="z2xx880">
         <!-- Evaluating the 260 field -->
@@ -4734,7 +4684,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name z3xx880</xd:desc>
     </xd:doc>
     <xsl:template name="z3xx880">
         <!-- Evaluating the 300 field -->
@@ -4836,7 +4786,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
 
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name true880</xd:desc>
     </xd:doc>
     <xsl:template name="true880">
         <xsl:variable name="sf06" select="normalize-space(subfield[@code = '6'])"/>
@@ -4851,7 +4801,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc> match datafield</xd:desc>
     </xd:doc>
     <xsl:template match="datafield" mode="trans880">
         <xsl:variable name="datafield880" select="//datafield"/>
@@ -5185,8 +5135,9 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             <xsl:call-template name="part"/>
         </titleInfo>
     </xsl:template>
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createTitleInfoFrom730</xd:desc>
     </xd:doc>
     <xsl:template name="createTitleInfoFrom730">
         <titleInfo type="uniform">
@@ -5224,7 +5175,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createTitleInfoFrom210</xd:desc>
     </xd:doc>
     <xsl:template name="createTitleInfoFrom210">
         <titleInfo type="abbreviated">
@@ -5319,7 +5270,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createTitleInfoFrom246</xd:desc>
     </xd:doc>
     <xsl:template name="createTitleInfoFrom246">
         <titleInfo>
@@ -5336,9 +5287,9 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             <xsl:for-each select="subfield[@code = 'i']">
                 <!-- 1.183 -->
                 <datafield>
-                <xsl:attribute name="displayLabel">
-                    <xsl:value-of select="text()"/>
-                </xsl:attribute>
+                    <xsl:attribute name="displayLabel">
+                        <xsl:value-of select="text()"/>
+                    </xsl:attribute>
                 </datafield>
             </xsl:for-each>
             <xsl:variable name="this">
@@ -5396,7 +5347,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createTitleInfoFrom740</xd:desc>
     </xd:doc>
     <xsl:template name="createTitleInfoFrom740">
         <titleInfo type="alternative">
@@ -5434,10 +5385,10 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                 <!--Revision 2.06 cm3 edit, commented out named template to pull <namePart> from displayForm-->
                 <!--<xsl:call-template name="nameABCDQ"/>-->
                 <xsl:call-template name="personal_name"/>
+                <xsl:call-template name="nameIdentifier"/>
                 <xsl:call-template name="affiliation"/>
                 <xsl:call-template name="role"/>
                 <!-- 1.116 -->
-                <xsl:call-template name="nameIdentifier"/>
             </name>
         </xsl:if>
         <!-- 1.99 240 fix 20140804 -->
@@ -5453,10 +5404,11 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                 <!--Revision 2.06 cm3 edit, commented out named template to pull <namePart> from displayForm-->
                 <!--<xsl:call-template name="nameABCDQ"/>-->
                 <xsl:call-template name="personal_name"/>
+                <xsl:call-template name="nameIdentifier"/>
                 <xsl:call-template name="affiliation"/>
                 <xsl:call-template name="role"/>
                 <!-- 1.116 -->
-                <xsl:call-template name="nameIdentifier"/>
+
             </name>
         </xsl:if>
     </xsl:template>
@@ -5510,10 +5462,11 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                 <xsl:apply-templates select="subfield[@code = '0'][. != '']" mode="xlink"/>
                 <!--<xsl:call-template name="nameABCDQ"/>-->
                 <xsl:call-template name="personal_name"/>
+                <xsl:call-template name="nameIdentifier"/>
                 <xsl:call-template name="affiliation"/>
                 <xsl:call-template name="role"/>
                 <!-- 1.116 -->
-                <xsl:call-template name="nameIdentifier"/>
+
             </name>
         </xsl:if>
         <xsl:if test="@ind1 = '3'">
@@ -5525,13 +5478,13 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
                 <xsl:call-template name="affiliation"/>
                 <xsl:call-template name="role"/>
                 <!-- 1.116 -->
-                <xsl:call-template name="nameIdentifier"/>
+
             </name>
         </xsl:if>
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNameFrom710</xd:desc>
     </xd:doc>
     <xsl:template name="createNameFrom710">
         <name type="corporate">
@@ -5633,13 +5586,13 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             <xsl:call-template name="xxx880"/>
             <xsl:call-template name="subfieldSelect">
                 <xsl:with-param name="codes">abcdef</xsl:with-param>
-                <xsl:with-param name="delimeter">-</xsl:with-param>
+                <xsl:with-param name="delimiter">-</xsl:with-param>
             </xsl:call-template>
         </genre>
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createGenreFrom336</xd:desc>
     </xd:doc>
     <xsl:template name="createGenreFrom336">
         <genre>
@@ -5653,14 +5606,14 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             <xsl:call-template name="xxx880"/>
             <xsl:call-template name="subfieldSelect">
                 <xsl:with-param name="codes">a</xsl:with-param>
-                <xsl:with-param name="delimeter">-</xsl:with-param>
+                <xsl:with-param name="delimiter">-</xsl:with-param>
             </xsl:call-template>
         </genre>
 
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createGenreFrom655</xd:desc>
     </xd:doc>
     <xsl:template name="createGenreFrom655">
         <genre authority="marcgt">
@@ -5683,7 +5636,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
             <!-- 1.132 <xsl:apply-templates select="[. != '']" mode="xlink"/>-->
             <xsl:call-template name="subfieldSelect">
                 <xsl:with-param name="codes">abvxyz</xsl:with-param>
-                <xsl:with-param name="delimeter">-</xsl:with-param>
+                <xsl:with-param name="delimiter">-</xsl:with-param>
             </xsl:call-template>
         </genre>
     </xsl:template>
@@ -5802,7 +5755,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNoteFrom362</xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom362">
         <note type="date/sequential designation">
@@ -5819,7 +5772,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNoteFrom500</xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom500">
         <note>
@@ -5837,7 +5790,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNoteFrom502</xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom502">
         <note type="thesis">
@@ -5854,7 +5807,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNoteFrom504</xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom504">
         <note type="bibliography">
@@ -5871,7 +5824,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNoteFrom508</xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom508">
         <note type="creation/production credits">
@@ -5889,7 +5842,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNoteFrom511</xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom511">
         <note type="performers">
@@ -5906,7 +5859,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNoteFrom515</xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom515">
         <note type="numbering">
@@ -5923,7 +5876,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNoteFrom518</xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom518">
         <note type="venue">
@@ -5940,7 +5893,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNoteFrom524</xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom524">
         <note type="preferred citation">
@@ -5957,7 +5910,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNoteFrom530</xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom530">
         <note type="additional physical form">
@@ -5975,7 +5928,7 @@ An attribute node (nameTitleGroup) cannot be created after a child of the contai
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNoteFrom533</xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom533">
         <note type="reproduction">
@@ -6018,7 +5971,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNoteFrom536</xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom536">
         <note type="funding">
@@ -6035,7 +5988,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNoteFrom538</xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom538">
         <note type="system details">
@@ -6052,7 +6005,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNoteFrom541</xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom541">
         <note type="acquisition">
@@ -6069,7 +6022,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNoteFrom545</xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom545">
         <note type="biographical/historical">
@@ -6086,7 +6039,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNoteFrom546</xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom546">
         <note type="language">
@@ -6103,7 +6056,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNoteFrom561</xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom561">
         <note type="ownership">
@@ -6120,7 +6073,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNoteFrom562</xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom562">
         <note type="version identification">
@@ -6137,7 +6090,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNoteFrom581</xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom581">
         <note type="publications">
@@ -6154,7 +6107,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNoteFrom583</xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom583">
         <note type="action">
@@ -6171,7 +6124,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createNoteFrom585</xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom585">
         <note type="exhibitions">
@@ -6224,7 +6177,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createSubGeoFrom043</xd:desc>
     </xd:doc>
     <xsl:template name="createSubGeoFrom043">
         <subject>
@@ -6249,7 +6202,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createSubGeoFrom255</xd:desc>
     </xd:doc>
     <xsl:template name="createSubGeoFrom255">
         <subject>
@@ -6277,128 +6230,171 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createSubNameFrom600</xd:desc>
     </xd:doc>
     <xsl:template name="createSubNameFrom600">
-        <subject>
-            <xsl:call-template name="xxx880"/>
-            <xsl:call-template name="subjectAuthority"/>
-            <!-- 1.122 -->
-            <xsl:apply-templates select="subfield[@code = '0']" mode="xlink"/>
-            <name type="personal">
-                <namePart>
-                    <!-- 1.126 -->
-                    <xsl:call-template name="subfieldSelect">
-                        <xsl:with-param name="codes">aq</xsl:with-param>
-                    </xsl:call-template>
-                </namePart>
-                <xsl:call-template name="termsOfAddress"/>
-                <xsl:call-template name="nameDate"/>
-                <xsl:call-template name="affiliation"/>
-                <xsl:call-template name="role"/>
-            </name>
-            <xsl:if test="subfield[@code = 't']">
-                <titleInfo>
-                    <xsl:variable name="this">
-                        <xsl:call-template name="chopPunctuation">
-                            <xsl:with-param name="chopString">
-                                <xsl:call-template name="subfieldSelect">
-                                    <xsl:with-param name="codes">t</xsl:with-param>
-                                </xsl:call-template>
-                            </xsl:with-param>
+        <!-- 1.189 -->
+        <xsl:if test="datafield[@tag = '600']">
+            <subject>
+                <xsl:call-template name="xxx880"/>
+                <xsl:call-template name="subjectAuthority"/>
+                <!-- 1.122 -->
+                <xsl:apply-templates select="subfield[@code = '0']" mode="xlink"/>
+                <name type="personal">
+                    <namePart>
+                        <!-- 1.126 -->
+                        <xsl:call-template name="subfieldSelect">
+                            <xsl:with-param name="codes">aq</xsl:with-param>
                         </xsl:call-template>
-                    </xsl:variable>
-                    <title>
-                        <xsl:value-of select="normalize-space($this)"/>
-                    </title>
-                    <xsl:call-template name="part"/>
-                </titleInfo>
-            </xsl:if>
-            <xsl:call-template name="subjectAnyOrder"/>
-        </subject>
+                    </namePart>
+                    <xsl:call-template name="termsOfAddress"/>
+                    <xsl:call-template name="nameDate"/>
+                    <xsl:call-template name="affiliation"/>
+                    <xsl:call-template name="role"/>
+                </name>
+                <xsl:if test="subfield[@code = 't']">
+                    <titleInfo>
+                        <xsl:variable name="this">
+                            <xsl:call-template name="chopPunctuation">
+                                <xsl:with-param name="chopString">
+                                    <xsl:call-template name="subfieldSelect">
+                                        <xsl:with-param name="codes">t</xsl:with-param>
+                                    </xsl:call-template>
+                                </xsl:with-param>
+                            </xsl:call-template>
+                        </xsl:variable>
+                        <title>
+                            <xsl:value-of select="normalize-space($this)"/>
+                        </title>
+                        <xsl:call-template name="part"/>
+                    </titleInfo>
+                </xsl:if>
+                <xsl:call-template name="subjectAnyOrder"/>
+            </subject>
+        </xsl:if>
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createSubNameFrom610</xd:desc>
     </xd:doc>
     <xsl:template name="createSubNameFrom610">
-        <subject>
-            <xsl:call-template name="xxx880"/>
-            <xsl:call-template name="subjectAuthority"/>
-            <!-- 1.122 -->
-            <xsl:apply-templates select="subfield[@code = '0']" mode="xlink"/>
-            <name type="corporate">
-                <xsl:for-each select="subfield[@code = 'a']">
-                    <namePart>
-                        <xsl:value-of select="."/>
-                    </namePart>
-                </xsl:for-each>
-                <xsl:for-each select="subfield[@code = 'b']">
-                    <namePart>
-                        <xsl:value-of select="."/>
-                    </namePart>
-                </xsl:for-each>
-                <xsl:if
-                    test="subfield[@code = 'c' or @code = 'd' or @code = 'n' or @code = 'p']">
-                    <namePart>
-                        <xsl:call-template name="subfieldSelect">
-                            <xsl:with-param name="codes">cdnp</xsl:with-param>
-                        </xsl:call-template>
-                    </namePart>
+        <!-- 1.189 -->
+        <xsl:if test="datafield[@tag = '610']">
+            <subject>
+                <xsl:attribute name="authority">
+                    <xsl:call-template name="xxx880"/>
+                    <xsl:call-template name="subjectAuthority"/>
+                </xsl:attribute>
+                <!-- 1.122 -->
+                <xsl:apply-templates select="subfield[@code = '0']" mode="xlink"/>
+                <name type="corporate">
+                    <xsl:for-each select="subfield[@code = 'a']">
+                        <namePart>
+                            <xsl:value-of select="."/>
+                        </namePart>
+                    </xsl:for-each>
+                    <xsl:for-each select="subfield[@code = 'b']">
+                        <namePart>
+                            <xsl:value-of select="."/>
+                        </namePart>
+                    </xsl:for-each>
+                    <xsl:if
+                        test="subfield[@code = 'c' or @code = 'd' or @code = 'n' or @code = 'p']">
+                        <namePart>
+                            <xsl:call-template name="subfieldSelect">
+                                <xsl:with-param name="codes">cdnp</xsl:with-param>
+                            </xsl:call-template>
+                        </namePart>
+                    </xsl:if>
+                    <xsl:call-template name="role"/>
+                </name>
+                <xsl:if test="subfield[@code = 't']">
+                    <titleInfo>
+                        <xsl:variable name="this">
+                            <xsl:call-template name="chopPunctuation">
+                                <xsl:with-param name="chopString">
+                                    <xsl:call-template name="subfieldSelect">
+                                        <xsl:with-param name="codes">t</xsl:with-param>
+                                    </xsl:call-template>
+                                </xsl:with-param>
+                            </xsl:call-template>
+                        </xsl:variable>
+                        <title>
+                            <xsl:value-of select="normalize-space($this)"/>
+                        </title>
+                        <xsl:call-template name="part"/>
+                    </titleInfo>
                 </xsl:if>
-                <xsl:call-template name="role"/>
-            </name>
-            <xsl:if test="subfield[@code = 't']">
-                <titleInfo>
-                    <xsl:variable name="this">
-                        <xsl:call-template name="chopPunctuation">
-                            <xsl:with-param name="chopString">
-                                <xsl:call-template name="subfieldSelect">
-                                    <xsl:with-param name="codes">t</xsl:with-param>
-                                </xsl:call-template>
-                            </xsl:with-param>
-                        </xsl:call-template>
-                    </xsl:variable>
-                    <title>
-                        <xsl:value-of select="normalize-space($this)"/>
-                    </title>
-                    <xsl:call-template name="part"/>
-                </titleInfo>
-            </xsl:if>
-            <xsl:call-template name="subjectAnyOrder"/>
-        </subject>
+                <xsl:call-template name="subjectAnyOrder"/>
+            </subject>
+        </xsl:if>
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createSubNameFrom611</xd:desc>
     </xd:doc>
     <xsl:template name="createSubNameFrom611">
-        <subject>
-            <xsl:call-template name="xxx880"/>
-            <xsl:call-template name="subjectAuthority"/>
-            <!-- 1.122 -->
-            <xsl:apply-templates select="subfield[@code = '0']" mode="xlink"/>
-            <name type="conference">
-                <namePart>
-                    <xsl:call-template name="subfieldSelect">
-                        <xsl:with-param name="codes">abcdeqnp</xsl:with-param>
-                    </xsl:call-template>
-                </namePart>
-                <xsl:for-each select="subfield[@code = '4']">
-                    <role>
-                        <roleTerm authority="marcrelator" type="code">
-                            <xsl:value-of select="."/>
-                        </roleTerm>
-                    </role>
-                </xsl:for-each>
-            </name>
-            <xsl:if test="subfield[@code = 't']">
+        <!-- 1.189 -->
+        <xsl:if test="datafield[@tag = '611']">
+            <subject>
+                <xsl:call-template name="xxx880"/>
+                <xsl:call-template name="subjectAuthority"/>
+                <!-- 1.122 -->
+                <xsl:apply-templates select="subfield[@code = '0']" mode="xlink"/>
+                <name type="conference">
+                    <namePart>
+                        <xsl:call-template name="subfieldSelect">
+                            <xsl:with-param name="codes">abcdeqnp</xsl:with-param>
+                        </xsl:call-template>
+                    </namePart>
+                    <xsl:for-each select="subfield[@code = '4']">
+                        <role>
+                            <roleTerm authority="marcrelator" type="code">
+                                <xsl:value-of select="."/>
+                            </roleTerm>
+                        </role>
+                    </xsl:for-each>
+                </name>
+                <xsl:if test="subfield[@code = 't']">
+                    <titleInfo>
+                        <xsl:variable name="this">
+                            <xsl:call-template name="chopPunctuation">
+                                <xsl:with-param name="chopString">
+                                    <xsl:call-template name="subfieldSelect">
+                                        <xsl:with-param name="codes">tpn</xsl:with-param>
+                                    </xsl:call-template>
+                                </xsl:with-param>
+                            </xsl:call-template>
+                        </xsl:variable>
+
+                        <title>
+                            <xsl:value-of select="normalize-space($this)"/>
+                        </title>
+                        <xsl:call-template name="part"/>
+                    </titleInfo>
+                </xsl:if>
+                <xsl:call-template name="subjectAnyOrder"/>
+            </subject>
+        </xsl:if>
+    </xsl:template>
+
+    <xd:doc>
+        <xd:desc>name createSubTitleFrom630</xd:desc>
+    </xd:doc>
+    <xsl:template name="createSubTitleFrom630">
+        <!-- 1.189 -->
+        <xsl:if test="datafield[@tag = '630']">
+            <subject>
+                <xsl:call-template name="xxx880"/>
+                <xsl:call-template name="subjectAuthority"/>
+                <!-- 1.122 -->
+                <xsl:apply-templates select="subfield[@code = '0']" mode="xlink"/>
                 <titleInfo>
                     <xsl:variable name="this">
                         <xsl:call-template name="chopPunctuation">
                             <xsl:with-param name="chopString">
                                 <xsl:call-template name="subfieldSelect">
-                                    <xsl:with-param name="codes">tpn</xsl:with-param>
+                                    <xsl:with-param name="codes">adfhklor</xsl:with-param>
                                 </xsl:call-template>
                             </xsl:with-param>
                         </xsl:call-template>
@@ -6409,75 +6405,50 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
                     </title>
                     <xsl:call-template name="part"/>
                 </titleInfo>
-            </xsl:if>
-            <xsl:call-template name="subjectAnyOrder"/>
-        </subject>
+                <xsl:call-template name="subjectAnyOrder"/>
+            </subject>
+        </xsl:if>
     </xsl:template>
 
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createSubChronFrom648</xd:desc>
     </xd:doc>
-    <xsl:template name="createSubTitleFrom630">
-        <subject>
-            <xsl:call-template name="xxx880"/>
-            <xsl:call-template name="subjectAuthority"/>
-            <!-- 1.122 -->
-            <xsl:apply-templates select="subfield[@code = '0']" mode="xlink"/>
-            <titleInfo>
-                <xsl:variable name="this">
+    <xsl:template name="createSubChronFrom648">
+        <!-- 1.189 -->
+        <xsl:if test="datafield[@tag = '648']">
+            <subject>
+                <xsl:call-template name="xxx880"/>
+                <xsl:if test="subfield[@ind2 = '7'][@code = '2']">
+                    <xsl:attribute name="authority">
+                        <xsl:value-of select="subfield[@code = '2']"/>
+                    </xsl:attribute>
+                </xsl:if>
+                <xsl:call-template name="uri"/>
+                <xsl:call-template name="subjectAuthority"/>
+                <temporal>
                     <xsl:call-template name="chopPunctuation">
                         <xsl:with-param name="chopString">
                             <xsl:call-template name="subfieldSelect">
-                                <xsl:with-param name="codes">adfhklor</xsl:with-param>
+                                <xsl:with-param name="codes">abcd</xsl:with-param>
                             </xsl:call-template>
                         </xsl:with-param>
                     </xsl:call-template>
-                </xsl:variable>
-
-                <title>
-                    <xsl:value-of select="normalize-space($this)"/>
-                </title>
-                <xsl:call-template name="part"/>
-            </titleInfo>
-            <xsl:call-template name="subjectAnyOrder"/>
-        </subject>
+                </temporal>
+                <xsl:call-template name="subjectAnyOrder"/>
+            </subject>
+        </xsl:if>
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
-    </xd:doc>
-    <xsl:template name="createSubChronFrom648">
-        <subject>
-            <xsl:call-template name="xxx880"/>
-            <xsl:if test="subfield[@code = '2']">
-                <xsl:attribute name="authority">
-                    <xsl:value-of select="subfield[@code = '2']"/>
-                </xsl:attribute>
-            </xsl:if>
-            <xsl:call-template name="uri"/>
-            <xsl:call-template name="subjectAuthority"/>
-            <temporal>
-                <xsl:call-template name="chopPunctuation">
-                    <xsl:with-param name="chopString">
-                        <xsl:call-template name="subfieldSelect">
-                            <xsl:with-param name="codes">abcd</xsl:with-param>
-                        </xsl:call-template>
-                    </xsl:with-param>
-                </xsl:call-template>
-            </temporal>
-            <xsl:call-template name="subjectAnyOrder"/>
-        </subject>
-    </xsl:template>
-
-    <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createSubTopFrom650</xd:desc>
     </xd:doc>
     <xsl:template name="createSubTopFrom650">
         <subject>
             <xsl:call-template name="xxx880"/>
             <xsl:call-template name="subjectAuthority"/>
             <!-- 1.122 -->
-            <xsl:apply-templates select="subfield[@code = '0']" mode="xlink"/>
+            <xsl:apply-templates select="subfield[@code='0']" mode="xlink"/>
             <topic>
                 <xsl:call-template name="chopPunctuation">
                     <xsl:with-param name="chopString">
@@ -6490,11 +6461,13 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
             <xsl:call-template name="subjectAnyOrder"/>
         </subject>
     </xsl:template>
-
+    
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createSubGeoFrom651</xd:desc>
     </xd:doc>
     <xsl:template name="createSubGeoFrom651">
+        <!-- 1.189 -->
+         <xsl:if test="datafield[@tag='651']">
         <subject>
             <xsl:call-template name="xxx880"/>
             <xsl:call-template name="subjectAuthority"/>
@@ -6509,14 +6482,14 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
             </xsl:for-each>
             <xsl:call-template name="subjectAnyOrder"/>
         </subject>
+        </xsl:if>
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createSubFrom653</xd:desc>
     </xd:doc>
     <xsl:template name="createSubFrom653">
-
-        <xsl:if test="@ind2 = ' '">
+        <xsl:if test="datafield[@tag = '653'][@ind2 = ' ']">
             <subject>
                 <!-- 1.121 -->
                 <xsl:call-template name="xxx880"/>
@@ -6610,98 +6583,104 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createSubFrom656</xd:desc>
     </xd:doc>
     <xsl:template name="createSubFrom656">
-        <subject>
-            <xsl:call-template name="xxx880"/>
-            <!-- 1.122 -->
-            <xsl:apply-templates select="subfield[@code = '0']" mode="xlink"/>
-            <xsl:if test="subfield[@code = '2']">
-                <xsl:attribute name="authority">
-                    <xsl:value-of select="subfield[@code = '2']"/>
-                </xsl:attribute>
-            </xsl:if>
-            <occupation>
-                <xsl:call-template name="chopPunctuation">
-                    <xsl:with-param name="chopString">
-                        <xsl:value-of select="subfield[@code = 'a']"/>
-                    </xsl:with-param>
-                </xsl:call-template>
-            </occupation>
-        </subject>
-    </xsl:template>
-
-    <xd:doc>
-        <xd:desc/>
-    </xd:doc>
-    <xsl:template name="createSubGeoFrom662752">
-        <subject>
-            <xsl:call-template name="xxx880"/>
-            <!-- 1.139 -->
-            <xsl:apply-templates select="subfield[@code = '0']" mode="valueURI"/>
-            <hierarchicalGeographic>
-                <!-- 1.113 -->
-                <xsl:if test="subfield[@code = '0']">
-                    <xsl:attribute name="valueURI">
-                        <xsl:value-of select="subfield[@code = '0']"/>
+        <!-- 1.189 -->
+        <xsl:if test="datafield[@tag = '656']">
+            <subject>
+                <xsl:call-template name="xxx880"/>
+                <!-- 1.122 -->
+                <xsl:apply-templates select="subfield[@code = '0']" mode="xlink"/>
+                <xsl:if test="subfield[@code = '2']">
+                    <xsl:attribute name="authority">
+                        <xsl:value-of select="subfield[@code = '2']"/>
                     </xsl:attribute>
                 </xsl:if>
-                <xsl:for-each select="subfield[@code = 'a']">
-                    <country>
-                        <xsl:call-template name="chopPunctuation">
-                            <xsl:with-param name="chopString" select="."/>
-                        </xsl:call-template>
-                    </country>
-                </xsl:for-each>
-                <xsl:for-each select="subfield[@code = 'b']">
-                    <state>
-                        <xsl:call-template name="chopPunctuation">
-                            <xsl:with-param name="chopString" select="."/>
-                        </xsl:call-template>
-                    </state>
-                </xsl:for-each>
-                <xsl:for-each select="subfield[@code = 'c']">
-                    <county>
-                        <xsl:call-template name="chopPunctuation">
-                            <xsl:with-param name="chopString" select="."/>
-                        </xsl:call-template>
-                    </county>
-                </xsl:for-each>
-                <xsl:for-each select="subfield[@code = 'd']">
-                    <city>
-                        <xsl:call-template name="chopPunctuation">
-                            <xsl:with-param name="chopString" select="."/>
-                        </xsl:call-template>
-                    </city>
-                </xsl:for-each>
-                <xsl:for-each select="subfield[@code = 'e']">
-                    <citySection>
-                        <xsl:call-template name="chopPunctuation">
-                            <xsl:with-param name="chopString" select="."/>
-                        </xsl:call-template>
-                    </citySection>
-                </xsl:for-each>
-                <xsl:for-each select="subfield[@code = 'g']">
-                    <area>
-                        <xsl:call-template name="chopPunctuation">
-                            <xsl:with-param name="chopString" select="."/>
-                        </xsl:call-template>
-                    </area>
-                </xsl:for-each>
-                <xsl:for-each select="subfield[@code = 'h']">
-                    <extraterrestrialArea>
-                        <xsl:call-template name="chopPunctuation">
-                            <xsl:with-param name="chopString" select="."/>
-                        </xsl:call-template>
-                    </extraterrestrialArea>
-                </xsl:for-each>
-            </hierarchicalGeographic>
-        </subject>
+                <occupation>
+                    <xsl:call-template name="chopPunctuation">
+                        <xsl:with-param name="chopString">
+                            <xsl:value-of select="subfield[@code = 'a']"/>
+                        </xsl:with-param>
+                    </xsl:call-template>
+                </occupation>
+            </subject>
+        </xsl:if>
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createSubGeoFrom662752</xd:desc>
+    </xd:doc>
+    <xsl:template name="createSubGeoFrom662752">
+        <!-- 1.189 -->
+        <xsl:if test="datafield[@tag = '662' or @tag = '752']">
+            <subject>
+                <xsl:call-template name="xxx880"/>
+                <!-- 1.139 -->
+                <xsl:apply-templates select="subfield[@code = '0']" mode="valueURI"/>
+                <hierarchicalGeographic>
+                    <!-- 1.113 -->
+                    <xsl:if test="subfield[@code = '0']">
+                        <xsl:attribute name="valueURI">
+                            <xsl:value-of select="subfield[@code = '0']"/>
+                        </xsl:attribute>
+                    </xsl:if>
+                    <xsl:for-each select="subfield[@code = 'a']">
+                        <country>
+                            <xsl:call-template name="chopPunctuation">
+                                <xsl:with-param name="chopString" select="."/>
+                            </xsl:call-template>
+                        </country>
+                    </xsl:for-each>
+                    <xsl:for-each select="subfield[@code = 'b']">
+                        <state>
+                            <xsl:call-template name="chopPunctuation">
+                                <xsl:with-param name="chopString" select="."/>
+                            </xsl:call-template>
+                        </state>
+                    </xsl:for-each>
+                    <xsl:for-each select="subfield[@code = 'c']">
+                        <county>
+                            <xsl:call-template name="chopPunctuation">
+                                <xsl:with-param name="chopString" select="."/>
+                            </xsl:call-template>
+                        </county>
+                    </xsl:for-each>
+                    <xsl:for-each select="subfield[@code = 'd']">
+                        <city>
+                            <xsl:call-template name="chopPunctuation">
+                                <xsl:with-param name="chopString" select="."/>
+                            </xsl:call-template>
+                        </city>
+                    </xsl:for-each>
+                    <xsl:for-each select="subfield[@code = 'e']">
+                        <citySection>
+                            <xsl:call-template name="chopPunctuation">
+                                <xsl:with-param name="chopString" select="."/>
+                            </xsl:call-template>
+                        </citySection>
+                    </xsl:for-each>
+                    <xsl:for-each select="subfield[@code = 'g']">
+                        <area>
+                            <xsl:call-template name="chopPunctuation">
+                                <xsl:with-param name="chopString" select="."/>
+                            </xsl:call-template>
+                        </area>
+                    </xsl:for-each>
+                    <xsl:for-each select="subfield[@code = 'h']">
+                        <extraterrestrialArea>
+                            <xsl:call-template name="chopPunctuation">
+                                <xsl:with-param name="chopString" select="."/>
+                            </xsl:call-template>
+                        </extraterrestrialArea>
+                    </xsl:for-each>
+                </hierarchicalGeographic>
+            </subject>
+        </xsl:if>
+    </xsl:template>
+
+    <xd:doc>
+        <xd:desc>name createSubTemFrom045</xd:desc>
     </xd:doc>
     <xsl:template name="createSubTemFrom045">
         <xsl:if
@@ -6903,7 +6882,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createClassificationFrom084</xd:desc>
     </xd:doc>
     <xsl:template name="createClassificationFrom084">
         <classification>
@@ -6918,7 +6897,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createClassificationFrom086</xd:desc>
     </xd:doc>
     <xsl:template name="createClassificationFrom086">
         <xsl:for-each select="datafield[@tag = '086'][@ind1 = '0']">
@@ -7042,7 +7021,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>createLocationFrom856</xd:desc>
     </xd:doc>
     <xsl:template name="createLocationFrom856">
         <xsl:if test="//datafield[@tag = '856'][@ind2 != '2'][subfield[@code = 'u']]">
@@ -7056,11 +7035,9 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
                             <xsl:when
                                 test="@ind2 = '0' and count(preceding-sibling::datafield[@tag = '856'][@ind2 = '0']) = 0"
                                 >true</xsl:when>
-
                             <xsl:when
                                 test="@ind2 = '1' and count(ancestor::record//datafield[@tag = '856'][@ind2 = '0']) = 0 and count(preceding-sibling::datafield[@tag = '856'][@ind2 = '1']) = 0"
                                 >true</xsl:when>
-
                             <xsl:when
                                 test="@ind2 != '1' and @ind2 != '0' and @ind2 != '2' and count(ancestor::record//datafield[@tag = '856' and @ind2 = '0']) = 0 and count(ancestor::record//datafield[@tag = '856' and @ind2 = '1']) = 0 and count(preceding-sibling::datafield[@tag = '856'][@ind2]) = 0"
                                 >true</xsl:when>
@@ -7070,7 +7047,6 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
                     <xsl:if test="$primary = 'true'">
                         <xsl:attribute name="usage">primary display</xsl:attribute>
                     </xsl:if>
-
                     <xsl:if test="subfield[@code = 'y' or @code = '3']">
                         <xsl:attribute name="displayLabel">
                             <xsl:call-template name="subfieldSelect">
@@ -7085,22 +7061,59 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
                             </xsl:call-template>
                         </xsl:attribute>
                     </xsl:if>
-                    <xsl:value-of select="subfield[@code = 'u']"/>
+                    <!-- 1.184 -->
+                    <xsl:if test="subfield[@code = 'u']">
+                        <xsl:value-of select="f:percentEncode(subfield[@code = 'u'])"/>
+                    </xsl:if>
                 </url>
             </location>
         </xsl:if>
     </xsl:template>
+
+    <!-- location/url from NAL local fields -->
+    <extension>
+        <xsl:for-each select="datafield[@tag = '910']">
+            <xsl:call-template name="createNameFrom910"/>
+        </xsl:for-each>
+        <xsl:if test="datafield[@tag = 859]">
+            <location>
+                <xsl:call-template name="createLocationFrom859"/>
+            </location>
+        </xsl:if>
+    </extension>
+
+    <xd:doc id="createLocationFrom859" scope="component">
+        <xd:desc>createLocationFrom859</xd:desc>
+    </xd:doc>
+    <xsl:template name="createLocationFrom859">
+        <xsl:for-each select="datafield[@tag = 859]">
+            <url note="ARS submission">
+                <xsl:if test="count(preceding-sibling::datafield[@tag = 859]) = 0">
+                    <xsl:attribute name="usage">primary</xsl:attribute>
+                </xsl:if>
+                <xsl:if test="subfield[@code = 'y' or @code = '3']">
+                    <xsl:attribute name="displayLabel">
+                        <xsl:call-template name="subfieldSelect">
+                            <xsl:with-param name="codes">y3</xsl:with-param>
+                        </xsl:call-template>
+                    </xsl:attribute>
+                </xsl:if>
+                <xsl:choose>
+                    <xsl:when test="subfield[@code = 'u']">
+                        <xsl:value-of select="subfield[@code = 'u']"/>
+                    </xsl:when>
+                    <xsl:when test="subfield[@code = 'a']">
+                        <xsl:value-of select="subfield[@code = 'a']"/>
+                    </xsl:when>
+                </xsl:choose>
+            </url>
+        </xsl:for-each>
+    </xsl:template>
+
     <xd:doc id="createAccessConditionFrom506" scope="component">
         <xd:desc> accessCondition 506 540 1.87 20130829</xd:desc>
     </xd:doc>
     <xsl:template name="createAccessConditionFrom506">
-        <!-- 1.175 commented out LC's code replaced with NAL's access condition statement
-        <accessCondition type="restriction on access">
-            <xsl:call-template name="xxx880"/>
-            <xsl:call-template name="subfieldSelect">
-                <xsl:with-param name="codes">abcd35</xsl:with-param>
-            </xsl:call-template>  
-       </accessCondition> -->
         <xsl:if
             test="matches(., 'Resource is Open Access') and matches(., 'http://purl.org/eprint/accessRights/OpenAccess')">
             <accessCondition type="use and reproduction" displayLabel="Resource is Open Access">
@@ -7112,7 +7125,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name createAccessConditionFrom540</xd:desc>
     </xd:doc>
     <xsl:template name="createAccessConditionFrom540">
         <accessCondition type="use and reproduction">
@@ -7123,17 +7136,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
         </accessCondition>
     </xsl:template>
 
-    <!-- recordInfo 040 005 001 003 -->
 
-
-    <xd:doc>
-        <xd:desc> 880 global copy template </xd:desc>
-    </xd:doc>
-    <xsl:template match="* | @*" mode="global_copy">
-        <xsl:copy>
-            <xsl:apply-templates select="* | @* | text()" mode="global_copy"/>
-        </xsl:copy>
-    </xsl:template>
     <xd:doc id="nameTitleGroup" scope="component">
         <xd:desc> 1.24 rules for applying nameTitleGroup attribute </xd:desc>
     </xd:doc>
@@ -7166,9 +7169,9 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
             <xsl:when test="self::datafield[@tag = '100' or @tag = '110' or @tag = '111']">
                 <xsl:choose>
                     <xsl:when test="../datafield[@tag = '240']">
-                       <!-- 1.183 -->
+                        <!-- 1.183 -->
                         <datafield>
-                        <xsl:attribute name="nameTitleGroup">1</xsl:attribute>
+                            <xsl:attribute name="nameTitleGroup">1</xsl:attribute>
                         </datafield>
                     </xsl:when>
                     <xsl:otherwise/>
@@ -7182,13 +7185,13 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
                     <xsl:when
                         test="../datafield[@tag = '880'][starts-with(subfield[@code = '6'], '240')]">
                         <!-- 1.183 -->
-                       <datafield>
-                        <xsl:attribute name="nameTitleGroup">
-                            <xsl:value-of
-                                select="count(preceding-sibling::datafield[@tag = '700' or @tag = '710' or @tag = '711' or @tag = '880']) + 2"
-                            />
-                        </xsl:attribute>
-                       </datafield>
+                        <datafield>
+                            <xsl:attribute name="nameTitleGroup">
+                                <xsl:value-of
+                                    select="count(preceding-sibling::datafield[@tag = '700' or @tag = '710' or @tag = '711' or @tag = '880']) + 2"
+                                />
+                            </xsl:attribute>
+                        </datafield>
                     </xsl:when>
                     <xsl:otherwise/>
                 </xsl:choose>
@@ -7281,7 +7284,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
     </xsl:template>
 
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name reformattingQuality</xd:desc>
     </xd:doc>
     <xsl:template name="reformattingQuality">
         <xsl:for-each select="controlfield[@tag = '007'][substring(text(), 1, 1) = 'c']">
@@ -7298,6 +7301,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
             </xsl:choose>
         </xsl:for-each>
     </xsl:template>
+
     <xd:doc id="digitalOrigin" scope="component">
         <xd:desc>digitalOrigin</xd:desc>
         <xd:param name="typeOf008"/>
@@ -7318,8 +7322,9 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
             <digitalOrigin>digitized other analog</digitalOrigin>
         </xsl:if>
     </xsl:template>
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>name "form"</xd:desc>
         <xd:param name="controlField008"/>
         <xd:param name="typeOf008"/>
         <xd:param name="marcLeader6"/>
@@ -7697,10 +7702,9 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
         </xsl:if>
     </xsl:template>
     <!-- 130, 240, 242, 245, 246, 256 246, 730 form elements for physical description -->
-
     <xd:doc>
-        <xd:desc> Form element generated from 130, 240, 242, 245, 246,730 and 256 datafields
-        </xd:desc>
+        <xd:desc> Form element generated from 130, 240, 242, 245, 246,730 and 256
+            datafields</xd:desc>
     </xd:doc>
     <xsl:template match="
             datafield[@tag = '130']/subfield[@code = 'h']
@@ -7728,8 +7732,9 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
             </xsl:call-template>
         </form>
     </xsl:template>
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>match datafield[337] subfield[$a] (mode physDesc, type Media)</xd:desc>
     </xd:doc>
     <xsl:template
         match="datafield[@tag = '337']/subfield[@code = 'a'] | datafield[@tag = '880'][starts-with(subfield[@code = '6'], '337')]/subfield[@code = 'a']"
@@ -7744,8 +7749,9 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
             <xsl:apply-templates/>
         </form>
     </xsl:template>
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>match datafield[338] subfield[$a] (mode physDesc, type Carrier)</xd:desc>
     </xd:doc>
     <xsl:template
         match="datafield[@tag = '338']/subfield[@code = 'a'] | datafield[@tag = '880'][starts-with(subfield[@code = '6'], '338')]/subfield[@code = 'a']"
@@ -7760,8 +7766,9 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
             <xsl:apply-templates/>
         </form>
     </xsl:template>
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>match datafield[256] subfield[$a] (mode physDesc)</xd:desc>
     </xd:doc>
     <xsl:template
         match="datafield[@tag = '256']/subfield[@code = 'a'] | datafield[@tag = '880'][starts-with(subfield[@code = '6'], '256')]/subfield[@code = 'a']"
@@ -7771,9 +7778,8 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
         </form>
     </xsl:template>
 
-
     <xd:doc>
-        <xd:desc/>
+        <xd:desc> originInfo </xd:desc>
         <xd:param name="marcLeader6"/>
         <xd:param name="marcLeader7"/>
         <xd:param name="marcLeader19"/>
@@ -7791,68 +7797,67 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
         <xsl:variable name="dataField260c">
             <!--1.184-->
             <xsl:call-template name="chopPunctuationStrings">
-                    <xsl:with-param name="chopStrings"
-                        select="datafield[@tag = '260']/subfield[@code = 'c']"/>   
+                <xsl:with-param name="chopStrings"
+                    select="datafield[@tag = '260']/subfield[@code = 'c']"/>
             </xsl:call-template>
         </xsl:variable>
         <!--1.166 -->
         <!-- variable name originInfoShared-->
         <xsl:variable name="originInfoShared">
             <!-- MARC Country Codes -->
-
             <place>
-                <xsl:analyze-string select="$controlField008"
-                    regex="\d{{6}}[a-z]\d+(\\{{2,4}}|\s{{2,4}})?(xx|[a-z]{{2,3}}).*">
-                    <xsl:matching-substring>
-                        <xsl:if test="contains(regex-group(2), 'xx')"/>
-
-                        <xsl:if test="matches(regex-group(2), '[a-z]{2,3}')">
-                            <!-- marccountry code -->
-                            <placeTerm>
-                                <xsl:attribute name="type">code</xsl:attribute>
-                                <xsl:attribute name="authority">marccountry</xsl:attribute>
-                                <xsl:value-of select="regex-group(2)"/>
-                            </placeTerm>
-                            <!--1.167 -->
-                            <placeTerm>
-                                <xsl:attribute name="type">text</xsl:attribute>
-                                <xsl:value-of select="f:decodeMARCCountry(regex-group(2))"/>
-                            </placeTerm>
+                <!-- $controlfield008-15-17: Place of publication, production, or execution -->
+                <xsl:variable name="controlField008-15-17"
+                    select="normalize-space(substring($controlField008, 16, 3))"/>
+                <xsl:choose>
+                    <xsl:when test="contains($controlField008-15-17, 'xx')"/>
+                    <xsl:when test="translate($controlField008-15-17, '|', '')">
+                        <placeTerm>
+                            <xsl:attribute name="type">code</xsl:attribute>
+                            <xsl:attribute name="authority">marccountry</xsl:attribute>
+                            <xsl:value-of select="$controlField008-15-17"/>
+                        </placeTerm>
+                        <!-- 1.185 -->
+                        <placeTerm>
+                            <xsl:attribute name="type">text</xsl:attribute>
+                            <xsl:value-of select="info:marcCountry($controlField008-15-17)"/>
+                        </placeTerm>
+                    </xsl:when>
+                </xsl:choose>
+                <!-- </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:if test="translate($controlField008-15-17, '|', '')">
+                        <xsl:analyze-string select="$controlField008"
+                            regex="\d{{6}}[a-z]\d+(\\{{2,4}}|\s{{2,4}})?(xx|[a-z]{{2,3}}).*">
+                            <xsl:matching-substring>
+                                <xsl:choose>
+                                    <xsl:when test="contains(regex-group(2), 'xx')"/>
+                                    <xsl:when test="matches(regex-group(2), '[a-z]{2,3}')">
+                                        <!-\- marc country code -\->
+                                        <placeTerm>
+                                            <xsl:attribute name="type">code</xsl:attribute>
+                                            <xsl:attribute name="authority">marccountry</xsl:attribute>
+                                            <xsl:value-of select="regex-group(2)"/>
+                                        </placeTerm>
+                                        <!-\-1.167 -\->
+                                        <placeTerm>
+                                            <xsl:attribute name="type">text</xsl:attribute>
+                                            <xsl:value-of select="f:decodeMARCCountry(regex-group(2))"/>
+                                        </placeTerm>                                        
+                                    </xsl:when>
+                                </xsl:choose>
+                            </xsl:matching-substring>
+                        </xsl:analyze-string>
                         </xsl:if>
-                    </xsl:matching-substring>
-                    <xsl:non-matching-substring>
-                        <!-- Variable for marc publication code, generated from controlfield 008 -->
-                        <xsl:variable name="MARCpublicationCode"
-                            select="normalize-space(substring($controlField008, 16, 3))"/>
-                        <!-- Build place elements -->
-                        <xsl:if test="contains(regex-group(2), 'xx')"/>
-                        <xsl:if test="translate($MARCpublicationCode, '|', '')">
-
-                            <placeTerm>
-                                <xsl:attribute name="type">code</xsl:attribute>
-                                <xsl:attribute name="authority">marccountry</xsl:attribute>
-                                <xsl:value-of select="$MARCpublicationCode"/>
-                            </placeTerm>
-                            <placeTerm>
-                                <xsl:attribute name="type">text</xsl:attribute>
-                                <xsl:value-of select="f:decodeMARCCountry($MARCpublicationCode)"/>
-                            </placeTerm>
-
-                        </xsl:if>
-                    </xsl:non-matching-substring>
-                </xsl:analyze-string>
+                    </xsl:otherwise>
+                </xsl:choose>-->
             </place>
-
-
-
             <!-- 1.177 for journal publisher to appear with article -->
             <xsl:for-each select="datafield[@tag = '773']">
                 <publisher>
                     <xsl:value-of select="subfield[@code = 'd'][1]"/>
                 </publisher>
             </xsl:for-each>
-
-
             <!--dateCreated/dateIssued-->
             <xsl:variable name="controlField008-7-10"
                 select="normalize-space(substring($controlField008, 8, 4))"/>
@@ -7873,9 +7878,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
                 </xsl:analyze-string>
             </xsl:variable>
 
-            <!-- tmee 1.35 and 1.36 and 1.84-->
-
-
+            <!-- tmee 1.35 and 1.36 and 1.84 -->
             <xsl:if
                 test="($controlField008-6 = 'e' or $controlField008-6 = 'p' or $controlField008-6 = 'r' or $controlField008-6 = 's' or $controlField008-6 = 't') and ($marcLeader6 = 'd' or $marcLeader6 = 'f' or $marcLeader6 = 'p' or $marcLeader6 = 't')">
                 <xsl:if test="$controlField008-7-10 and ($controlField008-7-10 != $dataField260c)">
@@ -7886,7 +7889,6 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
             </xsl:if>
             <!-- 2022-11-23 CM3, added NALcontrolField008 variable -->
             <xsl:choose>
-                <!--YYYYMMDD -->
                 <xsl:when
                     test="($controlField008-6 = 'e' or $controlField008-6 = 'p' or $controlField008-6 = 'r' or $controlField008-6 = 's' or $controlField008-6 = 't') and not($marcLeader6 = 'd' or $marcLeader6 = 'f' or $marcLeader6 = 'p' or $marcLeader6 = 't')">
                     <!-- use substring to limit for dates-->
@@ -7899,25 +7901,22 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
                                 <xsl:matching-substring>
                                     <dateIssued encoding="w3cdtf" keyDate="yes">
                                         <xsl:choose>
+                                            <!--YYYY-MM-DD-->
                                             <xsl:when test="matches(regex-group(3), '\d{8}')">
-                                                <!--YYYY-->
                                                 <xsl:number value="substring(regex-group(3), 1, 4)"
                                                   format="0001"/>
                                                 <xsl:text>-</xsl:text>
-                                                <!--MM-->
                                                 <xsl:number value="substring(regex-group(3), 5, 2)"
                                                   format="01"/>
                                                 <xsl:text>-</xsl:text>
-                                                <!--DD-->
                                                 <xsl:number value="substring(regex-group(3), 7, 2)"
                                                   format="01"/>
                                             </xsl:when>
                                             <xsl:when test="matches(regex-group(3), '\d{6}')">
-                                                <!--YYYY-->
+                                                <!--YYYY-MM-->
                                                 <xsl:number value="substring(regex-group(3), 1, 4)"
                                                   format="0001"/>
                                                 <xsl:text>-</xsl:text>
-                                                <!--MM-->
                                                 <xsl:number value="substring(regex-group(3), 5, 2)"
                                                   format="01"/>
                                             </xsl:when>
@@ -7945,7 +7944,6 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
                     </xsl:choose>
                 </xsl:when>
             </xsl:choose>
-
             <!-- 2014-08-17 JG -->
             <xsl:if
                 test="($controlField008-6 = 'e' or $controlField008-6 = 'p' or $controlField008-6 = 'r' or $controlField008-6 = 's' or $controlField008-6 = 't') and ($marcLeader6 = 'd' or $marcLeader6 = 'f' or $marcLeader6 = 'p' or $marcLeader6 = 't')">
@@ -7955,7 +7953,6 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
                     </dateCreated>
                 </xsl:if>
             </xsl:if>
-
             <!--dateIssued-->
             <xsl:if
                 test="($controlField008-6 = 'e' or $controlField008-6 = 'p' or $controlField008-6 = 'r' or $controlField008-6 = 's' or $controlField008-6 = 't') and not($marcLeader6 = 'd' or $marcLeader6 = 'f' or $marcLeader6 = 'p' or $marcLeader6 = 't')">
@@ -8006,7 +8003,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
             <!-- issuance -->
             <!--1.179 -->
             <xsl:if
-                test="subfield[@code = 'h'] and datafield[@tag = '655']/subfield[@code = 'a'] != 'article' or not(matches(datafield[@tag = '773']/subfield[@code = 'x'][1], '\d{4}\-\d{3}.'))">
+                test="subfield[@code = 'h'] and datafield[@tag = '655']/subfield[@code = 'a'] != 'article' or not(matches(datafield[@tag = '773'][1]/subfield[@code = 'x'][1], '\d{4}\-\d{3}.'))">
                 <!-- 1.120 - @260$ -->
                 <!-- 1.158 -->
                 <xsl:for-each select="leader">
@@ -8026,10 +8023,9 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
                                 <!-- 1.106 20141218 -->
                                 <xsl:when test="$marcLeader7 = 'm' and ($marcLeader19 = ' ')">single
                                     unit</xsl:when>
-                                <!--1.152-->
-                                <!--<xsl:when test="$marcLeader7 = 'i'">integrating resource</xsl:when>
-							<xsl:when test="$marcLeader7 = 'b' or $marcLeader7 = 's'"
-								>serial</xsl:when>-->
+                                <!--1.152
+                                    <xsl:when test="$marcLeader7 = 'i'">integrating resource</xsl:when>
+						        	<xsl:when test="$marcLeader7 = 'b' or $marcLeader7 = 's'">serial</xsl:when>-->
                             </xsl:choose>
                         </issuance>
                     </xsl:if>
@@ -8081,6 +8077,7 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
                 </xsl:for-each>
             </xsl:if>
         </xsl:variable>
+
         <!-- Build main originInfo element -->
         <xsl:choose>
             <xsl:when
@@ -8203,8 +8200,8 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
             </originInfo>
         </xsl:for-each>
     </xsl:template>
-    <!-- 1.130 originInfo subfields-->
 
+    <!-- 1.130 originInfo subfields-->
     <xd:doc>
         <xd:desc> @880$6 </xd:desc>
     </xd:doc>
@@ -8298,8 +8295,9 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
             </xsl:if>
         </xsl:for-each>
     </xsl:template>
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>origin Info Special Coded Dates 046</xd:desc>
     </xd:doc>
     <xsl:template
         match="datafield[@tag = '046'] | datafield[@tag = '880'][starts-with(subfield[@code = '6'], '046')]"
@@ -8340,8 +8338,9 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
             </dateCreated>
         </xsl:for-each>
     </xsl:template>
+
     <xd:doc>
-        <xd:desc/>
+        <xd:desc>match datafield[@tag = '033'] originInfo Info </xd:desc>
     </xd:doc>
     <xsl:template
         match="datafield[@tag = '033'] | datafield[@tag = '880'][starts-with(subfield[@code = '6'], '033')]"
@@ -8389,16 +8388,6 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
         </frequency>
     </xsl:template>
 
-    <!-- recordInfo 040 005 001 003 -->
-    <xd:doc>
-        <xd:desc> 880 global copy template </xd:desc>
-    </xd:doc>
-    <xsl:template match="* | @*" mode="global_copy">
-        <xsl:copy>
-            <xsl:apply-templates select="* | @* | text()" mode="global_copy"/>
-        </xsl:copy>
-    </xsl:template>
-
     <xd:doc id="createNameFrom910" scope="component">
         <xd:desc> name affiliation 910 </xd:desc>
     </xd:doc>
@@ -8417,5 +8406,13 @@ select="subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select="."/&gt
         </affiliation>
     </xsl:template>
 
+    <xd:doc>
+        <xd:desc> 880 global copy template </xd:desc>
+    </xd:doc>
+    <xsl:template match="* | @*" mode="global_copy">
+        <xsl:copy>
+            <xsl:apply-templates select="* | @* | text()" mode="global_copy"/>
+        </xsl:copy>
+    </xsl:template>
 
 </xsl:stylesheet>
