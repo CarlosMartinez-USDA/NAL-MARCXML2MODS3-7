@@ -4580,7 +4580,8 @@
                     <xsl:value-of select="$sf06b"/>
                 </xsl:attribute>
             </xsl:if>
-            <xsl:attribute name="script">
+
+                <xsl:attribute name="script">
                 <xsl:choose>
                     <xsl:when test="$scriptCode = ''">Latn</xsl:when>
                     <xsl:when test="$scriptCode = '(3'">Arab</xsl:when>
@@ -5691,14 +5692,11 @@
                     <xsl:attribute name="displayLabel">Summary</xsl:attribute>
                 </xsl:otherwise>
             </xsl:choose>
-            <xsl:variable name="this">
                 <xsl:call-template name="xxx880"/>
                 <xsl:call-template name="uri"/>
                 <xsl:call-template name="subfieldSelect">
                     <xsl:with-param name="codes">ab</xsl:with-param>
                 </xsl:call-template>
-            </xsl:variable>
-            <xsl:value-of select="normalize-space($this)"/>
         </abstract>
     </xsl:template>
     <xd:doc id="createTargetAudienceFrom521" scope="component">
@@ -6413,18 +6411,17 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
     <xd:doc>
         <xd:desc>name createSubChronFrom648</xd:desc>
     </xd:doc>
-    <xsl:template name="createSubChronFrom648">
-        <!-- 1.189 -->
-<!--        <xsl:if test="marc:datafield[@tag = '648']">-->
+    <xsl:template name="createSubChronFrom648">      
             <subject>
+                <!-- 1.189 -->      
+                <xsl:call-template name="subjectAuthority"/>
                 <xsl:call-template name="xxx880"/>
                 <xsl:if test="marc:subfield[@ind2 = '7'][@code = '2']">
                     <xsl:attribute name="authority">
                         <xsl:value-of select="marc:subfield[@code = '2']"/>
                     </xsl:attribute>
                 </xsl:if>
-                <xsl:call-template name="uri"/>
-                <xsl:call-template name="subjectAuthority"/>
+                <xsl:call-template name="uri"/>               
                 <temporal>
                     <xsl:call-template name="chopPunctuation">
                         <xsl:with-param name="chopString">
@@ -6465,11 +6462,10 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
         <xd:desc>name createSubGeoFrom651</xd:desc>
     </xd:doc>
     <xsl:template name="createSubGeoFrom651">
-        <!-- 1.189 -->
       <subject>
+          <!-- 1.189 -->
           <xsl:call-template name="subjectAuthority"/>     
-          <xsl:call-template name="xxx880"/>
-               
+          <xsl:call-template name="xxx880"/>               
                 <!-- 1.122 -->
                 <xsl:apply-templates select="marc:subfield[@code = '0']" mode="xlink"/>
                 <xsl:for-each select="marc:subfield[@code = 'a']">
