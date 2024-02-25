@@ -1,17 +1,18 @@
 <?xml version='1.0'?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0" xmlns:err="http://www.w3.org/2005/xqt-errors" xmlns:f="http://functions" xmlns:info="info:lc/xmlns/codelist-v1" xmlns:isolang="http://isolanguages" xmlns:local="http://www.local.gov/namespace" xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:marccountry="http://www.local.gov/marc/countries" xmlns:nalsubcat="http://nal-subject-category-codes" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    exclude-result-prefixes="err f info isolang local marc marccountry nalsubcat xd xs">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0" xmlns:err="http://www.w3.org/2005/xqt-errors" xmlns:f="http://functions" xmlns:info="info:lc/xmlns/codelist-v1" xmlns:isolang="http://isolanguages" xmlns:local="http://www.local.gov/namespace" xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:marccountry="http://www.local.gov/marc/countries" xmlns:nalsubcat="http://nal-subject-category-codes" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    exclude-result-prefixes="err f info isolang local marc marccountry nalsubcat xd xlink xs">
     <xd:doc scope="stylesheet" id="Institution-id-LC">
         <xd:desc>
-            <xd:p><xd:b>MARC 21 </xd:b></xd:p>
+            <xd:p><xd:b>XSLT 1.0 templates</xd:b></xd:p>
             <xd:p><xd:b>Created on:</xd:b>August, 19, 2004</xd:p>
             <xd:p><xd:b>Author:</xd:b>Nate Trail</xd:p>
+            <xd:p><xd:b>XSLT 2.0 functions</xd:b></xd:p>
             <xd:p><xd:b>Modified on:</xd:b>December, 14, 2007</xd:p>
             <xd:p><xd:b>Author:</xd:b>Nate Trail</xd:p>
             <xd:p><xd:b>Modified on:</xd:b>August 8, 2008</xd:p>
         </xd:desc>
         <xd:desc>
-            <xd:p><xd:b>Custom functions added by NAL</xd:b></xd:p>
+            <xd:p><xd:b>NAL XSLT functions</xd:b></xd:p>
             <xd:p><xd:b>Created on:</xd:b>October 27, 2022</xd:p>
             <xd:p><xd:b>Author</xd:b>Carlos Martinez III</xd:p>
         </xd:desc>
@@ -40,7 +41,306 @@
     <xsl:variable name="hex">0123456789ABCDEF</xsl:variable>
     <xsl:variable name="alpha">ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-|. '~</xsl:variable>
     
-    <!-- Local functions -->
+    <!-- builds datafield template-->
+    <xd:doc>
+        <xd:desc>datafield</xd:desc>
+        <xd:param name="tag"/>
+        <xd:param name="ind1"/>
+        <xd:param name="ind2"/>
+        <xd:param name="subfields"/>
+    </xd:doc>
+    <xsl:template name="datafields">
+        <xsl:param name="tag"/>
+        <xsl:param name="ind1">
+            <xsl:text> </xsl:text>
+        </xsl:param>
+        <xsl:param name="ind2">
+            <xsl:text> </xsl:text>
+        </xsl:param>
+        <xsl:param name="subfields"/>
+        <xsl:choose>
+            <!-- prefixed -->
+            <xsl:when test="marc:datafield">
+                <xsl:element name="marc:datafield">
+                    <xsl:attribute name="tag">
+                        <xsl:value-of select="$tag"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="ind1">
+                        <xsl:value-of select="$ind1"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="ind2">
+                        <xsl:value-of select="$ind2"/>
+                    </xsl:attribute>
+                    <xsl:copy-of select="$subfields"/>
+                </xsl:element>
+            </xsl:when>
+            <!-- non-prefixed-->
+            <xsl:otherwise>
+                <xsl:element name="datafield">
+                    <xsl:attribute name="tag">
+                        <xsl:value-of select="$tag"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="ind1">
+                        <xsl:value-of select="$ind1"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="ind2">
+                        <xsl:value-of select="$ind2"/>
+                    </xsl:attribute>
+                    <xsl:copy-of select="$subfields"/>
+                </xsl:element>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    
+    <!-- builds subfield select -->
+    <xd:doc>
+        <xd:desc/>
+        <xd:param name="codes"/>    
+        <xd:param name="delimiter"/>
+    </xd:doc>
+    <xsl:template name="subfieldSelect">
+        <xsl:param name="codes">abcdefghijklmnopqrstuvwxyz01</xsl:param>
+        <xsl:param name="delimiter">
+            <xsl:text> </xsl:text>
+        </xsl:param>
+        <xsl:variable name="str">
+            <xsl:choose>                
+                <!-- prefixed -->
+                <xsl:when test="marc:subfield">
+                    <xsl:for-each select="marc:subfield">
+                        <xsl:if test="contains($codes, @code)">
+                            <xsl:value-of select="text()"/>
+                            <xsl:value-of select="$delimiter"/>
+                        </xsl:if>
+                    </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>                    
+                    <!-- non-prefixed -->
+                    <xsl:for-each select="subfield">
+                        <xsl:if test="contains($codes, @code)">
+                            <xsl:value-of select="text()"/>
+                            <xsl:value-of select="$delimiter"/>
+                        </xsl:if>
+                    </xsl:for-each>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:value-of select="substring($str, 1, string-length($str) - string-length($delimiter))"/>
+    </xsl:template>
+    
+    <xd:doc>
+        <xd:desc/>
+        <xd:param name="anyCodes"/>
+        <xd:param name="axis"/>
+        <xd:param name="beforeCodes"/>
+        <xd:param name="afterCodes"/>
+    </xd:doc>
+    <xsl:template name="specialSubfieldSelect">
+        <xsl:param name="anyCodes"/>
+        <xsl:param name="axis"/>
+        <xsl:param name="beforeCodes"/>
+        <xsl:param name="afterCodes"/>
+        <xsl:variable name="str">
+            <xsl:for-each select="marc:subfield|subfield">
+                <xsl:if
+                    test="contains($anyCodes, @code) or (contains($beforeCodes, @code) and following-sibling::marc:subfield[@code = $axis]) or (contains($afterCodes, @code) and preceding-sibling::marc:subfield[@code = $axis])">
+                    <xsl:value-of select="text()"/>
+                    <xsl:text>&#160;</xsl:text>
+                </xsl:if>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:value-of select="substring($str, 1, string-length($str) - 1)"/>
+    </xsl:template>
+    
+    <xd:doc>
+        <xd:desc/>
+        <xd:param name="spaces"/>
+        <xd:param name="char"/>
+    </xd:doc>
+    <xsl:template name="buildSpaces">
+        <xsl:param name="spaces"/>
+        <xsl:param name="char">
+            <xsl:text> </xsl:text>
+        </xsl:param>
+        <xsl:if test="$spaces > 0">
+            <xsl:value-of select="$char"/>
+            <xsl:call-template name="buildSpaces">
+                <xsl:with-param name="spaces" select="$spaces - 1"/>
+                <xsl:with-param name="char" select="$char"/>
+            </xsl:call-template>
+        </xsl:if>
+    </xsl:template>
+    
+    <xd:doc>
+        <xd:desc/>
+        <xd:param name="chopString"/>
+        <xd:param name="punctuation"/>
+    </xd:doc>
+    <xsl:template name="chopPunctuation">
+        <xsl:param name="chopString"/>
+        <xsl:param name="punctuation">
+            <xsl:text>.:,;/ </xsl:text>
+        </xsl:param>
+        <xsl:variable name="length">
+            <xsl:sequence select="string-length($chopString)"/>
+        </xsl:variable>
+        <xsl:choose>
+            <xsl:when test="$length = 0"/>
+            <xsl:when test="contains($punctuation, substring($chopString, $length, 1))">
+                <xsl:call-template name="chopPunctuation">
+                    <xsl:with-param name="chopString"
+                        select="substring($chopString, 1, $length - 1)"/>
+                    <xsl:with-param name="punctuation" select="$punctuation"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="not($chopString)"/>
+            <xsl:otherwise>
+                <xsl:value-of select="$chopString"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    
+    <xd:doc>
+        <xd:desc/>
+        <xd:param name="chopStrings"/>
+        <xd:param name="punctuation"/>
+    </xd:doc>
+    <xsl:template name="chopPunctuationStrings">
+        <xsl:param name="chopStrings"/>
+        <xsl:param name="punctuation">
+            <xsl:text>.:,;/ </xsl:text>
+        </xsl:param>
+        
+        <xsl:for-each select="$chopStrings">
+            <xsl:variable name="chopString" select="."/>
+            <xsl:variable name="length" select="string-length($chopString)"/>
+            <xsl:choose>
+                <xsl:when test="$length = 0"/>
+                <xsl:when test="contains($punctuation, substring($chopString, $length, 1))">
+                    <xsl:call-template name="chopPunctuation">
+                        <xsl:with-param name="chopString"
+                            select="substring($chopString, 1, $length - 1)"/>
+                        <xsl:with-param name="punctuation" select="$punctuation"/>
+                    </xsl:call-template>
+                </xsl:when>
+                <xsl:when test="not($chopString)"/>
+                <xsl:otherwise>
+                    <xsl:value-of select="$chopString"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:for-each>
+    </xsl:template>
+    
+    
+    <xd:doc>
+        <xd:desc/>
+        <xd:param name="chopString"/>
+    </xd:doc>
+    <xsl:template name="chopPunctuationFront">
+        <xsl:param name="chopString"/>
+        <xsl:variable name="length" select="string-length($chopString)"/>
+        <xsl:choose>
+            <xsl:when test="$length = 0"/>
+            <xsl:when test="contains('.:,;/[ ', substring($chopString, 1, 1))">
+                <xsl:call-template name="chopPunctuationFront">
+                    <xsl:with-param name="chopString"
+                        select="substring($chopString, 2, $length - 1)"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="not($chopString)"/>
+            <xsl:otherwise>
+                <xsl:value-of select="$chopString"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    
+    <xd:doc>
+        <xd:desc/>
+        <xd:param name="chopString"/>
+        <xd:param name="punctuation"/>
+    </xd:doc>
+    <xsl:template name="chopPunctuationBack">
+        <xsl:param name="chopString"/>
+        <xsl:param name="punctuation">
+            <xsl:text>.:,;/] </xsl:text>
+        </xsl:param>
+        <xsl:variable name="length" select="string-length($chopString)"/>
+        <xsl:choose>
+            <xsl:when test="$length = 0"/>
+            <xsl:when test="contains($punctuation, substring($chopString, $length, 1))">
+                <xsl:call-template name="chopPunctuation">
+                    <xsl:with-param name="chopString"
+                        select="substring($chopString, 1, $length - 1)"/>
+                    <xsl:with-param name="punctuation" select="$punctuation"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="not($chopString)"/>
+            <xsl:otherwise>
+                <xsl:value-of select="$chopString"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    
+    
+    <xd:doc>
+        <xd:desc> nate added 12/14/2007 for lccn.loc.gov: url encode ampersand, etc. </xd:desc>
+        <xd:param name="str"/>
+    </xd:doc>
+    <xsl:template name="url-encode">
+        
+        <xsl:param name="str"/>
+        
+        <xsl:if test="$str">
+            <xsl:variable name="first-char" select="substring($str, 1, 1)"/>
+            <xsl:choose>
+                <xsl:when test="contains($safe, $first-char)">
+                    <xsl:value-of select="$first-char"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:variable name="codepoint">
+                        <xsl:choose>
+                            <xsl:when test="contains($ascii, $first-char)">
+                                <xsl:value-of
+                                    select="string-length(substring-before($ascii, $first-char)) + 32"
+                                />
+                            </xsl:when>
+                            <xsl:when test="contains($latin1, $first-char)">
+                                <xsl:value-of
+                                    select="string-length(substring-before($latin1, $first-char)) + 160"/>
+                                <!-- was 160 -->
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:message terminate="no">Warning: string contains a character
+                                    that is out of range! Substituting "?".</xsl:message>
+                                <xsl:text>63</xsl:text>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:variable>
+                    <xsl:variable name="hex-digit1"
+                        select="substring($hex, floor($codepoint div 16) + 1, 1)"/>
+                    <xsl:variable name="hex-digit2"
+                        select="substring($hex, $codepoint mod 16 + 1, 1)"/>
+                    <!-- <xsl:value-of select="concat('%',$hex-digit2)"/> -->
+                    <xsl:value-of select="concat('%', $hex-digit1, $hex-digit2)"/>
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:if test="string-length($str) &gt; 1">
+                <xsl:call-template name="url-encode">
+                    <xsl:with-param name="str" select="substring($str, 2)"/>
+                </xsl:call-template>
+            </xsl:if>
+        </xsl:if>
+    </xsl:template>
+    
+    
+    <!-- Stylus Studio meta-information - (c)1998-2002 eXcelon Corp.
+<metaInformation>
+<scenarios/><MapperInfo srcSchemaPath="" srcSchemaRoot="" srcSchemaPathIsRelative="yes" srcSchemaInterpretAsXML="no" destSchemaPath="" destSchemaRoot="" destSchemaPathIsRelative="yes" destSchemaInterpretAsXML="no"/>
+</metaInformation>
+-->
+    
+    
+    <!-- XSLT 2.0 functions -->
     
     <xd:doc>
         <xd:desc>  
@@ -236,303 +536,6 @@
     
 
 
-    <!-- builds datafield template-->
-    <xd:doc>
-        <xd:desc>datafield</xd:desc>
-        <xd:param name="tag"/>
-        <xd:param name="ind1"/>
-        <xd:param name="ind2"/>
-        <xd:param name="subfields"/>
-    </xd:doc>
-    <xsl:template name="datafields">
-        <xsl:param name="tag"/>
-        <xsl:param name="ind1">
-            <xsl:text> </xsl:text>
-        </xsl:param>
-        <xsl:param name="ind2">
-            <xsl:text> </xsl:text>
-        </xsl:param>
-        <xsl:param name="subfields"/>
-        <xsl:choose>
-            <!-- prefixed -->
-            <xsl:when test="marc:datafield">
-                <xsl:element name="marc:datafield">
-                    <xsl:attribute name="tag">
-                        <xsl:value-of select="$tag"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="ind1">
-                        <xsl:value-of select="$ind1"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="ind2">
-                        <xsl:value-of select="$ind2"/>
-                    </xsl:attribute>
-                    <xsl:copy-of select="$subfields"/>
-                </xsl:element>
-            </xsl:when>
-            <!-- non-prefixed-->
-            <xsl:otherwise>
-                <xsl:element name="datafield">
-                    <xsl:attribute name="tag">
-                        <xsl:value-of select="$tag"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="ind1">
-                        <xsl:value-of select="$ind1"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="ind2">
-                        <xsl:value-of select="$ind2"/>
-                    </xsl:attribute>
-                    <xsl:copy-of select="$subfields"/>
-                </xsl:element>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
-<!-- builds subfield select -->
-    <xd:doc>
-        <xd:desc/>
-        <xd:param name="codes"/>    
-        <xd:param name="delimiter"/>
-    </xd:doc>
-    <xsl:template name="subfieldSelect">
-        <xsl:param name="codes">abcdefghijklmnopqrstuvwxyz01</xsl:param>
-        <xsl:param name="delimiter">
-            <xsl:text> </xsl:text>
-        </xsl:param>
-        <xsl:variable name="str">
-            <xsl:choose>                
-                <!-- prefixed -->
-                <xsl:when test="marc:subfield">
-                    <xsl:for-each select="marc:subfield">
-                    <xsl:if test="contains($codes, @code)">
-                        <xsl:value-of select="text()"/>
-                        <xsl:value-of select="$delimiter"/>
-                    </xsl:if>
-                    </xsl:for-each>
-                </xsl:when>
-                <xsl:otherwise>                    
-                    <!-- non-prefixed -->
-            <xsl:for-each select="subfield">
-                <xsl:if test="contains($codes, @code)">
-                    <xsl:value-of select="text()"/>
-                    <xsl:value-of select="$delimiter"/>
-                </xsl:if>
-            </xsl:for-each>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
-        <xsl:value-of select="substring($str, 1, string-length($str) - string-length($delimiter))"/>
-    </xsl:template>
-
-    <xd:doc>
-        <xd:desc/>
-        <xd:param name="anyCodes"/>
-        <xd:param name="axis"/>
-        <xd:param name="beforeCodes"/>
-        <xd:param name="afterCodes"/>
-    </xd:doc>
-    <xsl:template name="specialSubfieldSelect">
-        <xsl:param name="anyCodes"/>
-        <xsl:param name="axis"/>
-        <xsl:param name="beforeCodes"/>
-        <xsl:param name="afterCodes"/>
-        <xsl:variable name="str">
-            <xsl:for-each select="marc:subfield|subfield">
-                <xsl:if
-                    test="contains($anyCodes, @code) or (contains($beforeCodes, @code) and following-sibling::marc:subfield[@code = $axis]) or (contains($afterCodes, @code) and preceding-sibling::marc:subfield[@code = $axis])">
-                    <xsl:value-of select="text()"/>
-                    <xsl:text>&#160;</xsl:text>
-                </xsl:if>
-            </xsl:for-each>
-        </xsl:variable>
-        <xsl:value-of select="substring($str, 1, string-length($str) - 1)"/>
-    </xsl:template>
-    
-    <xd:doc>
-        <xd:desc/>
-        <xd:param name="spaces"/>
-        <xd:param name="char"/>
-    </xd:doc>
-    <xsl:template name="buildSpaces">
-        <xsl:param name="spaces"/>
-        <xsl:param name="char">
-            <xsl:text> </xsl:text>
-        </xsl:param>
-        <xsl:if test="$spaces > 0">
-            <xsl:value-of select="$char"/>
-            <xsl:call-template name="buildSpaces">
-                <xsl:with-param name="spaces" select="$spaces - 1"/>
-                <xsl:with-param name="char" select="$char"/>
-            </xsl:call-template>
-        </xsl:if>
-    </xsl:template>
-
-    <xd:doc>
-        <xd:desc/>
-        <xd:param name="chopString"/>
-        <xd:param name="punctuation"/>
-    </xd:doc>
-    <xsl:template name="chopPunctuation">
-        <xsl:param name="chopString"/>
-        <xsl:param name="punctuation">
-            <xsl:text>.:,;/ </xsl:text>
-        </xsl:param>
-        <xsl:variable name="length">
-            <xsl:sequence select="string-length($chopString)"/>
-        </xsl:variable>
-        <xsl:choose>
-            <xsl:when test="$length = 0"/>
-            <xsl:when test="contains($punctuation, substring($chopString, $length, 1))">
-                <xsl:call-template name="chopPunctuation">
-                    <xsl:with-param name="chopString"
-                        select="substring($chopString, 1, $length - 1)"/>
-                    <xsl:with-param name="punctuation" select="$punctuation"/>
-                </xsl:call-template>
-            </xsl:when>
-            <xsl:when test="not($chopString)"/>
-            <xsl:otherwise>
-                <xsl:value-of select="$chopString"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-    
-    <xd:doc>
-        <xd:desc/>
-        <xd:param name="chopStrings"/>
-        <xd:param name="punctuation"/>
-    </xd:doc>
-    <xsl:template name="chopPunctuationStrings">
-        <xsl:param name="chopStrings"/>
-        <xsl:param name="punctuation">
-            <xsl:text>.:,;/ </xsl:text>
-        </xsl:param>
-      
-        <xsl:for-each select="$chopStrings">
-            <xsl:variable name="chopString" select="."/>
-            <xsl:variable name="length" select="string-length($chopString)"/>
-        <xsl:choose>
-            <xsl:when test="$length = 0"/>
-            <xsl:when test="contains($punctuation, substring($chopString, $length, 1))">
-                <xsl:call-template name="chopPunctuation">
-                    <xsl:with-param name="chopString"
-                        select="substring($chopString, 1, $length - 1)"/>
-                    <xsl:with-param name="punctuation" select="$punctuation"/>
-                </xsl:call-template>
-            </xsl:when>
-            <xsl:when test="not($chopString)"/>
-            <xsl:otherwise>
-                <xsl:value-of select="$chopString"/>
-            </xsl:otherwise>
-        </xsl:choose>
-        </xsl:for-each>
-    </xsl:template>
-    
-
-    <xd:doc>
-        <xd:desc/>
-        <xd:param name="chopString"/>
-    </xd:doc>
-    <xsl:template name="chopPunctuationFront">
-        <xsl:param name="chopString"/>
-        <xsl:variable name="length" select="string-length($chopString)"/>
-        <xsl:choose>
-            <xsl:when test="$length = 0"/>
-            <xsl:when test="contains('.:,;/[ ', substring($chopString, 1, 1))">
-                <xsl:call-template name="chopPunctuationFront">
-                    <xsl:with-param name="chopString"
-                        select="substring($chopString, 2, $length - 1)"/>
-                </xsl:call-template>
-            </xsl:when>
-            <xsl:when test="not($chopString)"/>
-            <xsl:otherwise>
-                <xsl:value-of select="$chopString"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
-    <xd:doc>
-        <xd:desc/>
-        <xd:param name="chopString"/>
-        <xd:param name="punctuation"/>
-    </xd:doc>
-    <xsl:template name="chopPunctuationBack">
-        <xsl:param name="chopString"/>
-        <xsl:param name="punctuation">
-            <xsl:text>.:,;/] </xsl:text>
-        </xsl:param>
-        <xsl:variable name="length" select="string-length($chopString)"/>
-        <xsl:choose>
-            <xsl:when test="$length = 0"/>
-            <xsl:when test="contains($punctuation, substring($chopString, $length, 1))">
-                <xsl:call-template name="chopPunctuation">
-                    <xsl:with-param name="chopString"
-                        select="substring($chopString, 1, $length - 1)"/>
-                    <xsl:with-param name="punctuation" select="$punctuation"/>
-                </xsl:call-template>
-            </xsl:when>
-            <xsl:when test="not($chopString)"/>
-            <xsl:otherwise>
-                <xsl:value-of select="$chopString"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
-
-    <xd:doc>
-        <xd:desc> nate added 12/14/2007 for lccn.loc.gov: url encode ampersand, etc. </xd:desc>
-        <xd:param name="str"/>
-    </xd:doc>
-    <xsl:template name="url-encode">
-
-        <xsl:param name="str"/>
-
-        <xsl:if test="$str">
-            <xsl:variable name="first-char" select="substring($str, 1, 1)"/>
-            <xsl:choose>
-                <xsl:when test="contains($safe, $first-char)">
-                    <xsl:value-of select="$first-char"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:variable name="codepoint">
-                        <xsl:choose>
-                            <xsl:when test="contains($ascii, $first-char)">
-                                <xsl:value-of
-                                    select="string-length(substring-before($ascii, $first-char)) + 32"
-                                />
-                            </xsl:when>
-                            <xsl:when test="contains($latin1, $first-char)">
-                                <xsl:value-of
-                                    select="string-length(substring-before($latin1, $first-char)) + 160"/>
-                                <!-- was 160 -->
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:message terminate="no">Warning: string contains a character
-                                    that is out of range! Substituting "?".</xsl:message>
-                                <xsl:text>63</xsl:text>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:variable>
-                    <xsl:variable name="hex-digit1"
-                        select="substring($hex, floor($codepoint div 16) + 1, 1)"/>
-                    <xsl:variable name="hex-digit2"
-                        select="substring($hex, $codepoint mod 16 + 1, 1)"/>
-                    <!-- <xsl:value-of select="concat('%',$hex-digit2)"/> -->
-                    <xsl:value-of select="concat('%', $hex-digit1, $hex-digit2)"/>
-                </xsl:otherwise>
-            </xsl:choose>
-            <xsl:if test="string-length($str) &gt; 1">
-                <xsl:call-template name="url-encode">
-                    <xsl:with-param name="str" select="substring($str, 2)"/>
-                </xsl:call-template>
-            </xsl:if>
-        </xsl:if>
-    </xsl:template>
-
-
-    <!-- Stylus Studio meta-information - (c)1998-2002 eXcelon Corp.
-<metaInformation>
-<scenarios/><MapperInfo srcSchemaPath="" srcSchemaRoot="" srcSchemaPathIsRelative="yes" srcSchemaInterpretAsXML="no" destSchemaPath="" destSchemaRoot="" destSchemaPathIsRelative="yes" destSchemaInterpretAsXML="no"/>
-</metaInformation>
--->
   
 
     <!--NAL Custom Functions by Carlos Martinez III-->
@@ -577,7 +580,7 @@
                         <xd:i>9.<xd:ref name="f:substring-before-match" type="function"/>f:substring-before-match</xd:i>
                     </xd:li>
                     <xd:li>
-                        <xd:i>10.<xd:ref name="f:nameIdentifier" type="function"/>f:nameIdentifier</xd:i>
+                        <xd:i>10.<xd:ref name="f:nameIdAttr" type="function"/>f:nameIdentifier</xd:i>
                     </xd:li>
                     <xd:li>
                         <xd:i>11.<xd:ref name="f:isNumber" type="function"/>f:isNumber</xd:i>
@@ -587,6 +590,9 @@
                     </xd:li>
                     <xd:li>
                         <xd:i>13.<xd:ref name="f:percentEncode" type="function"/>f:percentEncode</xd:i>
+                    </xd:li>
+                    <xd:li>
+                        <xd:i>14.<xd:ref name="f:punctuation-trim" type="function"/>f:punctuation-trim</xd:i>
                     </xd:li>
                 </xd:ul>
             </xd:p>
@@ -729,11 +735,11 @@
         <xsl:sequence select="$country_name"/>
     </xsl:function>
     
-    <!-- f:isoTwo2Lang -->
+    <!-- info:langCode -->
     <xd:doc scope="component">
         <xd:desc>
-            <xd:p><xd:b>Function: </xd:b>f:isoTwo2Lang</xd:p>
-            <xd:p><xd:b>Usage: </xd:b>f:isoTwo2Lang(iso 639-2b code)</xd:p>
+            <xd:p><xd:b>Function: </xd:b>info:langCode()</xd:p>
+            <xd:p><xd:b>Usage: </xd:b>info:langCode(iso 639-2b code)</xd:p>
             <xd:p><xd:b>Purpose: </xd:b>Convert ISO 639-2b three-letter codes into the corresponding
                 languages.</xd:p>
         </xd:desc>
@@ -891,57 +897,34 @@
         <xsl:sequence select="tokenize($arg, $regex)[1]"/>
     </xsl:function>
 
-    <!-- f:nameIdentifier -->
+    <!-- nal:nameIdentifier -->
     <xd:doc>
         <xd:desc>
-            <xd:p><xd:b>Function: </xd:b>f:nameIdentifier</xd:p>
-            <xd:p><xd:b>Usage: </xd:b>f:nameIdentifier(XPath)</xd:p>
-            <xd:p><xd:b>Purpose: </xd:b>The f:nameIdentifier takes the xpath provided as $arg.
-                First fn:matches($arg, $regex) tests the $arg. If $arg matches the $regex, then
-                fn:replace($arg, $regex, $flag),</xd:p>
+            <xd:p><xd:b>Function: </xd:b>f:typeIdentifier</xd:p>
+            <xd:p><xd:b>Usage: </xd:b>f:typeIdentifier(XPath)</xd:p>
+            <xd:p><xd:b>Purpose: </xd:b>The f:typeIdentifier xpath is passed to the $uri param.
+                The sequunce select uses the fn:matches($uri, $regex) tests the $arg. If $arg matches the $regex, then
+                fn:replace($uri, $regex, $flag),</xd:p>
             <xd:p><xd:b>Returns: </xd:b> Removes the first and last substrings, leaving the org
                 name.</xd:p>
             <xd:p>
                 <xd:b>Parameters</xd:b>
             </xd:p>
         </xd:desc>
-         <xd:param name="args"/>
+        <xd:param name="uri"/>
+        <xd:variable name="id">
+           <xd:p>uses fn:replace to break up the uri and determine the uncontrolled identifier informtion to put into the type attribute.</xd:p>
+        </xd:variable>
     </xd:doc>
-    <xsl:function name="f:nameIdentifier" as="xs:string" xmlns:f="http://functions">
-            <xsl:param name="args" as="xs:string"/>
-          <!--  <xsl:choose>
-                <xsl:when test=". =''"/>
-                <xsl:otherwise>-->
-            <!--   <xsl:for-each select="$args">
-                <xsl:variable name="arg">-->
-                    <xsl:sequence select="
-                        if (matches($args, 'id.loc.gov')) 
-                        then ('lcnaf')
-                        else if ((contains($args, 'orcid') or contains($args, 'viaf') or  contains($args, 'isni') or  matches($args, '[a-z]+')) = true())
-                        then replace($args, '(^https?)://(www)?(\w+)((\.\w+)(\.\w+)?(\.\w+)?)/?(\S+)/?(\?uri=)?(.*)', '$3')
-                        else $args"/>
-              <!--  </xsl:variable>-->
-              <!--  <xsl:choose>
-                    <xsl:when test="contains($arg, 'orcid')">
-                        <xsl:value-of select="'orcid'"/>
-                    </xsl:when>
-                    <xsl:when test="contains($arg, 'viaf')">
-                        <xsl:value-of select="'viaf'"/>
-                    </xsl:when>
-                    <xsl:when test="contains($arg, 'loc')">
-                        <xsl:value-of select="'lcnaf'"/>
-                    </xsl:when>
-                    <xsl:when test="contains($arg, 'nlm')">
-                        <xsl:value-of select="'mesh'"/>
-                    </xsl:when>
-                    <xsl:when test="contains($arg, 'nal')">
-                        <xsl:value-of select="'atg'"/>
-                    </xsl:when>
-                </xsl:choose>
-            </xsl:for-each>
-                </xsl:otherwise>
-            </xsl:choose>-->
-              <!-- </xsl:for-each>-->
+    <xsl:function name="f:typeIdentifier" as="xs:string" xmlns:f="http://functions">
+        <xsl:param name="uri" as="xs:string"/>
+        <xsl:variable name="id" select="replace($uri, '(^https?)://(www)?(\w+)((\.\w+)(\.\w+)?(\.\w+)?)/?(\S+)/?(\?uri=)?(.*)', '$3')"/>
+        <xsl:sequence select="
+            if (matches($uri, '^https?://(www)?[id|agclass|lod|entities]+\.[a-z]+\.[a-z]+(\.[a-z]+)?.*')) 
+            then replace($uri,'(^.*)(/.*$)','$1') 
+            else if ((contains($uri, 'orcid') or contains($uri, 'viaf') or  contains($uri, 'isni') or  matches($uri, '[a-z]+')) = true())
+            then $id
+            else $uri"/>           
     </xsl:function>
     
     <!-- f:isNumber -->
@@ -996,6 +979,26 @@
         <xsl:sequence select="if (contains($uri, '[') or (contains($uri, ']')))
             then ($sub2) 
             else $uri"/>
+        </xsl:for-each>
+    </xsl:function>
+    
+    <xd:doc>
+        <xd:desc>
+            <xd:p><xd:b>Function: </xd:b>f:punctuation-trim</xd:p>
+            <xd:p><xd:b>Usage: </xd:b>f:punctation-trim($punctuated)</xd:p>
+            <xd:p><xd:b>Purpose: </xd:b>When the parameter contains brackets or other puntuation it is removed.</xd:p>
+        </xd:desc>
+        <xd:param name="punctuated"/>
+    </xd:doc>
+    <xsl:function name="f:punctuation-trim">
+        <xsl:param name="punctuated"/>
+        <xsl:variable name="punctuation_removed" select="translate($punctuated, '[]:;', '')"/>
+        <xsl:for-each select="$punctuated">           
+            <xsl:sequence select="if ($punctuated = '')
+                                  then ($punctuated)
+                                  else if(matches($punctuated,'(^.*)?[\[\]:;](.*$)?'))
+                                  then (replace($punctuated, '(^.*)?[\[\]:;](.*$)?', '$1'))
+                                  else $punctuation_removed"/>
         </xsl:for-each>
     </xsl:function>
 </xsl:stylesheet>

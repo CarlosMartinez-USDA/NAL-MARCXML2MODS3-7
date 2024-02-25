@@ -10,8 +10,8 @@
     <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes" media-type="text/xml"/>
     <xsl:strip-space elements="*"/>
     
-    <xsl:template match="root">
-        <xsl:result-document method="xml" encoding="UTF-8" indent="yes" href="file:///{//*:workingDirectory}N-{//*:originalFile}_{position()}.json">
+    <xsl:template match="*/no">
+        <xsl:result-document method="xml" encoding="UTF-8" indent="yes" href="file:///{//*:workingDirectory}N-{//*:originalFile}_{position()}.xml">
             <mods version="3.7">
                 <xsl:namespace name="xlink">http://www.w3.org/1999/xlink</xsl:namespace>
                 <xsl:namespace name="xsi">http://www.w3.org/2001/XMLSchema-instance</xsl:namespace>
