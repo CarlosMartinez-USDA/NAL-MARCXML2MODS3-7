@@ -3249,13 +3249,13 @@
             </xsl:otherwise>
         </xsl:choose>
         <!--1.193 -->
-           <!-- 100/700 $0 - Authority record control number or standard number (R)            
+           <!-- 100/700 $0 - Authority record control number or standard number (R) -->           
                 <xsl:for-each select="$lcnaf">
                     <nameIdentifier>
-                    <xsl:attribute name="typeURI" select="f:nameIdentifier($lcnaf)"/>
+                    <xsl:attribute name="type" select="f:nameIdentifier($lcnaf)"/>
                     <xsl:copy-of select="$lcnaf"/>
                     </nameIdentifier>
-                </xsl:for-each>-->
+                </xsl:for-each>
            <!-- 100/700 $1 - Real World Object URI (R)-->
         <xsl:for-each select="$rwo">
             <nameIdentifier>
@@ -5407,7 +5407,7 @@
                 <!--Revision 2.06 cm3 edit, commented out named template to pull <namePart> from displayForm-->
                 <!-- <xsl:call-template name="nameABCDQ"/>-->
                 <xsl:call-template name="personal_name"/>
-                <xsl:call-template name="nameIdentifier"/>
+<!--                <xsl:call-template name="nameIdentifier"/>-->
                 <xsl:call-template name="affiliation"/>
                 <xsl:call-template name="role"/>
                 <!-- 1.116 -->
@@ -5482,7 +5482,7 @@
                 <xsl:call-template name="nameTitleGroup"/>
                 <!--<xsl:call-template name="nameABCDQ"/>-->
                 <xsl:call-template name="personal_name"/>
-                <xsl:call-template name="nameIdentifier"/>
+<!--                <xsl:call-template name="nameIdentifier"/>-->
                 <xsl:call-template name="affiliation"/>
                 <xsl:call-template name="role"/>
                 <!-- 1.116 -->

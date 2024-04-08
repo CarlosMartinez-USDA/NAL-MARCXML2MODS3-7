@@ -883,13 +883,27 @@
     </xd:doc>
     <xsl:function name="f:nameIdentifier" as="xs:string" xmlns:f="http://functions">
         <xsl:param name="uri" as="xs:string"/>
-        <xsl:variable name="id" select="replace($uri, '(^https?)://(www)?(\w+)((\.\w+)(\.\w+)?(\.\w+)?)/?(\S+)/?(\?uri=)?(.*)', '$3')"/>
+        <xsl:variable name="id" select="replace($uri, '(^https?)://(www)?(\w+)((\.\w+)(\.\w+)?(\.\w+)?)/?(\S+)/?(\?uri=)?(.*)', '$3$4')"/>
+        
         <xsl:sequence select="
             if (matches($uri, '^https?://(www)?[id|agclass|lod|entities]+\.[a-z]+\.[a-z]+(\.[a-z]+)?.*')) 
-            then replace($uri,'(^.*)(/.*$)','$1') 
+            then f:authority($id)
             else if ((contains($uri, 'orcid') or contains($uri, 'viaf') or  contains($uri, 'isni') or  matches($uri, '[a-z]+')) = true())
-            then $id
+            then substring-before($id,'.')
             else $uri"/>           
+    </xsl:function>
+    
+    <xd:doc>
+        <xd:desc/>
+        <xd:param name="authority"/>
+    </xd:doc>
+    <xsl:function name="f:authority" as="xs:string">
+        <xsl:param name="authority" as="xs:string"/>
+        <xsl:sequence select="if (contains($authority, 'loc'))
+            then 'lcnaf'
+            else if (contains($authority,'nlm'))
+            then 'mesh'
+            else ''"/>
     </xsl:function>
     
     <!-- f:isNumber -->
