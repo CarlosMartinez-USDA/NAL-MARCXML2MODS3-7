@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- recombine.xsl uses the xml files listed here. 
+The filenames must match those found within the mods directory. -->
 <collection>
     <doc href="N-msplit00000000_1.xml"></doc>
     <doc href="N-msplit00000001_1.xml"></doc>
