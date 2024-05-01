@@ -2,7 +2,6 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0" xmlns="http://www.loc.gov/mods/v3" xmlns:f="http://functions" xmlns:info="info:lc/xmlns/codelist-v1" xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:nalsubcat="http://nal-subject-category-codes" xmlns:saxon="http://saxon.sf.net/" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exclude-result-prefixes="f info marc nalsubcat saxon xd xlink xs xsi">
     <!-- includes -->
     <xsl:include href="NAL-MARC21slimUtils.xsl"/>
-
     <!-- outputs -->
     <xsl:output encoding="UTF-8" indent="yes" method="xml" name="original" saxon:next-in-chain="fix_characters.xsl"/>
     <!-- whitespace control -->
@@ -11,13 +10,13 @@
     <!-- Maintenance note: For each revision, change the content of <recordInfo><recordOrigin> to reflect the new revision number.
 	NAL-MARC21slim2MODS3-7-prefix.xsl
 	┌ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┐ 
-	│  NAL Revisions (Revision 1.193) 20240403        |    
+	│  NAL Revisions (Revision 1.193) 20240403    |    
 	└ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┘ 	
 	┌ ━ ━ ━ ━ ━ ┐ 
-	│ MODS 3.7  │  
+	│ MODS 3.7 │  
 	└ ━ ━ ━ ━ ━ ┘
-	Revision 1.193 - Added real world object name identifier to personal_name template. 
-    	Revision 1.192 - CreatNameFrom#00, moved xlink:href to first instruction of template to avoid error.  
+	Revision 1.193 - Added real world object name identifier to personal_name template. 20240403 cm3
+    Revision 1.192 - xlink:href instruction moved to first PI in createNameFrom100/700 templates to avoid error. 20240403 cm3
 	Revision 1.191 - 072_0 $a is a non-repeatable subfield. Corrects error and reports incorrect record #. 20240211 cm3 
 	Revision 1.190 - Reworked transliteration related templates to accomodate updates made for NAL. 20240206 cm3
 	Revision 1.189 - Called subjectAuthority template before the xxx880 to prevent attribute creation error. 20240202 cm3
@@ -25,9 +24,9 @@
 	Revision 1.187 - Revised function references authoritative resource https://www.loc.gov/standards/codelists/languages.xml. 20240201 cm3  
 	Revision 1.186 - Elsevier's electronic page numbers. 20240118 cm3
 	Revision 1.185 - Revised function references authoritative resource https://www.loc.gov/standards/codelists/countries.xml. 20240102 cm3  
-    	Revision 1.184 - Percent encodes brackets. 20231222 cm3
+    Revision 1.184 - Percent encodes brackets. 20231222 cm3
 	Revision 1.183 - An attribute node (displayLabel) cannot be created after a child of the containing elementResolved fatal erroor"Added <marc:datafield>. 20230615 cm3
-    	Revision 1.182 - An attribute node (nameTitleGroup) cannot be created after a child of the containing element. 20230615 cm3
+    Revision 1.182 - An attribute node (nameTitleGroup) cannot be created after a child of the containing element. 20230615 cm3
 	Revision 1.181 - Simplified marcCountry and f:decodeMARCCountry functions. Regex updated. 20230615 cm3
 	Revision 1.180 - Added conditional statement to prevent physicalDescription from appearing in article records. 20230615 cm3
 	Revision 1.179 - Added conditional statement to prevent issuance from appearing in article records. 20230615 cm3
@@ -54,9 +53,9 @@
 	Revision 1.158 - Added conditional statement above issuance to focus on monographs, single part items and multipart monographs. 20221210 cm3
 	Revision 1.157 - Added condtional statement if agid:# is empty from 773, use 914 marc:subfield a. 20221209 cm3
 	Revision 1.156 - Added condtional statement if ISSN is empty from 773, use 914 marc:subfield b. 20221209 cm3
-    	Revision 1.155 - Corrected "subjectAuthority" template corrected "nal" to "atg" (https://www.loc.gov/standards/sourcelist/subject.html#codes) 20221208 cm3
-    	Revision 1.154 - Commented out conditional statements within issuance element for serials, continuing resources, and integrating resources. 20221208 cm3	
-    	Revision 1.153 - Used subtring-before function to get marc:subfield b (ie., publisher) and marc:subfield c (i.e., dateIssued). 20221208 cm3
+    Revision 1.155 - Corrected "subjectAuthority" template corrected "nal" to "atg" (https://www.loc.gov/standards/sourcelist/subject.html#codes) 20221208 cm3
+    Revision 1.154 - Commented out conditional statements within issuance element for serials, continuing resources, and integrating resources. 20221208 cm3	
+    Revision 1.153 - Used subtring-before function to get marc:subfield b (ie., publisher) and marc:subfield c (i.e., dateIssued). 20221208 cm3
 	Revision 1.152 - Added conditional statement outside of issuance element to allow monographs, multipart monographs, and single items only. 20221208 cm3 
 	Revision 1.151 - $controlField008-35-37replace, uses replace function and regex to capture 3 letter string. cm3 2022/12/05
 	Revision 1.150 - Updated recordOrigin to reflect the XSLT filename Used in transform. 20221208 cm3
@@ -71,10 +70,10 @@
 	Revision 1.142 - Fixed dateIssued to include month and date from the 008  20140818 JG
 	Revision 1.141 - Added displayForm to 700 JG 2014/05/29
 	┌ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┐ 
-	│ NAL Staff Revisions Begin (Revision 1.141)      |    
+	│ NAL Staff Revisions Begin (Revision 1.141)  |    
 	└ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┘ 	
 	┌ ━ ━ ━ ━ ━ ┐ 
-	│ MODS 3.6  │  
+	│ MODS 3.6 │  
 	└ ━ ━ ━ ━ ━ ┘ 
 	Revision 1.140 - Fixed admin metadata - XSLT was referencing MODS 3.6 - 2020/07/17 - tmee
 	Revision 1.139 - Update to MODS v.3.7 - 2020/02/13 ws
@@ -150,7 +149,7 @@
 	Revision 1.95 - Modified 035 to include identifier type (WlCaITV) tmee 2014/04/21	
 	Revision 1.94 - marc:leader 07 b changed mapping from continuing to serial tmee 2014/02/21
 	┌ ━ ━ ━ ━ ━ ┐ 
-	│ MODS 3.5  │  
+	│ MODS 3.5 │  
 	└ ━ ━ ━ ━ ━ ┘
 	Revision 1.95 - Added a xsl:when to deal with '#' and ' ' in $marcLeader19 and $controlField008-18 - ws 2014/12/19
 	Revision 1.94 - marc:leader 07 b mapping changed from "continuing" to "serial" tmee 2014/02/21
@@ -194,7 +193,7 @@
 	Revision 1.56 - Mapped 1xx usage="primary" - 2010/09/17 tmee
 	Revision 1.55 - Mapped UT 240/1xx nameTitleGroup - 2010/09/17 tmee
 	┌ ━ ━ ━ ━ ━ ┐ 
-	│ MODS 3.4  │  
+	│ MODS 3.4 │  
 	└ ━ ━ ━ ━ ━ ┘
 	Revision 1.54 - Fixed 086 redundancy - 2010/07/27 tmee
 	Revision 1.53 - Added direct href for MARC21slimUtils - 2010/07/27 tmee
@@ -256,11 +255,8 @@
     </xd:doc>
     <xsl:template match="/">
         <xsl:param name="originalFile" select="replace(base-uri(), '(.*/)(.*)(\.xml)', '$2')"/>
-        <xsl:param name="workingDirectory"
-            select="substring-before(base-uri(), tokenize(base-uri(), '/')[last()])"/>
-        <xsl:result-document encoding="UTF-8" version="1.0" method="xml" media-type="text/xml"
-            indent="yes" format="original"
-            href="{$workingDirectory}/mods/N-{$originalFile}_{position()}.xml">
+        <xsl:param name="workingDirectory" select="substring-before(base-uri(), tokenize(base-uri(), '/')[last()])"/>
+        <xsl:result-document encoding="UTF-8" version="1.0" method="xml" media-type="text/xml" indent="yes" format="original" href="{$workingDirectory}/mods/N-{$originalFile}_{position()}.xml">
             <xsl:choose>
                 <xsl:when test="//marc:collection/marc:record">
                     <modsCollection xmlns="http://www.loc.gov/mods/v3"
@@ -4593,7 +4589,6 @@
                     <xsl:value-of select="$sf06b"/>
                 </xsl:attribute>
             </xsl:if>
-
             <xsl:attribute name="script">
                 <xsl:choose>
                     <xsl:when test="$scriptCode = ''">Latn</xsl:when>
@@ -4616,8 +4611,7 @@
     </xd:doc>
     <xsl:template name="yyy880">
         <xsl:if test="preceding-sibling::marc:subfield[@code = '6']">
-            <xsl:variable name="sf06"
-                select="normalize-space(preceding-sibling::marc:subfield[@code = '6'])"/>
+            <xsl:variable name="sf06" select="normalize-space(preceding-sibling::marc:subfield[@code = '6'])"/>
             <xsl:variable name="sf06a" select="substring($sf06, 1, 3)"/>
             <xsl:variable name="sf06b" select="substring($sf06, 5, 2)"/>
             <xsl:variable name="sf06c" select="substring($sf06, 7)"/>
@@ -4637,8 +4631,7 @@
         <xsl:variable name="x260">
             <xsl:choose>
                 <xsl:when test="@tag = '260' and marc:subfield[@code = '6']">
-                    <xsl:variable name="sf06260"
-                        select="normalize-space(child::marc:subfield[@code = '6'])"/>
+                    <xsl:variable name="sf06260" select="normalize-space(child::marc:subfield[@code = '6'])"/>
                     <xsl:variable name="sf06260a" select="substring($sf06260, 1, 3)"/>
                     <xsl:variable name="sf06260b" select="substring($sf06260, 5, 2)"/>
                     <xsl:variable name="sf06260c" select="substring($sf06260, 7)"/>
@@ -4646,8 +4639,7 @@
                 </xsl:when>
                 <xsl:when
                     test="@tag = '250' and ../marc:datafield[@tag = '260']/marc:subfield[@code = '6']">
-                    <xsl:variable name="sf06260"
-                        select="normalize-space(../marc:datafield[@tag = '260']/marc:subfield[@code = '6'])"/>
+                    <xsl:variable name="sf06260" select="normalize-space(../marc:datafield[@tag = '260']/marc:subfield[@code = '6'])"/>
                     <xsl:variable name="sf06260a" select="substring($sf06260, 1, 3)"/>
                     <xsl:variable name="sf06260b" select="substring($sf06260, 5, 2)"/>
                     <xsl:variable name="sf06260c" select="substring($sf06260, 7)"/>
@@ -4659,17 +4651,14 @@
         <xsl:variable name="x250">
             <xsl:choose>
                 <xsl:when test="@tag = '250' and marc:subfield[@code = '6']">
-                    <xsl:variable name="sf06250"
-                        select="normalize-space(../marc:datafield[@tag = '250']/marc:subfield[@code = '6'])"/>
+                    <xsl:variable name="sf06250" select="normalize-space(../marc:datafield[@tag = '250']/marc:subfield[@code = '6'])"/>
                     <xsl:variable name="sf06250a" select="substring($sf06250, 1, 3)"/>
                     <xsl:variable name="sf06250b" select="substring($sf06250, 5, 2)"/>
                     <xsl:variable name="sf06250c" select="substring($sf06250, 7)"/>
                     <xsl:value-of select="$sf06250b"/>
                 </xsl:when>
-                <xsl:when
-                    test="@tag = '260' and ../marc:datafield[@tag = '250']/marc:subfield[@code = '6']">
-                    <xsl:variable name="sf06250"
-                        select="normalize-space(../marc:datafield[@tag = '250']/marc:subfield[@code = '6'])"/>
+                <xsl:when test="@tag = '260' and ../marc:datafield[@tag = '250']/marc:subfield[@code = '6']">
+                    <xsl:variable name="sf06250" select="normalize-space(../marc:datafield[@tag = '250']/marc:subfield[@code = '6'])"/>
                     <xsl:variable name="sf06250a" select="substring($sf06250, 1, 3)"/>
                     <xsl:variable name="sf06250b" select="substring($sf06250, 5, 2)"/>
                     <xsl:variable name="sf06250c" select="substring($sf06250, 7)"/>
@@ -4706,8 +4695,7 @@
         <xsl:variable name="x300">
             <xsl:choose>
                 <xsl:when test="@tag = '300' and marc:subfield[@code = '6']">
-                    <xsl:variable name="sf06300"
-                        select="normalize-space(child::marc:subfield[@code = '6'])"/>
+                    <xsl:variable name="sf06300" select="normalize-space(child::marc:subfield[@code = '6'])"/>
                     <xsl:variable name="sf06300a" select="substring($sf06300, 1, 3)"/>
                     <xsl:variable name="sf06300b" select="substring($sf06300, 5, 2)"/>
                     <xsl:variable name="sf06300c" select="substring($sf06300, 7)"/>
@@ -4715,8 +4703,7 @@
                 </xsl:when>
                 <xsl:when
                     test="@tag = '351' and ../marc:datafield[@tag = '300']/marc:subfield[@code = '6']">
-                    <xsl:variable name="sf06300"
-                        select="normalize-space(../marc:datafield[@tag = '300']/marc:subfield[@code = '6'])"/>
+                    <xsl:variable name="sf06300" select="normalize-space(../marc:datafield[@tag = '300']/marc:subfield[@code = '6'])"/>
                     <xsl:variable name="sf06300a" select="substring($sf06300, 1, 3)"/>
                     <xsl:variable name="sf06300b" select="substring($sf06300, 5, 2)"/>
                     <xsl:variable name="sf06300c" select="substring($sf06300, 7)"/>
@@ -4728,8 +4715,7 @@
         <xsl:variable name="x351">
             <xsl:choose>
                 <xsl:when test="@tag = '351' and marc:subfield[@code = '6']">
-                    <xsl:variable name="sf06351"
-                        select="normalize-space(../marc:datafield[@tag = '351']/marc:subfield[@code = '6'])"/>
+                    <xsl:variable name="sf06351" select="normalize-space(../marc:datafield[@tag = '351']/marc:subfield[@code = '6'])"/>
                     <xsl:variable name="sf06351a" select="substring($sf06351, 1, 3)"/>
                     <xsl:variable name="sf06351b" select="substring($sf06351, 5, 2)"/>
                     <xsl:variable name="sf06351c" select="substring($sf06351, 7)"/>
@@ -4749,8 +4735,7 @@
 
         <xsl:variable name="x337">
             <xsl:if test="@tag = '337' and marc:subfield[@code = '6']">
-                <xsl:variable name="sf06337"
-                    select="normalize-space(child::marc:subfield[@code = '6'])"/>
+                <xsl:variable name="sf06337" select="normalize-space(child::marc:subfield[@code = '6'])"/>
                 <xsl:variable name="sf06337a" select="substring($sf06337, 1, 3)"/>
                 <xsl:variable name="sf06337b" select="substring($sf06337, 5, 2)"/>
                 <xsl:variable name="sf06337c" select="substring($sf06337, 7)"/>
@@ -4759,8 +4744,7 @@
         </xsl:variable>
         <xsl:variable name="x338">
             <xsl:if test="@tag = '338' and marc:subfield[@code = '6']">
-                <xsl:variable name="sf06338"
-                    select="normalize-space(child::marc:subfield[@code = '6'])"/>
+                <xsl:variable name="sf06338" select="normalize-space(child::marc:subfield[@code = '6'])"/>
                 <xsl:variable name="sf06338a" select="substring($sf06338, 1, 3)"/>
                 <xsl:variable name="sf06338b" select="substring($sf06338, 5, 2)"/>
                 <xsl:variable name="sf06338c" select="substring($sf06338, 7)"/>
@@ -4798,8 +4782,6 @@
         <xsl:if test="//marc:datafield/marc:subfield[@code = '6']"> </xsl:if>
     </xsl:template>
 
-
-
     <xd:doc>
         <xd:desc>name true880</xd:desc>
     </xd:doc>
@@ -4824,9 +4806,7 @@
         <xsl:variable name="sf06a" select="substring($sf06, 1, 3)"/>
         <xsl:variable name="sf06b" select="substring($sf06, 4)"/>
         <xsl:choose>
-
             <!--tranforms 880 equiv-->
-
             <xsl:when test="$sf06a = '047'">
                 <xsl:call-template name="createGenreFrom047"/>
             </xsl:when>
@@ -4836,7 +4816,6 @@
             <xsl:when test="$sf06a = '655'">
                 <xsl:call-template name="createGenreFrom655"/>
             </xsl:when>
-
             <xsl:when test="$sf06a = '050'">
                 <xsl:call-template name="createClassificationFrom050"/>
             </xsl:when>
@@ -4916,9 +4895,7 @@
             <xsl:when test="$sf06a = '540'">
                 <xsl:call-template name="createAccessConditionFrom540"/>
             </xsl:when>
-
-            <!-- note 245 362 etc	-->
-
+            <!-- note 245 362 etc -->
             <xsl:when test="$sf06a = '245'">
                 <xsl:call-template name="createNoteFrom245c"/>
             </xsl:when>
@@ -4956,7 +4933,7 @@
 			<xsl:when test="$sf06a='534'">
 				<xsl:call-template name="createNoteFrom534"/>
 			</xsl:when>
--->
+            -->
             <xsl:when test="$sf06a = '535'">
                 <xsl:call-template name="createNoteFrom535"/>
             </xsl:when>
@@ -4990,9 +4967,7 @@
             <xsl:when test="$sf06a = '585'">
                 <xsl:call-template name="createNoteFrom585"/>
             </xsl:when>
-
-            <!--	note 5XX	-->
-
+            <!-- note 5XX -->
             <xsl:when test="$sf06a = '501'">
                 <xsl:call-template name="createNoteFrom5XX"/>
             </xsl:when>
