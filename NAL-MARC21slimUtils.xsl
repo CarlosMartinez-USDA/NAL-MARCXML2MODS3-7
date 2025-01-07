@@ -987,6 +987,7 @@
     <xsl:variable name="stylesheet" select="doc(document(''))"/>
     <xd:doc scope="component" id="f:parseOrigin">
         <xd:desc>function to parse originInfo <xd:a href="f:parseOrigin" docid="{$stylehsheet//f:parseOrigin}"></xd:a></xd:desc>
+        <xd:param name="input"/>
     </xd:doc>
     <xsl:function name="f:parseOrigin">
         <xsl:param name="input"/>
