@@ -2293,6 +2293,7 @@
 
                         <!-- originInfo -->
                         <xsl:if test="marc:subfield[@code = 'b' or @code = 'd'] or marc:subfield[@code = 'f']">
+                         <originInfo>
                             <xsl:call-template name="xxx880"/>
                                 <xsl:if test="@tag = '775'"> <!-- 1.197 added @775$d -->
                                     <xsl:for-each select="marc:subfield[@code = 'f' or @code='d']">
@@ -2317,7 +2318,7 @@
                                 </xsl:if>
                       
                              <!-- commmented out publisher, appearing in wrong place -->
-                                <!--  <xsl:for-each select="marc:subfield[@code = 'd']">
+                                  <xsl:for-each select="marc:subfield[@code = 'd']">
                                         <publisher>
                                             <xsl:call-template name="chopPunctuation">
                                                 <xsl:with-param name="chopString">
@@ -2325,15 +2326,16 @@
                                                 </xsl:with-param>
                                             </xsl:call-template>
                                         </publisher>
-                                    </xsl:for-each>-->
+                                    </xsl:for-each>
                                 
                                 <xsl:for-each select="marc:subfield[@code = 'b']">
                                     <edition>
                                         <xsl:apply-templates/>
                                     </edition>
                                 </xsl:for-each>
-                        
+                         </originInfo>
                         </xsl:if>
+                        
                         <!-- language -->
                         <xsl:if test="@tag = '775'">
                             <xsl:if test="marc:subfield[@code = 'e']">
