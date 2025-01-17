@@ -9,30 +9,31 @@
 
     <!-- Maintenance note: For each revision, change the content of <recordInfo><recordOrigin> to reflect the new revision number.
 	NAL-MARC21slim2MODS3-7-prefix.xsl
-	 _______________________________________________ 
+_______________________________________________ 
     |                                               |
-    |   NAL Revisions (Revision 1.197) 20250105     |
+    |   NAL Revisions (Revision 1.198) 20250117    |
     |_______________________________________________|
      ______________
     |              |
     |   MODS 3.7   |
     |______________|
+	Revision 1.198 - Addded support to viaf instances in nameIdentifier 20250117 cm3
 	Revision 1.197 - Added @775$d to existing @775$f preventin creation of empty <originInfo/> from appearing within <relateItem> 20250105 cm3
 	Revision 1.196 - Added support for @776$d and @787$d to prevent empty <originInfo/> from appearing within <relatedItem>. 20250104 cm3 
 	Revision 1.195 - Removed saxon:next-in-chain="fix_characters.xsl". Unnecessary processsing. 20250104 cm3
 	Revision 1.194 - Added conditional test to check if nameIdentifier is empty, fail on true. 20250103 cm3
 	Revision 1.193 - Added real world object name identifier to personal_name template. 20240403 cm3
-    Revision 1.192 - xlink:href instruction moved to first PI in createNameFrom100/700 templates to avoid error. 20240403 cm3
+	Revision 1.192 - xlink:href instruction moved to first PI in createNameFrom100/700 templates to avoid error. 20240403 cm3
 	Revision 1.191 - 072_0 $a is a non-repeatable subfield. Corrects error and reports incorrect record #. 20240211 cm3 
 	Revision 1.190 - Reworked transliteration related templates to accomodate updates made for NAL. 20240206 cm3
 	Revision 1.189 - Called subjectAuthority template before the xxx880 to prevent attribute creation error. 20240202 cm3
 	Revision 1.188 - Created and added remove_ending_punctuation.xsl to produce a cleaner result document 20240202 cm3
 	Revision 1.187 - Revised function references authoritative resource https://www.loc.gov/standards/codelists/languages.xml. 20240201 cm3  
 	Revision 1.186 - Elsevier's electronic page numbers. 20240118 cm3
-	Revision 1.185 - Revised function references authoritative resource https://www.loc.gov/standards/codelists/countries.xml. 20240102 cm3  
-    Revision 1.184 - Percent encodes brackets. 20231222 cm3
-	Revision 1.183 - An attribute node (displayLabel) cannot be created after a child of the containing elementResolved fatal erroor"Added <marc:datafield>. 20230615 cm3
-    Revision 1.182 - An attribute node (nameTitleGroup) cannot be created after a child of the containing element. 20230615 cm3
+	Revision 1.185 - Revised function references authoritative resource https://www.loc.gov/standards/codelists/countries.xml. 20240102 cm3
+	Revision 1.184 - Percent encodes brackets. 20231222 cm3
+	Revision 1.183 - An attribute node (displayLabel) cannot be created after a child of the containing elementResolved fatal erroor"Added . 20230615 cm3
+	Revision 1.182 - An attribute node (nameTitleGroup) cannot be created after a child of the containing element. 20230615 cm3
 	Revision 1.181 - Simplified marcCountry and f:decodeMARCCountry functions. Regex updated. 20230615 cm3
 	Revision 1.180 - Added conditional statement to prevent physicalDescription from appearing in article records. 20230615 cm3
 	Revision 1.179 - Added conditional statement to prevent issuance from appearing in article records. 20230615 cm3
@@ -45,7 +46,7 @@
 	Revision 1.172 - Changed identifer configuration in order to match journal article representations. 20230123 cm3
 	Revision 1.171 - Added $controlField008-35-07 as alternative to language of cataloging. 20230123 cm3
 	Revision 1.170 - Added $controlField008-0-14 variable to get correct dates is "w3cdtf" format 20221123 cm3
-	Revision 1.169 - Added $this variables to <title>, <subtitle>, <abstract>, <relatedItem><title> , etc. (any lenthy text field to resolve MODS Schema whitespace error. 20230108 cm3
+	Revision 1.169 - Added $this variables to <title>, <subtitle>, <abstract>, <relatedItem><title> , etc. (any lengthy text field to resolve MODS Schema whitespace error. 20230108 cm3
 	Revision 1.168 - Added conditional statement to get marc:datafield[@tag='914']/marc:subfield[@code='a'] when $w is not present. 20230108 cm3
 	Revision 1.167 - Custom function f:decodeMARCCountry($marcCode) returns the country/state name. 20230108 cm3
 	Revision 1.166 - Filters 008 field for 2 or 3 letter country/state codes. 20230108 cm3
@@ -59,9 +60,9 @@
 	Revision 1.158 - Added conditional statement above issuance to focus on monographs, single part items and multipart monographs. 20221210 cm3
 	Revision 1.157 - Added condtional statement if agid:# is empty from 773, use 914 marc:subfield a. 20221209 cm3
 	Revision 1.156 - Added condtional statement if ISSN is empty from 773, use 914 marc:subfield b. 20221209 cm3
-    Revision 1.155 - Corrected "subjectAuthority" template corrected "nal" to "atg" (https://www.loc.gov/standards/sourcelist/subject.html#codes) 20221208 cm3
-    Revision 1.154 - Commented out conditional statements within issuance element for serials, continuing resources, and integrating resources. 20221208 cm3	
-    Revision 1.153 - Used subtring-before function to get marc:subfield b (ie., publisher) and marc:subfield c (i.e., dateIssued). 20221208 cm3
+	Revision 1.155 - Corrected "subjectAuthority" template corrected "nal" to "atg" (https://www.loc.gov/standards/sourcelist/subject.html#codes) 20221208 cm3
+	Revision 1.154 - Commented out conditional statements within issuance element for serials, continuing resources, and integrating resources. 20221208 cm3
+	Revision 1.153 - Used subtring-before function to get marc:subfield b (ie., publisher) and marc:subfield c (i.e., dateIssued). 20221208 cm3
 	Revision 1.152 - Added conditional statement outside of issuance element to allow monographs, multipart monographs, and single items only. 20221208 cm3 
 	Revision 1.151 - $controlField008-35-37replace, uses replace function and regex to capture 3 letter string. cm3 2022/12/05
 	Revision 1.150 - Updated recordOrigin to reflect the XSLT filename Used in transform. 20221208 cm3
@@ -75,7 +76,7 @@
 	Revision 1.143 - Fixed dateIssued to include year only date from the 008  20141216 JG
 	Revision 1.142 - Fixed dateIssued to include month and date from the 008  20140818 JG
 	Revision 1.141 - Added displayForm to 700 JG 2014/05/29
-	 _______________________________________________ 
+_______________________________________________ 
     |                                               |
     | NAL Staff Revisions Begin (Revision 1.141)    |
     |_______________________________________________|
@@ -2311,7 +2312,7 @@
                                     </xsl:for-each>
                                 </xsl:if>
                                 <!-- 1.196 @776$d and @787$d cm3 -->
-                                <xsl:if test="@tag='776' or @tag='787'">
+                             <xsl:if test="@tag='776' or @tag='787'">
                                     <xsl:for-each select="marc:subfield[@code = 'd']">
                                        <xsl:copy-of select="f:parseOrigin(.)"/>
                                     </xsl:for-each>
@@ -3118,7 +3119,7 @@
                 <xsl:variable name="dateTime"
                     select="format-dateTime(current-dateTime(), '[M01]/[D01]/[Y0001] at [h1]:[m01] [P]')"/>
                 <xsl:value-of
-                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.196 20250104 cm3),'))"/>
+                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.198 20250117 cm3),'))"/>
                 <xsl:text>&#xa0;</xsl:text>
                 <xsl:value-of select="normalize-space(concat('Transformed on: ', $dateTime))"/>
             </recordOrigin>
@@ -3177,7 +3178,15 @@
               <xsl:for-each select="$lcnaf">
                 <nameIdentifier>
                     <xsl:attribute name="type" select="f:nameIdentifier($lcnaf)"/>
-                    <xsl:copy-of select="$lcnaf"/>
+                    <!-- 1.198 -->
+                    <xsl:choose>
+                    <xsl:when test="contains($lcnaf,'viaf')">
+                        <xsl:value-of select="replace($lcnaf, '(\(uri\)) (https?://\w+\..*)','$2')"/>
+                    </xsl:when>
+                      <xsl:otherwise>
+                    <xsl:value-of select="$lcnaf"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
                 </nameIdentifier>
             </xsl:for-each> 
         </xsl:if>
@@ -3185,8 +3194,15 @@
         <xsl:if test="$rwo!=''">      <!-- 1.194 -->
             <xsl:for-each select="$rwo">
                 <nameIdentifier>
-                    <xsl:attribute name="type" select="f:nameIdentifier($rwo)"/>
-                    <xsl:copy-of select="$rwo"/>
+                    <xsl:choose>
+                        <!-- 1.198 -->
+                        <xsl:when test="contains($rwo,'viaf')">
+                            <xsl:value-of select="replace($rwo, '(\(uri\)) (https?://\w+\..*)','$2')"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="$rwo"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </nameIdentifier>
             </xsl:for-each>
         </xsl:if>
@@ -3426,13 +3442,21 @@
             </xsl:call-template>
         </partName>
     </xsl:template>
-
+     <!-- 1.122-->
     <xd:doc id="xlink" scope="component">
-        <xd:desc>marc:subfield[@code = '0']: 1.122 </xd:desc>
+        <xd:desc>marc:subfield[@code = '0']</xd:desc>
     </xd:doc>
     <xsl:template match="marc:subfield[@code = '0']" mode="xlink">
         <xsl:attribute name="xlink:href">
-            <xsl:value-of select="."/>
+            <!-- 1.198 -->
+            <xsl:choose>
+                <xsl:when test="contains(.,'viaf')">
+                    <xsl:value-of select="replace(., '(\(uri\)) (https?://\w+\..*)','$2')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="."/>
+                </xsl:otherwise>
+            </xsl:choose>
         </xsl:attribute>
     </xsl:template>
 
@@ -3605,7 +3629,6 @@
 
     <!--@depreciated - no longer used see 1.12 
        call template name create @76X-78X    -->
-
 
     <xd:doc>
         <xd:desc> subjectGeographicZ</xd:desc>
@@ -5265,11 +5288,11 @@
             <xsl:call-template name="xxx880"/>
             <xsl:for-each select="marc:subfield[@code = 'i']">
                 <!-- 1.183 -->
-                <marc:datafield>
+              <!-- <marc:datafield> -->
                     <xsl:attribute name="displayLabel">
                         <xsl:value-of select="text()"/>
                     </xsl:attribute>
-                </marc:datafield>
+              <!-- </marc:datafield> -->
             </xsl:for-each>
             <xsl:variable name="this">
 
@@ -5327,7 +5350,7 @@
     <xd:doc>
         <xd:desc> createTitleInfoFrom740</xd:desc>
     </xd:doc>
-    <xsl:template name="createTitleInfoFrom740">
+    <xsl:template name="createTitleInfoFrom740"> 
         <titleInfo type="alternative">
             <xsl:call-template name="xxx880"/>
             <xsl:variable name="this">
@@ -7129,9 +7152,9 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                 <xsl:choose>
                     <xsl:when test="../marc:datafield[@tag = '240']">
                         <!-- 1.183 -->
-                        <marc:datafield>
+<!--                        <marc:datafield>-->
                             <xsl:attribute name="nameTitleGroup">1</xsl:attribute>
-                        </marc:datafield>
+                        <!--</marc:datafield>-->
                     </xsl:when>
                     <xsl:otherwise/>
                 </xsl:choose>
@@ -7143,13 +7166,13 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                 <xsl:choose>
                     <xsl:when test="../marc:datafield[@tag = '880'][starts-with(marc:subfield[@code = '6'], '240')]">
                         <!-- 1.183 -->
-                        <marc:datafield>
+<!--                        <marc:datafield>-->
                             <xsl:attribute name="nameTitleGroup">
                                 <xsl:value-of
                                     select="count(preceding-sibling::marc:datafield[@tag = '700' or @tag = '710' or @tag = '711' or @tag = '880']) + 2"
                                 />
                             </xsl:attribute>
-                        </marc:datafield>
+                        <!--</marc:datafield>-->
                     </xsl:when>
                     <xsl:otherwise/>
                 </xsl:choose>

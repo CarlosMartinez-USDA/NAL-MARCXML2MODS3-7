@@ -989,7 +989,7 @@
         <xd:desc>function to parse originInfo <xd:a href="f:parseOrigin" docid="{$stylehsheet//f:parseOrigin}"></xd:a></xd:desc>
         <xd:param name="input"/>
     </xd:doc>
-    <xsl:function name="f:parseOrigin">
+    <xsl:function name="f:parseOrigin" xmlns:f="http://functions" xmlns="http://www.loc.gov/mods/v3">
         <xsl:param name="input"/>
         <xsl:analyze-string select="$input" regex="(.*?)(\w+?\s?\w+\s?)?(\s;\s|\s:\s|,|\[.*\])(\w+\s+)?(.*;)?(.*:)?(.*)(,|\[)(.*)">
             <xsl:matching-substring>

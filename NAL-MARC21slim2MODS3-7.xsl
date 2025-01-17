@@ -6,31 +6,33 @@
     <xsl:output encoding="UTF-8" indent="yes" method="xml" name="original"/>
     <!-- whitespace control -->
     <xsl:strip-space elements="*"/>
-
+    
     <!-- Maintenance note: For each revision, change the content of <recordInfo><recordOrigin> to reflect the new revision number.
 	NAL-MARC21slim2MODS3-7-prefix.xsl
-	┌ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┐ 
-	│  NAL Revisions (Revision 1.193) 20240403    |    
-	└ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┘ 	
-	┌ ━ ━ ━ ━ ━ ┐ 
-	│ MODS 3.7 │  
-	└ ━ ━ ━ ━ ━ ┘
+_______________________________________________ 
+    |                                               |
+    |   NAL Revisions (Revision 1.197) 20250105     |
+    |_______________________________________________|
+     ______________
+    |              |
+    |   MODS 3.7   |
+    |______________|
 	Revision 1.197 - Added @775$d to existing @775$f preventin creation of empty <originInfo/> from appearing within <relateItem> 20250105 cm3
 	Revision 1.196 - Added support for @776$d and @787$d to prevent empty <originInfo/> from appearing within <relatedItem>. 20250104 cm3 
 	Revision 1.195 - Removed saxon:next-in-chain="fix_characters.xsl". Unnecessary processsing. 20250104 cm3
 	Revision 1.194 - Added conditional test to check if nameIdentifier is empty, fail on true. 20250103 cm3
 	Revision 1.193 - Added real world object name identifier to personal_name template. 20240403 cm3
-    Revision 1.192 - xlink:href instruction moved to first PI in createNameFrom100/700 templates to avoid error. 20240403 cm3
+	Revision 1.192 - xlink:href instruction moved to first PI in createNameFrom100/700 templates to avoid error. 20240403 cm3
 	Revision 1.191 - 072_0 $a is a non-repeatable subfield. Corrects error and reports incorrect record #. 20240211 cm3 
 	Revision 1.190 - Reworked transliteration related templates to accomodate updates made for NAL. 20240206 cm3
 	Revision 1.189 - Called subjectAuthority template before the xxx880 to prevent attribute creation error. 20240202 cm3
 	Revision 1.188 - Created and added remove_ending_punctuation.xsl to produce a cleaner result document 20240202 cm3
 	Revision 1.187 - Revised function references authoritative resource https://www.loc.gov/standards/codelists/languages.xml. 20240201 cm3  
 	Revision 1.186 - Elsevier's electronic page numbers. 20240118 cm3
-	Revision 1.185 - Revised function references authoritative resource https://www.loc.gov/standards/codelists/countries.xml. 20240102 cm3  
-    Revision 1.184 - Percent encodes brackets. 20231222 cm3
+	Revision 1.185 - Revised function references authoritative resource https://www.loc.gov/standards/codelists/countries.xml. 20240102 cm3
+	Revision 1.184 - Percent encodes brackets. 20231222 cm3
 	Revision 1.183 - An attribute node (displayLabel) cannot be created after a child of the containing elementResolved fatal erroor"Added <datafield>. 20230615 cm3
-    Revision 1.182 - An attribute node (nameTitleGroup) cannot be created after a child of the containing element. 20230615 cm3
+	Revision 1.182 - An attribute node (nameTitleGroup) cannot be created after a child of the containing element. 20230615 cm3
 	Revision 1.181 - Simplified marcCountry and f:decodeMARCCountry functions. Regex updated. 20230615 cm3
 	Revision 1.180 - Added conditional statement to prevent physicalDescription from appearing in article records. 20230615 cm3
 	Revision 1.179 - Added conditional statement to prevent issuance from appearing in article records. 20230615 cm3
@@ -73,12 +75,15 @@
 	Revision 1.143 - Fixed dateIssued to include year only date from the 008  20141216 JG
 	Revision 1.142 - Fixed dateIssued to include month and date from the 008  20140818 JG
 	Revision 1.141 - Added displayForm to 700 JG 2014/05/29
-	┌ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┐ 
-	│ NAL Staff Revisions Begin (Revision 1.141)  |    
-	└ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┘ 	
-	┌ ━ ━ ━ ━ ━ ┐ 
-	│ MODS 3.6 │  
-	└ ━ ━ ━ ━ ━ ┘ 
+_______________________________________________ 
+    |                                               |
+    | NAL Staff Revisions Begin (Revision 1.141)    |
+    |_______________________________________________|
+     ______________
+    |              |
+    |   MODS 3.6   |
+    |______________|
+    
 	Revision 1.140 - Fixed admin metadata - XSLT was referencing MODS 3.6 - 2020/07/17 - tmee
 	Revision 1.139 - Update to MODS v.3.7 - 2020/02/13 ws
 	Revision 1.138 - Update output to notes fields for 500. - 2020/01/06 ws
@@ -151,12 +156,13 @@
 	Revision 1.97 - Fixed 264 mapping tmee 20140521
 	Revision 1.96 - Fixed 310 and 321 and 008 frequency authority for marcfrequency tmee 2014/04/22
 	Revision 1.95 - Modified 035 to include identifier type (WlCaITV) tmee 2014/04/21	
-	Revision 1.94 - leader 07 b changed mapping from continuing to serial tmee 2014/02/21
-	┌ ━ ━ ━ ━ ━ ┐ 
-	│ MODS 3.5 │  
-	└ ━ ━ ━ ━ ━ ┘
+     ______________
+    |              |
+    |   MODS 3.5   |
+    |______________|
+	
 	Revision 1.95 - Added a xsl:when to deal with '#' and ' ' in $marcLeader19 and $controlField008-18 - ws 2014/12/19
-	Revision 1.94 - leader 07 b mapping changed from "continuing" to "serial" tmee 2014/02/21
+	Revision 1.94 - marc:leader 07 b mapping changed from "continuing" to "serial" tmee 2014/02/21
 	Revision 1.93 - Fixed personal name transform for ind1=0 tmee 2014/01/31
 	Revision 1.92 - Removed duplicate code for 856 1.51 tmee 2014/01/31
 	Revision 1.91 - Fixed createnameFrom720 duplication tmee 2014/01/31
@@ -196,9 +202,11 @@
 	Revision 1.57 - Added Ldr/07 and Ldr/19 mappings - 2010/09/17 tmee
 	Revision 1.56 - Mapped 1xx usage="primary" - 2010/09/17 tmee
 	Revision 1.55 - Mapped UT 240/1xx nameTitleGroup - 2010/09/17 tmee
-	┌ ━ ━ ━ ━ ━ ┐ 
-	│ MODS 3.4 │  
-	└ ━ ━ ━ ━ ━ ┘
+     ______________
+    |              |
+    |   MODS 3.4   |
+    |______________|
+    
 	Revision 1.54 - Fixed 086 redundancy - 2010/07/27 tmee
 	Revision 1.53 - Added direct href for MARC21slimUtils - 2010/07/27 tmee
 	Revision 1.52 - Mapped 046 subfields c,e,k,l - 2010/04/09 tmee
