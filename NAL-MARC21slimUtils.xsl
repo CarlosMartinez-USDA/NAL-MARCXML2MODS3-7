@@ -571,6 +571,9 @@
                     <xd:li>
                         <xd:i>14.<xd:ref name="f:punctuation-trim" type="function"/>f:punctuation-trim</xd:i>
                     </xd:li>
+                    <xd:li>
+                        <xd:i>15.<xd:href name="f:parseOrigin" type="function">f:parseOrigin</xd:href></xd:i>
+                    </xd:li>
                 </xd:ul>
             </xd:p>
         </xd:desc>
@@ -979,5 +982,58 @@
                                   then (replace($punctuated, '(^.*)?[\[\]:;](.*$)?', '$1'))
                                   else $punctuation_removed"/>
         </xsl:for-each>
+    </xsl:function>
+    
+    <xsl:variable name="stylesheet" select="doc(document(''))"/>
+    <xd:doc scope="component" id="f:parseOrigin">
+        <xd:desc>function to parse originInfo <xd:a href="f:parseOrigin" docid="{$stylehsheet//f:parseOrigin}"></xd:a></xd:desc>
+        <xd:param name="input"/>
+    </xd:doc>
+    <xsl:function name="f:parseOrigin" xmlns:f="http://functions" xmlns="http://www.loc.gov/mods/v3">
+        <xsl:param name="input"/>
+        <xsl:analyze-string select="$input" regex="(.*?)(\w+?\s?\w+\s?)?(\s;\s|\s:\s|,|\[.*\])(\w+\s+)?(.*;)?(.*:)?(.*)(,|\[)(.*)">
+            <xsl:matching-substring>
+                <!-- place -->
+                <xsl:variable name="this">   
+                    <xsl:choose>
+                        <xsl:when test="regex-group(1)!=''">
+                            <xsl:value-of select="normalize-space(concat(regex-group(1),regex-group(2), regex-group(6)))"/>
+                        </xsl:when>  
+                        <xsl:otherwise>
+                            <xsl:value-of select="normalize-space(string-join(regex-group(2),regex-group(6)))"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:variable>
+                <xsl:if test="$this !=''">
+                    <place>
+                        <placeTerm type="text">
+                            <xsl:value-of select="normalize-space($this)"/>
+                        </placeTerm>
+                    </place>
+                </xsl:if>
+                <!-- publisher -->
+                <xsl:if test="regex-group(4)!='' and regex-group(5)!=''">
+                    <publisher>
+                        <xsl:value-of select="normalize-space(concat(regex-group(4),' ',regex-group(5)))"/>
+                    </publisher>
+                </xsl:if>
+                <publisher>
+                    <xsl:value-of select="normalize-space(regex-group(7))"/>
+                </publisher>
+                <!-- dates of publication/copyright -->
+                <xsl:choose>
+                    <xsl:when test="starts-with(regex-group(9),'©')">
+                        <copyrightDate>
+                            <xsl:value-of select="normalize-space(translate(regex-group(9),'[]',''))"/>
+                        </copyrightDate>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <dateIssued>
+                            <xsl:value-of select="normalize-space(translate(regex-group(9),'[]',''))"/>
+                        </dateIssued>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:matching-substring>   
+        </xsl:analyze-string>
     </xsl:function>
 </xsl:stylesheet>
