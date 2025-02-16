@@ -11,12 +11,14 @@
 	NAL-MARC21slim2MODS3-7.xsl
      _______________________________________________ 
     |                                               |
-    |   NAL Revisions (Revision 1.198) 20250117     |
+    |   NAL Revisions (Revision 2.000) 20250206     |
     |_______________________________________________|
      ______________
     |              |
     |   MODS 3.7   |
     |______________|
+    Revisino 2.000 - subjectAuthority adds conditions for @ind2='7', NAL-IND records do not have $2 thus adds condition to template making the value "marcgt". 20250208
+    Revision 1.199 - Added not(ends-with(http://)) to prevent empty urls feom being added and causin invalidation 20250206 cm3
 	Revision 1.198 - Addded support to viaf instances in nameIdentifier 20250117 cm3
 	Revision 1.197 - Added @775$d to existing @775$f preventin creation of empty <originInfo/> from appearing within <relateItem> 20250105 cm3
 	Revision 1.196 - Added support for @776$d and @787$d to prevent empty <originInfo/> from appearing within <relatedItem>. 20250104 cm3 
@@ -28,12 +30,12 @@
 	Revision 1.190 - Reworked transliteration related templates to accomodate updates made for NAL. 20240206 cm3
 	Revision 1.189 - Called subjectAuthority template before the xxx880 to prevent attribute creation error. 20240202 cm3
 	Revision 1.188 - Created and added remove_ending_punctuation.xsl to produce a cleaner result document 20240202 cm3
-	Revision 1.187 - Revised function references authoritative resource https://www.loc.gov/standards/codelists/languages.xml. 20240201 cm3  
+	Revision 1.187 - Revised custom function references authoritative resource https://www.loc.gov/standards/codelists/languages.xml. 20240201 cm3  
 	Revision 1.186 - Elsevier's electronic page numbers. 20240118 cm3
-	Revision 1.185 - Revised function references authoritative resource https://www.loc.gov/standards/codelists/countries.xml. 20240102 cm3
+	Revision 1.185 - Revised custom function f:decodeMARCCountry so that it references the authoritative resource https://www.loc.gov/standards/codelists/countries.xml. 20240102 cm3
 	Revision 1.184 - Percent encodes brackets. 20231222 cm3
-	Revision 1.183 - An attribute node (displayLabel) cannot be created after a child of the containing elementResolved fatal erroor"Added . 20230615 cm3
-	Revision 1.182 - An attribute node (nameTitleGroup) cannot be created after a child of the containing element. 20230615 cm3
+	Revision 1.183 - Reverted->An attribute node (displayLabel) cannot be created after a child of the containing elementResolved fatal erroor"Added . 20230615 cm3
+	Revision 1.182 - Reverted->An attribute node (nameTitleGroup) cannot be created after a child of the containing element. 20230615 cm3
 	Revision 1.181 - Simplified marcCountry and f:decodeMARCCountry functions. Regex updated. 20230615 cm3
 	Revision 1.180 - Added conditional statement to prevent physicalDescription from appearing in article records. 20230615 cm3
 	Revision 1.179 - Added conditional statement to prevent issuance from appearing in article records. 20230615 cm3
@@ -48,7 +50,7 @@
 	Revision 1.170 - Added $controlField008-0-14 variable to get correct dates is "w3cdtf" format 20221123 cm3
 	Revision 1.169 - Added $this variables to <title>, <subtitle>, <abstract>, <relatedItem><title> , etc. (any lengthy text field to resolve MODS Schema whitespace error. 20230108 cm3
 	Revision 1.168 - Added conditional statement to get marc:datafield[@tag='914']/marc:subfield[@code='a'] when $w is not present. 20230108 cm3
-	Revision 1.167 - Custom function f:decodeMARCCountry($marcCode) returns the country/state name. 20230108 cm3
+	Revision 1.167 - Deprecated-> Custom function f:decodeMARCCountry($marcCode) returns the country/state name. 20230108 cm3
 	Revision 1.166 - Filters 008 field for 2 or 3 letter country/state codes. 20230108 cm3
 	Revision 1.165 - Repurposed and renamed displayForm template to personal_name added specialSubfieldSelect from 1.164 as variable, parsed it as contributor name output. 20230106 cm3
 	Revision 1.164 - moved specialSubfieldSelect to NAL-MARC21slimUtils.xsl 20230106 cm3
@@ -76,7 +78,7 @@
 	Revision 1.143 - Fixed dateIssued to include year only date from the 008  20141216 JG
 	Revision 1.142 - Fixed dateIssued to include month and date from the 008  20140818 JG
 	Revision 1.141 - Added displayForm to 700 JG 2014/05/29
-_______________________________________________ 
+     _______________________________________________ 
     |                                               |
     | NAL Staff Revisions Begin (Revision 1.141)    |
     |_______________________________________________|
@@ -3119,7 +3121,7 @@ _______________________________________________
                 <xsl:variable name="dateTime"
                     select="format-dateTime(current-dateTime(), '[M01]/[D01]/[Y0001] at [h1]:[m01] [P]')"/>
                 <xsl:value-of
-                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.198 20250117 cm3),'))"/>
+                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.199 20250117 cm3),'))"/>
                 <xsl:text>&#xa0;</xsl:text>
                 <xsl:value-of select="normalize-space(concat('Transformed on: ', $dateTime))"/>
             </recordOrigin>
@@ -3136,12 +3138,26 @@ _______________________________________________
     </xsl:template>
 
     <!--1.165 -->
-    <xd:doc id="personal_name" scope="component"><xd:desc><xd:p>formerly named displayForm template</xd:p><xd:p>this template selects and builds marc datafields @100/@700.</xd:p></xd:desc><xd:param name="name"/><xd:param name="lcnaf"/><xd:param name="rwo"/></xd:doc><xsl:template name="personal_name">
-        <xsl:param name="name"><xsl:call-template name="specialSubfieldSelect"><xsl:with-param name="anyCodes">aq</xsl:with-param><!-- $a Personal name/$q Fuller form of Name --><xsl:with-param name="axis">t</xsl:with-param><xsl:with-param name="beforeCodes">g</xsl:with-param></xsl:call-template></xsl:param>
+    <xd:doc id="personal_name" scope="component"><xd:desc><xd:p>formerly named displayForm template</xd:p><xd:p>this template selects and builds marc datafields @100/@700.</xd:p></xd:desc><xd:param name="name"/><xd:param name="zero"/><xd:param name="one"/></xd:doc>
+    <xsl:template name="personal_name">
+        <xsl:param name="name">
+            <xsl:call-template name="specialSubfieldSelect">
+                <xsl:with-param name="anyCodes">aq</xsl:with-param>
+                <xsl:with-param name="axis">t</xsl:with-param>
+                <xsl:with-param name="beforeCodes">g</xsl:with-param>
+            </xsl:call-template>
+        </xsl:param>
         <!-- marc:subfield[@code = '0'] -  Authority record control number or standard number (R) -->
-        <xsl:param name="lcnaf"><xsl:call-template name="subfieldSelect"><xsl:with-param name="codes">0</xsl:with-param></xsl:call-template></xsl:param>
+        <xsl:param name="zero">
+            <xsl:call-template name="subfieldSelect"><xsl:with-param name="codes">0</xsl:with-param>
+            </xsl:call-template>
+        </xsl:param>
         <!-- marc:subfield[@code = '1'] - Real World Object URI (R)-->
-        <xsl:param name="rwo"><xsl:call-template name="subfieldSelect"><xsl:with-param name="codes">1</xsl:with-param></xsl:call-template></xsl:param>
+        <xsl:param name="one">
+            <xsl:call-template name="subfieldSelect">
+                <xsl:with-param name="codes">1</xsl:with-param>
+            </xsl:call-template>
+        </xsl:param>
         <!-- name -->
         <xsl:for-each select="$name">
             <namePart type="given">
@@ -3159,6 +3175,24 @@ _______________________________________________
                     <xsl:otherwise><xsl:value-of select="replace($name, '(.*,.*)(,|\.)', '$1')"/></xsl:otherwise>
                 </xsl:choose>
             </displayForm>
+            <!-- marc:subfield[@code = '0'] -->
+            <xsl:if test="$zero!=''">      <!-- 1.194 -->
+                <xsl:for-each select="$zero">
+                    <nameIdentifier type="{f:nameIdentifier($zero)}">
+                        <!-- 1.198 -->
+                        <xsl:value-of select="$zero"/>    
+                    </nameIdentifier>
+                </xsl:for-each> 
+            </xsl:if>
+            
+            <!--  marc:subfield[@code = '1']-->
+            <xsl:if test="$one!=''">    <!-- 1.194 -->
+                <xsl:for-each select="$one != ''">
+                    <nameIdentifier type="{f:nameIdentifier($one)}">
+                        <xsl:value-of select="$one"/>
+                    </nameIdentifier>
+                </xsl:for-each>
+            </xsl:if>
             <xsl:call-template name="affiliation"/>
         </xsl:for-each> 
         <xsl:choose>        
@@ -3173,39 +3207,8 @@ _______________________________________________
                 </role>
             </xsl:otherwise>
         </xsl:choose>
-        <!-- 100/700 $0 - Authority record control number or standard number (R) -->           
-        <xsl:if test="$lcnaf!=''">      <!-- 1.193, 1.194 -->
-              <xsl:for-each select="$lcnaf">
-                <nameIdentifier>
-                    <xsl:attribute name="type" select="f:nameIdentifier($lcnaf)"/>
-                    <!-- 1.198 -->
-                    <xsl:choose>
-                    <xsl:when test="contains($lcnaf,'viaf')">
-                        <xsl:value-of select="replace($lcnaf, '(\(uri\)) (https?://\w+\..*)','$2')"/>
-                    </xsl:when>
-                      <xsl:otherwise>
-                    <xsl:value-of select="$lcnaf"/>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                </nameIdentifier>
-            </xsl:for-each> 
-        </xsl:if>
-        <!-- 100/700 $1 - Real World Object URI (R)-->
-        <xsl:if test="$rwo!=''">      <!-- 1.194 -->
-            <xsl:for-each select="$rwo">
-                <nameIdentifier>
-                    <xsl:choose>
-                        <!-- 1.198 -->
-                        <xsl:when test="contains($rwo,'viaf')">
-                            <xsl:value-of select="replace($rwo, '(\(uri\)) (https?://\w+\..*)','$2')"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:value-of select="$rwo"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </nameIdentifier>
-            </xsl:for-each>
-        </xsl:if>
+        
+
     </xsl:template>
 
    <xd:doc scope="component" id="affiliation">
@@ -3952,7 +3955,11 @@ _______________________________________________
                                 <xsl:when test="@ind2 = '5'">csh</xsl:when>
                                 <xsl:when test="@ind2 = '6'">rvm</xsl:when>
                                 <xsl:when test="@ind2 = '7'">
-                                    <xsl:value-of select="marc:subfield[@code = '2']"/>
+                                    <!-- 2.000 -->
+                                    <xsl:choose>
+                                        <xsl:when test="not(marc:subfield[@code='2'])">marcgt</xsl:when>
+                                        <xsl:otherwise><xsl:value-of select="marc:subfield[@code = '2']"/></xsl:otherwise>
+                                    </xsl:choose>
                                 </xsl:when>
                             </xsl:choose>
                         </xsl:attribute>
@@ -7010,7 +7017,9 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
         <xd:desc>createLocationFrom856</xd:desc>
     </xd:doc>
     <xsl:template name="createLocationFrom856">
-        <xsl:if test="//marc:datafield[@tag = '856'][@ind2 != '2'][marc:subfield[@code = 'u']]">
+        <xsl:if test="marc:datafield[@tag = '856'][@ind2 != '2'][marc:subfield[@code = 'u']] and not(ends-with(marc:subfield[@code = 'u'], 'http://'))">
+            <!-- 1.199 -->
+                 
             <location>
                 <!-- 1.121 -->
                 <xsl:call-template name="xxx880"/>
@@ -7152,9 +7161,9 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                 <xsl:choose>
                     <xsl:when test="../marc:datafield[@tag = '240']">
                         <!-- 1.183 -->
-<!--                        <marc:datafield>-->
+                        <!-- <marc:datafield> -->
                             <xsl:attribute name="nameTitleGroup">1</xsl:attribute>
-                        <!--</marc:datafield>-->
+                        <!-- </marc:datafield> -->
                     </xsl:when>
                     <xsl:otherwise/>
                 </xsl:choose>
@@ -7166,13 +7175,11 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                 <xsl:choose>
                     <xsl:when test="../marc:datafield[@tag = '880'][starts-with(marc:subfield[@code = '6'], '240')]">
                         <!-- 1.183 -->
-<!--                        <marc:datafield>-->
+                        <!-- <marc:datafield> -->
                             <xsl:attribute name="nameTitleGroup">
-                                <xsl:value-of
-                                    select="count(preceding-sibling::marc:datafield[@tag = '700' or @tag = '710' or @tag = '711' or @tag = '880']) + 2"
-                                />
+                                <xsl:value-of select="count(preceding-sibling::marc:datafield[@tag = '700' or @tag = '710' or @tag = '711' or @tag = '880']) + 2"/>
                             </xsl:attribute>
-                        <!--</marc:datafield>-->
+                        <!-- </marc:datafield> -->
                     </xsl:when>
                     <xsl:otherwise/>
                 </xsl:choose>
@@ -7695,8 +7702,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
         <xsl:variable name="dataField260c">
             <!--1.184-->
             <xsl:call-template name="chopPunctuationStrings">
-                <xsl:with-param name="chopStrings"
-                    select="marc:datafield[@tag = '260']/marc:subfield[@code = 'c']"/>
+                <xsl:with-param name="chopStrings" select="marc:datafield[@tag = '260']/marc:subfield[@code = 'c']"/>
             </xsl:call-template>
         </xsl:variable>
         <xsl:variable name="originInfoShared"><!--1.166 -->
@@ -7715,33 +7721,37 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                     </place>
                 </xsl:when>
             </xsl:choose>
-                <!-- </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:if test="translate($controlField008-15-17, '|', '')">
-                        <xsl:analyze-string select="$controlField008"
-                            regex="\d{{6}}[a-z]\d+(\\{{2,4}}|\s{{2,4}})?(xx|[a-z]{{2,3}}).*">
-                            <xsl:matching-substring>
-                                <xsl:choose>
-                                    <xsl:when test="contains(regex-group(2), 'xx')"/>
-                                    <xsl:when test="matches(regex-group(2), '[a-z]{2,3}')">
-                                        <!-\- marc country code -\->
-                                        <placeTerm>
-                                            <xsl:attribute name="type">code</xsl:attribute>
-                                            <xsl:attribute name="authority">marccountry</xsl:attribute>
-                                            <xsl:value-of select="regex-group(2)"/>
-                                        </placeTerm>
-                                        <!-\-1.167 -\->
-                                        <placeTerm>
-                                            <xsl:attribute name="type">text</xsl:attribute>
-                                            <xsl:value-of select="f:decodeMARCCountry(regex-group(2))"/>
-                                        </placeTerm>                                        
-                                    </xsl:when>
-                                </xsl:choose>
-                            </xsl:matching-substring>
-                        </xsl:analyze-string>
-                        </xsl:if>
-                    </xsl:otherwise>
-                </xsl:choose>-->
+            
+       <!-- f:decodeMARCCountry() deprecated -->
+       <!--</xsl:when>
+            <xsl:otherwise>
+                <xsl:if test="translate($controlField008-15-17, '|', '')">
+                    <xsl:analyze-string select="$controlField008"
+                        regex="\d{{6}}[a-z]\d+(\\{{2,4}}|\s{{2,4}})?(xx|[a-z]{{2,3}}).*">
+                        <xsl:matching-substring>
+                            <xsl:choose>
+                                <xsl:when test="contains(regex-group(2), 'xx')"/>
+                                <xsl:when test="matches(regex-group(2), '[a-z]{2,3}')">
+                                    <!-\- marc country code -\->
+                                    <placeTerm>
+                                        <xsl:attribute name="type">code</xsl:attribute>
+                                        <xsl:attribute name="authority">marccountry</xsl:attribute>
+                                        <xsl:value-of select="regex-group(2)"/>
+                                    </placeTerm>
+                                    <!-\-1.167 -\->
+                                    <placeTerm>
+                                        <xsl:attribute name="type">text</xsl:attribute>
+                                        <xsl:value-of select="f:decodeMARCCountry(regex-group(2))"/>
+                                    </placeTerm>                                        
+                                </xsl:when>
+                            </xsl:choose>
+                        </xsl:matching-substring>
+                    </xsl:analyze-string>
+                </xsl:if>
+            </xsl:otherwise>
+            </xsl:choose>
+       -->
+            
             <!-- 1.177 for journal publisher to appear with article -->
             <xsl:for-each select="marc:datafield[@tag = '773']">
                 <publisher>
@@ -7896,17 +7906,15 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                             $marcLeader7 = 'm' and ($marcLeader19 = '#')">
                         <issuance>
                             <xsl:choose>
-                                <xsl:when test="$marcLeader7 = 'a' or $marcLeader7 = 'c' or $marcLeader7 = 'd' or $marcLeader7 = 'm'"
-                                    >monographic</xsl:when>
+                                <xsl:when test="$marcLeader7 = 'a' or $marcLeader7 = 'c' or $marcLeader7 = 'd' or $marcLeader7 = 'm'">monographic</xsl:when>
                                 <!-- <xsl:when test="$marcLeader7 = 'b'">continuing</xsl:when> -->
-                                <xsl:when test="$marcLeader7 = 'm' and ($marcLeader19 = 'a' or $marcLeader19 = 'b' or $marcLeader19 = 'c')"
-                                    >multipart monograph</xsl:when>
+                                <xsl:when test="$marcLeader7 = 'm' and ($marcLeader19 = 'a' or $marcLeader19 = 'b' or $marcLeader19 = 'c')">multipart monograph</xsl:when>
                                 <!-- 1.106 20141218 -->
-                                <xsl:when test="$marcLeader7 = 'm' and ($marcLeader19 = ' ')">single
-                                    unit</xsl:when>
+                                <xsl:when test="$marcLeader7 = 'm' and ($marcLeader19 = ' ')">single unit</xsl:when>
                                 <!--1.152
                                     <xsl:when test="$marcLeader7 = 'i'">integrating resource</xsl:when>
-						        	<xsl:when test="$marcLeader7 = 'b' or $marcLeader7 = 's'">serial</xsl:when>-->
+                                    <xsl:when test="$marcLeader7 = 'b' or $marcLeader7 = 's'">serial</xsl:when>
+                                -->
                             </xsl:choose>
                         </issuance>
                     </xsl:if>

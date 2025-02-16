@@ -886,6 +886,27 @@
     </xd:doc>
     <xsl:function name="f:nameIdentifier" as="xs:string" xmlns:f="http://functions">
         <xsl:param name="uri" as="xs:string"/>
+        <!--        <xsl:variable name="id" select="replace($uri, '(^https?)://(www)?(\w+)((\.\w+)(\.\w+)?(\.\w+)?)/?(\S+)/?(\?uri=)?(.*)', '$3$4')"/>-->
+<!--        <xsl:variable name="id">-->
+            <xsl:sequence select="if (contains($uri,'orcid')) then 'orcid'
+                             else if (contains($uri,'viaf')) then 'viaf' 
+                             else if (contains($uri, 'worldcat')) then 'oclc'
+                             else if (contains($uri, 'loc')) then  'lcnaf'
+                             else if (contains($uri, 'nlm')) then  'mesh'
+                             else if (contains($uri, 'wikidata')) then 'wikidata'
+                             else ''
+                                (:if (matches($uri, '^https?://(www)?[id|agclass|lod|entities]+\.[a-z]+\.[a-z]+(\.[a-z]+)?.*')) 
+                                then f:authority($id)
+                                else if ((contains($uri, 'orcid') or contains($uri, 'viaf') or  contains($uri, 'isni') or  matches($uri, '[a-z]+')) = true())
+                                then substring-before($id,'.')
+                                else $uri:)"/>     
+        <!--</xsl:variable>-->
+        <!--<xsl:if test="$id != ''">
+            <xsl:sequence select="$id"/>
+        </xsl:if>-->
+    </xsl:function>
+<!--    <xsl:function name="f:nameIdentifier" as="xs:string" xmlns:f="http://functions">
+        <xsl:param name="uri" as="xs:string"/>
         <xsl:variable name="id" select="replace($uri, '(^https?)://(www)?(\w+)((\.\w+)(\.\w+)?(\.\w+)?)/?(\S+)/?(\?uri=)?(.*)', '$3$4')"/>
         
         <xsl:sequence select="
@@ -894,7 +915,7 @@
             else if ((contains($uri, 'orcid') or contains($uri, 'viaf') or  contains($uri, 'isni') or  matches($uri, '[a-z]+')) = true())
             then substring-before($id,'.')
             else $uri"/>           
-    </xsl:function>
+    </xsl:function>-->
     
     <xd:doc>
         <xd:desc/>
