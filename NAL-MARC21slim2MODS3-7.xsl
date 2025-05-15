@@ -17,7 +17,8 @@
     |              |
     |   MODS 3.7   |
     |______________|
-    Revisino 2.000 - subjectAuthority adds conditions for @ind2='7', NAL-IND records do not have $2 thus adds condition to template making the value "marcgt". 20250208
+    Revision 1.201 - Corrected affililation template and added condition to include 373$a as affiliation. 20250515 cm3
+    Revision 1.200 - subjectAuthority adds conditions for @ind2='7', NAL-IND records do not have $2 thus adds condition to template making the value "marcgt". 20250208 cm3
     Revision 1.199 - Added not(ends-with(http://)) to prevent empty urls feom being added and causin invalidation 20250206 cm3
 	Revision 1.198 - Addded support to viaf instances in nameIdentifier 20250117 cm3
 	Revision 1.197 - Added @775$d to existing @775$f preventin creation of empty <originInfo/> from appearing within <relateItem> 20250105 cm3
@@ -3121,7 +3122,7 @@
                 <xsl:variable name="dateTime"
                     select="format-dateTime(current-dateTime(), '[M01]/[D01]/[Y0001] at [h1]:[m01] [P]')"/>
                 <xsl:value-of
-                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.199 20250117 cm3),'))"/>
+                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.201 20250515 cm3),'))"/>
                 <xsl:text>&#xa0;</xsl:text>
                 <xsl:value-of select="normalize-space(concat('Transformed on: ', $dateTime))"/>
             </recordOrigin>
@@ -3193,20 +3194,8 @@
                     </nameIdentifier>
                 </xsl:for-each>
             </xsl:if>
-            <xsl:call-template name="affiliation"/>
         </xsl:for-each> 
-        <xsl:choose>        
-            <xsl:when test="count(marc:subfield[@code = 'e']) = 0">
-                <role>
-                    <roleTerm type="text">author</roleTerm>
-                </role>
-            </xsl:when>
-            <xsl:otherwise>
-                <role>
-                    <roleTerm type="text"><xsl:value-of select="marc:subfield[@code='e']"/></roleTerm>
-                </role>
-            </xsl:otherwise>
-        </xsl:choose>
+
         
 
     </xsl:template>
@@ -3215,11 +3204,21 @@
        <xd:desc>affliliation</xd:desc>
    </xd:doc>
     <xsl:template name="affiliation">
-        <xsl:for-each select="marc:subfield[@code = 'u']">
-            <affiliation>
-                <xsl:value-of select="normalize-space(.)"/>
-            </affiliation>
-        </xsl:for-each>
+        <xsl:choose>
+            <xsl:when test="marc:subfield[@code='u']">
+                <xsl:for-each select="marc:subfield[@code='u']">
+                    <affiliation>
+                        <xsl:value-of select="normalize-space(.)"/>
+                    </affiliation>
+                </xsl:for-each>
+            </xsl:when>
+            <!-- 1.201 -->
+            <xsl:when test="//marc:datafield[@tag='373']/marc:subfield[@code = 'a']">
+                <affiliation>
+                    <xsl:value-of select="normalize-space(//marc:datafield[@tag='373']/marc:subfield[@code = 'a'])"/>
+                </affiliation>
+            </xsl:when>
+        </xsl:choose>
     </xsl:template>
 
     <xd:doc id="uri" scope="component">
@@ -3955,7 +3954,7 @@
                                 <xsl:when test="@ind2 = '5'">csh</xsl:when>
                                 <xsl:when test="@ind2 = '6'">rvm</xsl:when>
                                 <xsl:when test="@ind2 = '7'">
-                                    <!-- 2.000 -->
+                                    <!-- 1.200 -->
                                     <xsl:choose>
                                         <xsl:when test="not(marc:subfield[@code='2'])">marcgt</xsl:when>
                                         <xsl:otherwise><xsl:value-of select="marc:subfield[@code = '2']"/></xsl:otherwise>
@@ -5399,7 +5398,7 @@
                 <!-- 1.116 -->
             </name>
         </xsl:if>
-        <!-- 1.99 240 fix 20140804 -->
+        <!-- 240 fix 20140804 -->
         <xsl:if test="@ind1 = '3'">
             <name type="family">
                 <xsl:attribute name="usage">
@@ -5470,7 +5469,7 @@
                 <xsl:call-template name="personal_name"/>
 <!--                <xsl:call-template name="nameIdentifier"/>-->
                 <xsl:call-template name="affiliation"/>
-                <xsl:call-template name="role"/>
+                <xsl:call-template name="role"/>         
                 <!-- 1.116 -->
             </name>
         </xsl:if>
