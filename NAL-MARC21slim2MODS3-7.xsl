@@ -11,13 +11,13 @@
 	NAL-MARC21slim2MODS3-7.xsl
      _______________________________________________ 
     |                                               |
-    |   NAL Revisions (Revision 2.000) 20250206     |
+    |   NAL Revisions (Revision 1.200) 20250206     |
     |_______________________________________________|
      ______________
     |              |
     |   MODS 3.7   |
-    |______________|
-    Revision 1.201 - Corrected affililation template and added condition to include 373$a as affiliation. 20250515 cm3
+    |______________|                                                                                                            -->
+    <!--(In Dev Revision 1.201) - Add condition to include 373$a as affiliation. 20250515 cm3 --><!--  
     Revision 1.200 - subjectAuthority adds conditions for @ind2='7', NAL-IND records do not have $2 thus adds condition to template making the value "marcgt". 20250208 cm3
     Revision 1.199 - Added not(ends-with(http://)) to prevent empty urls feom being added and causin invalidation 20250206 cm3
 	Revision 1.198 - Addded support to viaf instances in nameIdentifier 20250117 cm3
@@ -3122,7 +3122,7 @@
                 <xsl:variable name="dateTime"
                     select="format-dateTime(current-dateTime(), '[M01]/[D01]/[Y0001] at [h1]:[m01] [P]')"/>
                 <xsl:value-of
-                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.201 20250515 cm3),'))"/>
+                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.200 20250206 cm3),'))"/>
                 <xsl:text>&#xa0;</xsl:text>
                 <xsl:value-of select="normalize-space(concat('Transformed on: ', $dateTime))"/>
             </recordOrigin>
@@ -3204,21 +3204,21 @@
        <xd:desc>affliliation</xd:desc>
    </xd:doc>
     <xsl:template name="affiliation">
-        <xsl:choose>
-            <xsl:when test="marc:subfield[@code='u']">
+       <!-- <xsl:choose>
+            <xsl:when test="marc:subfield[@code='u']">-->
                 <xsl:for-each select="marc:subfield[@code='u']">
                     <affiliation>
                         <xsl:value-of select="normalize-space(.)"/>
                     </affiliation>
                 </xsl:for-each>
-            </xsl:when>
-            <!-- 1.201 -->
-            <xsl:when test="//marc:datafield[@tag='373']/marc:subfield[@code = 'a']">
+          <!--  </xsl:when>
+            <!-\- 1.201 -\->
+            <xsl:when test="../marc:datafield[@tag='100'] and ../marc:datafield[@tag='373']//marc:subfield[@code = 'a']">
                 <affiliation>
-                    <xsl:value-of select="normalize-space(//marc:datafield[@tag='373']/marc:subfield[@code = 'a'])"/>
+                    <xsl:value-of select="../marc:datafield[@tag='373']/marc:subfield[@code = 'a'][../marc:datafield[@tag='100']]"/>
                 </affiliation>
             </xsl:when>
-        </xsl:choose>
+        </xsl:choose>-->
     </xsl:template>
 
     <xd:doc id="uri" scope="component">
