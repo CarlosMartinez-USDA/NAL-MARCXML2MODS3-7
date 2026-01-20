@@ -22,6 +22,7 @@
     <!-- 12/14/07: ntra added url encoding template -->
     <!-- 02/16/23: cmartinez updated datafield, subfieldSelec and specialSubfieldSelect templates to conditonally process both prefixed and non-prefixed elements. -->
     <!-- 05/22/23: cmartinez added alpha to use in functions (e.g., using translate to remove letters from page #'s) -->
+    <!---01/15/26: cmartinez added f:deSequencing-items to functions and applied it to "chopPunctutation" template to prevent error for contributors having more that one $e. --> 
  
     <!-- url encoding -->
 
@@ -180,13 +181,13 @@
             <xsl:text>.:,;/ </xsl:text>
         </xsl:param>
         <xsl:variable name="length">
-            <xsl:sequence select="string-length($chopString)"/>
+            <xsl:sequence select="string-length(f:deSequencing-items($chopString))"/>
         </xsl:variable>
         <xsl:choose>
             <xsl:when test="$length = 0"/>
-            <xsl:when test="contains($punctuation, substring($chopString, $length, 1))">
+            <xsl:when test="contains($punctuation, substring(f:deSequencing-items($chopString), $length, 1))">
                 <xsl:call-template name="chopPunctuation">
-                    <xsl:with-param name="chopString" select="substring($chopString, 1, $length - 1)"/>
+                    <xsl:with-param name="chopString" select="substring(f:deSequencing-items($chopString), 1, $length - 1)"/>
                     <xsl:with-param name="punctuation" select="$punctuation"/>
                 </xsl:call-template>
             </xsl:when>
@@ -522,60 +523,28 @@
             <xd:p><xd:d>created on:</xd:d>October 27, 2022</xd:p>
             <xd:p><xd:b>Creator:</xd:b>Carlos Martinez III</xd:p>
             <xd:p><xd:b>email:</xd:b>carlos.martinez2@usda.gov</xd:p>
-            <xd:p><xd:b>modified on:</xd:b>January 14, 2023</xd:p>
+            <xd:p><xd:b>modified on:</xd:b>January 15, 2026</xd:p>
             <xd:p>
                 <xd:b>NAL Custom XSLT Functions:</xd:b>
             </xd:p>
-            <xd:p>
-                <xd:ul>
-                    <xd:li>
-                        <xd:i>1.<xd:ref name="f:add-namespace-prefix" type="function"/>f:add-namespace-prefix</xd:i>
-                    </xd:li>
-                    <xd:li>
-                        <xd:i>2.<xd:ref name="f:subjCatCode" type="function"/>f:subjCatCode</xd:i>
-                    </xd:li>
-                    <xd:li>
-                        <xd:i>3.<xd:ref name="info:marcCountry">info:marcCountry</xd:ref>
-                            <xd:note name="f:decodeMARCCountry" type="function">Revised f:decodeMARCCountry to reference https://www.loc.gov/standards/codelists/countries.xml</xd:note></xd:i>
-                    </xd:li>
-                    <xd:li>
-                        <xd:i>4.<xd:ref name="f:f:isoTwo2Lang" type="function"/>f:isoTwo2Lang</xd:i>
-                    </xd:li>
-                    <xd:li>
-                        <xd:i>5.<xd:ref name="f:isoOne2Two" type="function"/>f:isoOne2Two</xd:i>
-                    </xd:li>
-                    <xd:li>
-                        <xd:i>6.<xd:ref name="f:capitalize-first" type="function"/>f:capitalize-first</xd:i>
-                    </xd:li>
-                    <xd:li>
-                        <xd:i>7.<xd:ref name="f:sentence-case" type="function"/>f:sentence-case</xd:i>
-                    </xd:li>
-                    <xd:li>
-                        <xd:i>8.<xd:ref name="f:f:proper-case" type="function"/>f:f:proper-case</xd:i>
-                    </xd:li>
-                    <xd:li>
-                        <xd:i>9.<xd:ref name="f:substring-before-match" type="function"/>f:substring-before-match</xd:i>
-                    </xd:li>
-                    <xd:li>
-                        <xd:i>10.<xd:ref name="f:nameIdAttr" type="function"/>f:nameIdentifier</xd:i>
-                    </xd:li>
-                    <xd:li>
-                        <xd:i>11.<xd:ref name="f:isNumber" type="function"/>f:isNumber</xd:i>
-                    </xd:li>
-                    <xd:li>
-                        <xd:i>12.<xd:ref name="f:modsTotalPages" type="function"/>f:modsTotalPages</xd:i>
-                    </xd:li>
-                    <xd:li>
-                        <xd:i>13.<xd:ref name="f:percentEncode" type="function"/>f:percentEncode</xd:i>
-                    </xd:li>
-                    <xd:li>
-                        <xd:i>14.<xd:ref name="f:punctuation-trim" type="function"/>f:punctuation-trim</xd:i>
-                    </xd:li>
-                    <xd:li>
-                        <xd:i>15.<xd:href name="f:parseOrigin" type="function">f:parseOrigin</xd:href></xd:i>
-                    </xd:li>
-                </xd:ul>
-            </xd:p>
+            <xd:p>Functions List<xd:ul>
+                    <xd:li><xd:i>1.<xd:ref name="f:add-namespace-prefix" type="function"/>f:add-namespace-prefix</xd:i></xd:li>
+                    <xd:li><xd:i>2.<xd:ref name="f:subjCatCode" type="function"/>f:subjCatCode</xd:i></xd:li>
+                    <xd:li><xd:i>3.<xd:ref name="info:marcCountry">info:marcCountry</xd:ref><xd:note name="f:decodeMARCCountry" type="function">Revised f:decodeMARCCountry to reference https://www.loc.gov/standards/codelists/countries.xml</xd:note></xd:i></xd:li>
+                    <xd:li><xd:i>4.<xd:ref name="f:f:isoTwo2Lang" type="function"/>f:isoTwo2Lang</xd:i></xd:li>
+                    <xd:li><xd:i>5.<xd:ref name="f:isoOne2Two" type="function"/>f:isoOne2Two</xd:i></xd:li>
+                    <xd:li><xd:i>6.<xd:ref name="f:capitalize-first" type="function"/>f:capitalize-first</xd:i></xd:li>
+                    <xd:li><xd:i>7.<xd:ref name="f:sentence-case" type="function"/>f:sentence-case</xd:i></xd:li>
+                    <xd:li><xd:i>8.<xd:ref name="f:f:proper-case" type="function"/>f:f:proper-case</xd:i></xd:li>
+                    <xd:li><xd:i>9.<xd:ref name="f:substring-before-match" type="function"/>f:substring-before-match</xd:i></xd:li>
+                    <xd:li><xd:i>10.<xd:ref name="f:nameIdAttr" type="function"/>f:nameIdentifier</xd:i></xd:li>
+                    <xd:li><xd:i>11.<xd:ref name="f:isNumber" type="function"/>f:isNumber</xd:i></xd:li>
+                    <xd:li><xd:i>12.<xd:ref name="f:modsTotalPages" type="function"/>f:modsTotalPages</xd:i></xd:li>
+                    <xd:li><xd:i>13.<xd:ref name="f:percentEncode" type="function"/>f:percentEncode</xd:i></xd:li>
+                    <xd:li><xd:i>14.<xd:ref name="f:punctuation-trim" type="function"/>f:punctuation-trim</xd:i></xd:li>
+                    <xd:li><xd:i>15.<xd:href name="f:parseOrigin" type="function">f:parseOrigin</xd:href></xd:i></xd:li>
+                    <xd:li><xd:i>16.<xd:href name="f:deSequencing-items" type="function">f:deSequencing-items</xd:href></xd:i></xd:li>
+                </xd:ul></xd:p>
         </xd:desc>
     </xd:doc>
 
@@ -697,7 +666,7 @@
           <xsl:param name="controlField008-15-17" as="xs:string"/><!-- control field 008, position 15-17--> 
         <xsl:variable name="country_name">
             <xsl:variable name="nodes">
-                <xsl:copy-of select="document('http://www.loc.gov/standards/codelists/countries.xml')"/>
+                <xsl:copy-of select="document('commons/xml/countries.xml')"/>
             </xsl:variable>
           <xsl:choose>
               <xsl:when test="$controlField008-15-17 = ''"/><!-- if empty, do not process --> 
@@ -723,7 +692,7 @@
         <xsl:param name="langParam"/>
         <xsl:variable name="langVar">
             <xsl:variable name="nodes">
-                <xsl:copy-of select="document('https://www.loc.gov/standards/codelists/languages.xml')"/>
+                <xsl:copy-of select="document('commons/xml/languages.xml')"/>
             </xsl:variable>
             <xsl:choose>
                 <xsl:when test="$langParam = ''"/>
@@ -1056,5 +1025,23 @@
                 </xsl:choose>
             </xsl:matching-substring>   
         </xsl:analyze-string>
+    </xsl:function>
+    
+    <xd:doc scope="component">
+        <xd:desc>
+            <xd:p><xd:b>Function: </xd:b>f:deSequencing-items</xd:p>
+            <xd:p><xd:b>Usage: </xd:b>f:deSequencing-items([xpath/sequence of items))</xd:p>
+            <xd:p><xd:b>Purpose: </xd:b>Avoids error: "A sequence of more than one item is not allowed"</xd:p>
+        </xd:desc>
+        <xd:param name="item-sequence"/>
+    </xd:doc>
+    <xsl:function name="f:deSequencing-items">
+        <xsl:param name="item-sequence"/>
+        <xsl:variable name="item">
+            <xsl:for-each select="$item-sequence">
+                <xsl:value-of select="."/>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:sequence select="$item"/>
     </xsl:function>
 </xsl:stylesheet>

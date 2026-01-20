@@ -5463,15 +5463,16 @@
         <xsl:if test="@ind1 = '0' or @ind1 = '1'">
             <name type="personal">
                 <!-- 1.122 and 1.192-->
+                <xsl:if test="not(marc:subfield[@code = '0']='')">
                 <xsl:apply-templates select="marc:subfield[@code = '0'][. != '']" mode="xlink"/>
+                </xsl:if>
                 <xsl:call-template name="xxx880"/>
                 <!-- 1.123 Add nameTitleGroup attribute if necessary -->
                 <xsl:call-template name="nameTitleGroup"/>
                 <!--<xsl:call-template name="nameABCDQ"/>-->
-                <xsl:call-template name="personal_name"/>
-<!--                <xsl:call-template name="nameIdentifier"/>-->
                 <xsl:call-template name="affiliation"/>
-                <xsl:call-template name="role"/>         
+                <xsl:call-template name="role"/>
+                <xsl:call-template name="nameIdentifier"/>
                 <!-- 1.116 -->
             </name>
         </xsl:if>
@@ -5481,9 +5482,9 @@
                 <xsl:call-template name="xxx880"/>
                 <!--<xsl:call-template name="nameABCDQ"/>-->
                 <xsl:call-template name="personal_name"/>
-                <xsl:call-template name="nameIdentifier"/>
                 <xsl:call-template name="affiliation"/>
                 <xsl:call-template name="role"/>
+                <xsl:call-template name="nameIdentifier"/>
             </name>
         </xsl:if>
     </xsl:template>
@@ -6152,13 +6153,14 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
             <xsl:call-template name="uri"/>
             <xsl:variable name="str">
                 <xsl:for-each select="marc:subfield[@code != '6' and @code != '8']">
-                    <xsl:value-of select="f:proper-case(.)"/>
+                    <xsl:value-of select="."/>
                     <xsl:text>&#xa0;</xsl:text>
                 </xsl:for-each>
             </xsl:variable>
             <xsl:value-of select="substring($str, 1, string-length($str) - 1)"/>
         </note>
     </xsl:template>
+    
     <xd:doc id="createSubGeoFrom034" scope="component">
         <xd:desc> subject Geo 034 043 045 255 656 662 752 </xd:desc>
     </xd:doc>
