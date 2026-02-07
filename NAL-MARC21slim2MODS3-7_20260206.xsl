@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0" xmlns="http://www.loc.gov/mods/v3" xmlns:f="http://functions" xmlns:info="info:lc/xmlns/codelist-v1" xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:nalsubcat="http://nal-subject-category-codes" xmlns:saxon="http://saxon.sf.net/" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exclude-result-prefixes="f info marc nalsubcat saxon xd xlink xs xsi">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0" xmlns="http://www.loc.gov/mods/v3" xmlns:f="http://functions" xmlns:info="info:lc/xmlns/codelist-v1" xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:nalsubcat="http://nal-subject-category-codes" xmlns:saxon="http://saxon.sf.net/" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exclude-result-prefixes="f info marc nalsubcat saxon xd xs xsi">
     <!-- includes -->
     <xsl:include href="NAL-MARC21slimUtils.xsl"/>
     <!-- outputs -->
@@ -11,13 +11,18 @@
 	NAL-MARC21slim2MODS3-7.xsl
      _______________________________________________ 
     |                                               |
-    |   NAL Revisions (Revision 1.202) 20261214     |
+    |   NAL Revisions (Revision 1.209) 20260203     |
     |_______________________________________________|
      ______________
     |              |
     |   MODS 3.7   |
     |______________|
-    Revision 1.204 - removed from 856 subfield u "dx." and added "s" to "http" from doi links. 20260130 cm3
+    Revisoin 1.209 - added 939 to capture historical "Sale Tape" dates. 20260206 cm3
+    Revision 1.208 - If the salesTape subfield 'b' still contains the '00000000', the current-date() is added in its place. 20260203 cm3
+    Revision 1.207 - Removed from "dx." and added "s" to "http" from/to doi links. 20260204 cm3
+    Revision 1.206 - Added funding-group information to be gathered from marc:datafield[@tag='596']. 20260203 cm3
+    Revision 1.205 - reconfigured 506/mods:accessCondition to correctly segment both "use and reproductiton" and "access restriction" statementnts  20260203.
+    Revision 1.204 - moved 856/mods:location below local identifiers 20260203 cm3 
     Revision 1.203 - added if test around volume to prevent empty <number/> tags from displaying. 20260126 cm3
     Revision 1.202 - corrected "role" template to call specific marc:subfield to avoid capturing the wrong metadata. 20260114 cm3
     Revision 1.201 - moved nameIdenftifers out of personal_name template. 2026-01-14
@@ -38,7 +43,7 @@
 	Revision 1.186 - Elsevier's electronic page numbers. 20240118 cm3
 	Revision 1.185 - Revised custom function f:decodeMARCCountry so that it references the authoritative resource https://www.loc.gov/standards/codelists/countries.xml. 20240102 cm3
 	Revision 1.184 - Percent encodes brackets. 20231222 cm3
-	Revision 1.183 - Reverted->An attribute node (displayLabel) cannot be created after a child of the containing elementResolved fatal erroor"Added . 20230615 cm3
+	Revision 1.183 - Reverted->An attribute node (displayLabel) cannot be created after a child of the containing elementResolved fatal error"Added . 20230615 cm3
 	Revision 1.182 - Reverted->An attribute node (nameTitleGroup) cannot be created after a child of the containing element. 20230615 cm3
 	Revision 1.181 - Simplified marcCountry and f:decodeMARCCountry functions. Regex updated. 20230615 cm3
 	Revision 1.180 - Added conditional statement to prevent physicalDescription from appearing in article records. 20230615 cm3
@@ -267,17 +272,17 @@
 	Revision 1.03 - Additional Changes not related to MODS Version 2.0 by ntra
 	Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
 -->
-<!--    <xsl:include href="commons/params.xsl"/>-->
+    <xsl:include href="commons/params.xsl"/>
     <xd:doc id="root" scope="stylesheet">
         <xd:desc>Processes the marcRecord template</xd:desc>
         <xd:param name="workingDirectory"/>
         <xd:param name="originalFile"/>
     </xd:doc>
     <xsl:template match="/">
-        <xsl:param name="originalFile" select="replace(base-uri(), '(.*/)(.*)(\.xml)', '$2')"/>
-        <xsl:param name="workingDirectory" select="substring-before(base-uri(), tokenize(base-uri(), '/')[last()])"/>
+        <xsl:param name="originalFile" select="replace(saxon:system-id(), '(.*/)(.*)(\.xml)', '$2')"/>
+        <xsl:param name="workingDirectory" select="substring-before(saxon:system-id(), tokenize(saxon:system-id(), '/')[last()])"/>
         
-        <xsl:result-document encoding="UTF-8" version="1.0" method="xml" media-type="text/xml" indent="yes" format="original" href="{$workingDirectory}/mods/N-{replace($originalFile, '(.*/)(.*)(\.xml)', '$2')}_{position()}.xml">
+        <xsl:result-document encoding="UTF-8" version="1.0" method="xml" media-type="text/xml" indent="yes" format="original" href="{$workingDirectory}/mods/N-{replace($originalFilename, '(.*/)(.*)(\.xml)', '$2')}_{position()}.xml">
             <xsl:choose>
                 <xsl:when test="marc:collection/marc:record">
                     <modsCollection xmlns="http://www.loc.gov/mods/v3" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -1423,15 +1428,15 @@
             <xsl:call-template name="createTargetAudienceFrom521"/>
         </xsl:for-each>
         <!-- 1.121 -->
-        <xsl:for-each
+  <!--      <xsl:for-each
             select="marc:datafield[@tag = '506'] | marc:datafield[@tag = '880'][starts-with(marc:subfield[@code = '6'], '506')]">
             <xsl:call-template name="createAccessConditionFrom506"/>
-        </xsl:for-each>
+        </xsl:for-each>-->
         <!-- 1.121 -->
-        <xsl:for-each
+<!--        <xsl:for-each
             select="marc:datafield[@tag = '540'] | marc:datafield[@tag = '880'][starts-with(marc:subfield[@code = '6'], '540')]">
             <xsl:call-template name="createAccessConditionFrom540"/>
-        </xsl:for-each>
+        </xsl:for-each>-->
 
         <xsl:if test="$typeOf008 = 'BK' or $typeOf008 = 'CF' or $typeOf008 = 'MU' or $typeOf008 = 'VM'">
             <xsl:variable name="controlField008-22" select="substring($controlField008, 23, 1)"/>
@@ -1487,6 +1492,7 @@
             select="marc:datafield[@tag = '504'] | marc:datafield[@tag = '880'][starts-with(marc:subfield[@code = '6'], '504')]">
             <xsl:call-template name="createNoteFrom504"/>
         </xsl:for-each>
+     
         <!-- 1.121 -->
         <xsl:for-each
             select="marc:datafield[@tag = '508'] | marc:datafield[@tag = '880'][starts-with(marc:subfield[@code = '6'], '508')]">
@@ -1746,10 +1752,15 @@
             <xsl:call-template name="createLocationFrom852"/>
         </xsl:for-each>
         <!-- 1.121 -->
-        <xsl:for-each
+     <!--   <xsl:for-each
             select="marc:datafield[@tag = '856'] | marc:datafield[@tag = '880'][starts-with(marc:subfield[@code = '6'], '856')]">
             <xsl:call-template name="createLocationFrom856"/>
         </xsl:for-each>
+        
+        <xsl:for-each
+            select="marc:datafield[@tag = '506'] | marc:datafield[@tag = '880'][starts-with(marc:subfield[@code = '6'], '506')]">
+            <xsl:call-template name="createAccessConditionFrom506"/>
+        </xsl:for-each>-->
 
         <!-- 1.120 - @490$ind1 -->
         <xsl:for-each
@@ -3073,8 +3084,19 @@
                 </relatedItem>
             </xsl:if>
         </xsl:for-each>
-
-
+<!-- 1.204 -->
+        <xsl:for-each
+            select="marc:datafield[@tag = '856'] | marc:datafield[@tag = '880'][starts-with(marc:subfield[@code = '6'], '856')]">
+            <xsl:call-template name="createLocationFrom856"/>
+        </xsl:for-each>
+<!-- 1.205 -->       
+        <xsl:for-each
+            select="marc:datafield[@tag = '506'] | marc:datafield[@tag = '880'][starts-with(marc:subfield[@code = '6'], '506')]">
+            <xsl:apply-templates select="marc:datafield[@tag='506']" mode="useAndReproduction"/>
+            <xsl:call-template name="createAccessConditionFrom506"/>
+        </xsl:for-each>
+        
+        
         <!--NAL notes 910, 930, 945, 946, 
             '974': removed from extension and placed under 016 Agricola accession numbmer  -->
         <extension>
@@ -3083,6 +3105,14 @@
             <xsl:call-template name="createNoteFrom939"/>
             <xsl:call-template name="createNoteFrom945"/>
             <xsl:call-template name="createNoteFrom946"/>
+            <!-- 1.206 -->
+            <xsl:if test="marc:datafield[@tag='596']!=''">
+                <funding-group>
+                    <xsl:for-each select=".">
+                        <xsl:apply-templates select="marc:datafield[@tag='596']" mode="award-group"/>
+                    </xsl:for-each>
+                </funding-group>
+            </xsl:if> 
         </extension>
 
         <!-- recordInfo 040 005 001 003 -->
@@ -3129,7 +3159,7 @@
                 <xsl:variable name="dateTime"
                     select="format-dateTime(current-dateTime(), '[M01]/[D01]/[Y0001] at [h1]:[m01] [P]')"/>
                 <xsl:value-of
-                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.204 20250130 cm3),'))"/>
+                    select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.208 20260203 cm3),'))"/>
                 <xsl:text>&#xa0;</xsl:text>
                 <xsl:value-of select="normalize-space(concat('Transformed on: ', $dateTime))"/>
             </recordOrigin>
@@ -3143,6 +3173,55 @@
                 </languageOfCataloging>
             </xsl:for-each>
         </recordInfo>
+    </xsl:template>
+
+<!--end marc:record template-->
+
+    <xd:doc>
+        <xd:desc> award-group </xd:desc>
+    </xd:doc>
+    <xsl:template match="marc:datafield[@tag='596']" mode="award-group">
+        <award-group>
+            <funding-source>
+                <institution-wrap>
+                    <institution>
+                        <xsl:value-of select="marc:subfield[@code='c']"/>
+                    </institution>
+                    <!-- 1.206 -->
+                    <xsl:if test="marc:subfield[@code='d']">
+                        <xsl:for-each select=".">
+                            <xsl:apply-templates select="marc:subfield[@code='d']" mode="institution-id"/>
+                        </xsl:for-each>
+                    </xsl:if>
+                </institution-wrap>
+            </funding-source>
+            <!-- 1.206 -->
+            <xsl:if test="marc:subfield[@code='a']">
+                <xsl:for-each select=".">
+                    <xsl:apply-templates select="marc:subfield[@code='a']" mode="award-id"/>
+                </xsl:for-each>
+            </xsl:if>
+        </award-group>
+    </xsl:template>
+    
+    <!-- 1.206 -->
+    <xd:doc>
+        <xd:desc>institution-id</xd:desc>
+    </xd:doc>
+    <xsl:template match="marc:subfield[@code='d']" mode="institution-id">       
+        <institution-id institution-id-type="{if (matches(., 'https?://(dx\.)?doi.org.*|^10.\d+/\S+$')) then 'doi' else if (contains(., 'ror')) then 'ror' else ''}">
+            <xsl:value-of select="if (starts-with(.,'10.')) then concat('https://doi.org/',.) else if (matches(., '(https?://)(dx\.)?(doi.org/.*)')) then replace(.,'(https?://)(dx\.)?(doi.org/.*)' ,'https://$3') else ."/>
+        </institution-id>
+    </xsl:template> 
+    
+     <!-- 1.206 -->
+    <xd:doc>
+        <xd:desc> award-id </xd:desc>
+    </xd:doc>
+    <xsl:template match="marc:subfield[@code='a']" mode="award-id">
+        <award-id>
+            <xsl:value-of select="."/>
+        </award-id>
     </xsl:template>
 
     <!--1.165 -->
@@ -3189,7 +3268,7 @@
     <xd:doc id="uri" scope="component">
         <xd:desc> uri</xd:desc>
     </xd:doc>
-    <xsl:template name="uri">
+    <xsl:template name="uri" xmlns:xlink="http://www.w3.org/1999/xlink">
         <xsl:for-each select="marc:subfield[@code = 'u'] | marc:subfield[@code = '0']">
             <!-- 1.183 -->
             <xsl:attribute name="xlink:href">
@@ -3455,7 +3534,7 @@
     <xd:doc id="xlink" scope="component">
         <xd:desc>marc:subfield[@code = '0']</xd:desc>
     </xd:doc>
-    <xsl:template match="marc:subfield[@code = '0']" mode="xlink">
+    <xsl:template match="marc:subfield[@code = '0']" mode="xlink"  xmlns:xlink="http://www.w3.org/1999/xlink">
         <xsl:attribute name="xlink:href">
             <!-- 1.198 -->
             <xsl:choose>
@@ -4921,9 +5000,9 @@
             <xsl:when test="$sf06a = '506'">
                 <xsl:call-template name="createAccessConditionFrom506"/>
             </xsl:when>
-            <xsl:when test="$sf06a = '540'">
+       <!--     <xsl:when test="$sf06a = '540'">
                 <xsl:call-template name="createAccessConditionFrom540"/>
-            </xsl:when>
+            </xsl:when>-->
             <!-- note 245 362 etc -->
             <xsl:when test="$sf06a = '245'">
                 <xsl:call-template name="createNoteFrom245c"/>
@@ -6735,30 +6814,52 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
             <xd:p>for AGRICOLA Sale file</xd:p>
         </xd:desc>
     </xd:doc>
-    <xsl:template name="createNoteFrom930" match="marc:datafield[@tag='930']/marc:subfield[@code ='a' or @code ='b' or @code ='c']">
+    <xsl:template name="createNoteFrom930"
+        match="marc:datafield[@tag = '930']/marc:subfield[@code = 'a' or @code = 'b' or @code = 'c']">
         <xsl:if test="marc:datafield[@tag = '930']">
-            <note type="saleTape1">
-                <xsl:value-of select="marc:datafield[@tag='930']/marc:subfield[@code = 'a']"/>
+            <note type="saleTape">
+                <xsl:value-of select="marc:datafield[@tag = '930']/marc:subfield[@code = 'a']"/>
                 <xsl:text>&#xa0;</xsl:text>
-                <xsl:value-of select="marc:datafield[@tag='930']/marc:subfield[@code = 'b']"/>
+                <!-- 1.208 -->
+                <xsl:value-of select="if (marc:datafield[@tag = '930']/marc:subfield[@code = 'b'] = '00000000') then replace(string(current-date()), '(\d{4})-(\d{2})-(\d{2})-\d{2}:00','$1$2$3') else marc:datafield[@tag = '930']/marc:subfield[@code = 'b']"/>
                 <xsl:text>&#xa0;</xsl:text>
-                <xsl:value-of select="marc:datafield[@tag='930']/marc:subfield[@code = 'c']"/>
+                <xsl:value-of select="marc:datafield[@tag = '930']/marc:subfield[@code = 'c']"/>
             </note>
         </xsl:if>
     </xsl:template>
     
-    <xsl:template name="createNoteFrom939" match="marc:datafield[@tag='939']/marc:subfield[@code ='a' or @code ='b' or @code ='c']">
+    <!-- NAL note from 930: <note type="salesTape"> -->
+    <xd:doc>
+        <xd:desc>
+            <xd:p>
+                <xd:b>AGRICOLA Sale File:</xd:b>
+            </xd:p>
+            <xd:p>Contains 3 date instances of a record:</xd:p>
+            <xd:ul>
+                <xd:li>(930$a) Selection,</xd:li>
+                <xd:li>(930$b) Insertion and,</xd:li>
+                <xd:li>(930$c) Deletion, </xd:li>
+            </xd:ul>
+            <xd:p>for AGRICOLA Sale file</xd:p>
+        </xd:desc>
+    </xd:doc>
+    <xd:doc>
+        <xd:desc/>
+    </xd:doc>
+    <xsl:template name="createNoteFrom939"
+        match="marc:datafield[@tag = '939']/marc:subfield[@code = 'a' or @code = 'b' or @code = 'c']">
         <xsl:if test="marc:datafield[@tag = '939']">
-            <note type="saleTape2">
-                <xsl:value-of select="marc:datafield[@tag='939']/marc:subfield[@code = 'a']"/>
+            <note type="saleTape">
+                <xsl:value-of select="marc:datafield[@tag = '939']/marc:subfield[@code = 'a']"/>
                 <xsl:text>&#xa0;</xsl:text>
-                <xsl:value-of select="marc:datafield[@tag='939']/marc:subfield[@code = 'b']"/>
+                <!-- 1.208 -->
+                <xsl:value-of select="if (marc:datafield[@tag = '939']/marc:subfield[@code = 'b'] = '00000000') then replace(string(current-date()), '(\d{4})-(\d{2})-(\d{2})-\d{2}:00','$1$2$3') else marc:datafield[@tag = '939']/marc:subfield[@code = 'b']"/>
                 <xsl:text>&#xa0;</xsl:text>
-                <xsl:value-of select="marc:datafield[@tag='939']/marc:subfield[@code = 'c']"/>
+                <xsl:value-of select="marc:datafield[@tag = '939']/marc:subfield[@code = 'c']"/>
             </note>
         </xsl:if>
     </xsl:template>
-  
+
 
     <xd:doc id="createNoteFrom945" scope="component">
         <xd:desc>NAL note from 945 </xd:desc>
@@ -6792,7 +6893,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
         </xsl:if>
     </xsl:template>
     <xd:doc id="createNoteFrom974" match="//marc:datafield[@tag = '974']" scope="component">
-        marc:datafield[@tag = '930']        <xd:desc>974 to local identifier agid# </xd:desc>
+        <xd:desc>974 to local identifier agid# </xd:desc>
     </xd:doc>
     <xsl:template name="createNoteFrom974" match="//marc:datafield[@tag = '974']">
         <!-- Revision 1.159 addedif test to prevent extra whitespace -->
@@ -7027,7 +7128,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
         <xd:desc>createLocationFrom856</xd:desc>
     </xd:doc>
     <xsl:template name="createLocationFrom856">
-        <xsl:if test="/marc:collection/marc:record/marc:datafield[@tag = '856'][@ind2 != '2'][marc:subfield[@code = 'u']] and not(ends-with(marc:subfield[@code = 'u'], 'http://'))">
+        <xsl:if test="/marc:collection/marc:record/marc:datafield[@tag = '856'][@ind2 != '2'][marc:subfield[@code = 'u']] and not(ends-with(f:deSequencing-items(marc:subfield[@code = 'u']), 'http://'))">
             <!-- 1.199 -->
                  
             <location>
@@ -7064,7 +7165,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
                             </xsl:call-template>
                         </xsl:attribute>
                     </xsl:if>
-                    <!-- 1.184 -->                    
+                    <!-- 1.184, 1.207 -->                    
                     <xsl:if test="matches(marc:subfield[@code = 'u'],'https?://(dx\.)?doi.org/.*')">
                         <xsl:value-of select="f:percentEncode(replace(marc:subfield[@code = 'u'],'https?://(dx\.)?(doi.org/.*)','https://$2'))"/>
                     </xsl:if>
@@ -7114,30 +7215,57 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
         </xsl:for-each>
     </xsl:template>
 
+
+
+
     <xd:doc id="createAccessConditionFrom506" scope="component">
         <xd:desc> accessCondition 506 540 1.87 20130829</xd:desc>
     </xd:doc>
-    <xsl:template name="createAccessConditionFrom506">
-        <xsl:if test="matches(., 'Resource is Open Access') and matches(., 'http://purl.org/eprint/accessRights/OpenAccess')">
-            <accessCondition type="use and reproduction" displayLabel="Resource is Open Access">
-                <program xmlns="https://data.crossref.org/schemas/AccessIndicators.xsd">
-                    <license_ref>http://purl.org/eprint/accessRights/OpenAccess</license_ref>
-                </program>
-            </accessCondition>
-        </xsl:if>
+    <xsl:template name="createAccessConditionFrom506" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <xsl:choose>
+            <!-- 1.205 -->
+            <xsl:when test="starts-with(marc:subfield[@code='a'],'Works produced by employees of the U.S. Government')">
+                <accessCondition type="use and reproduction" displayLabel="{marc:subfield[@code = 'a']}">Open Access</accessCondition>
+            </xsl:when>            
+            <xsl:when test="not(starts-with(marc:subfield[@code='u'], 'http://purl.org/eprint/accessRights'))">
+                <accessCondition type="use and reproduction" displayLabel="{marc:subfield[@code = 'a']}">
+                    <program xmlns="https://data.crossref.org/schemas/AccessIndicators.xsd">
+                        <license_ref><xsl:value-of select="marc:subfield[@code='u']"/></license_ref>
+                    </program>
+                </accessCondition>
+            </xsl:when>
+            <xsl:when test="matches(marc:subfield[@code='u'], 'http://purl.org/eprint/accessRights/[ORCpelsontArcid]+')">
+                <accessCondition type="restriction on access"
+                    xlink:href="{marc:subfield[@code='u']}"
+                    displayLabel="Access Status">
+                    <xsl:value-of select="marc:subfield[@code='a']"/>
+                </accessCondition>
+            </xsl:when>
+        </xsl:choose>
     </xsl:template>
+    
+    <xd:doc>
+        <xd:desc/>
+    </xd:doc>
+    <xsl:template match="marc:subfield[@code='f'] |marc:subfield[@code='2']"/>
+    
+  <!--  <xsl:template match="marc:datafield[@tag='506']" mode="useAndReproduction">
+<!-\-     -\->
+            
+        <!-\-</xsl:if>-\->
+    </xsl:template>-->
 
     <xd:doc>
         <xd:desc> createAccessConditionFrom540</xd:desc>
     </xd:doc>
-    <xsl:template name="createAccessConditionFrom540">
+  <!--  <xsl:template name="createAccessConditionFrom540">
         <accessCondition type="use and reproduction">
             <xsl:call-template name="xxx880"/>
             <xsl:call-template name="subfieldSelect">
                 <xsl:with-param name="codes">abcde35</xsl:with-param>
             </xsl:call-template>
         </accessCondition>
-    </xsl:template>
+    </xsl:template>-->
 
 
     <xd:doc id="nameTitleGroup" scope="component">
@@ -8307,18 +8435,5 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
             <xsl:apply-templates select="* | @* | text()" mode="global_copy"/>
         </xsl:copy>
     </xsl:template>
-    
-<!--    <xsl:template match="marc:datafield[@tag = '506']">
-        <accessCondition type="use and reproduction"
-            displayLabel="Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 Generic (CC BY-NC-ND 4.0)">
-            <program xmlns="https://data.crossref.org/schemas/AccessIndicators.xsd">
-                <license_ref>https://creativecommons.org/licenses/by-nc-nd/4.0/</license_ref>
-            </program>
-        </accessCondition>
-        <accessCondition xmlns:xlink="http://www.w3.org/1999/xlink"
-            type="restriction on access"
-            xlink:href="http://purl.org/eprint/accessRights/OpenAccess"
-            displayLabel="Access Status">Open Access</accessCondition>
-    </xsl:template>
--->
+   
 </xsl:stylesheet>
