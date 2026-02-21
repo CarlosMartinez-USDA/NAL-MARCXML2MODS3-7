@@ -511,10 +511,6 @@
         </xsl:variable>
         <xsl:value-of select="substring($subfieldStr, 1, string-length($subfieldStr) - 1)"/>
     </xsl:function>
-    
-
-
-  
 
     <!--NAL Custom Functions by Carlos Martinez III-->
 
