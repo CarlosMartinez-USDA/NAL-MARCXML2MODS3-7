@@ -18,7 +18,7 @@
     |   MODS 3.7   |
     |______________|
     Revisoin 1.209 - Added 939 to capture historical "Sale Tape" dates. 20260206 cm3
-    Revision 1.208 - If the salesTape subfield 'b' still contains the '00000000', the current-date() is added in its place. 20260203 cm3
+    Revision 1.208 - If the salesTape subfield 'b' still contains the '00000000', then the current-date() is added in its place. 20260203 cm3
     Revision 1.207 - Moved 856/mods:location below local identifiers 20260203 cm3
     Revision 1.206 - Added funding-group information to be gathered from marc:datafield[@tag='596']. 20260203 cm3
     Revision 1.205 - Reconfigured 506/mods:accessCondition to correctly segment both "use and reproductiton" and "access restriction" statementnts  20260203.

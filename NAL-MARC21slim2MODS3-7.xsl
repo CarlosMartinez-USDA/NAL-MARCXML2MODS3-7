@@ -6780,6 +6780,7 @@ select="marc:subfield[@code!='6' and @code!='8']"&gt; &lt;xsl:value-of select=".
             </note>
         </xsl:if>
     </xsl:template>
+    
     <xd:doc id="createNoteFrom946" scope="component">
         <xd:desc>NAL note from 946 </xd:desc>
     </xd:doc>
