@@ -11,12 +11,13 @@
 	NAL-MARC21slim2MODS3-7.xsl
      _______________________________________________ 
     |                                               |
-    |   NAL Revisions (Revision 1.209) 20260206     |
+    |   NAL Revisions (Revision 1.210) 20250324     |
     |_______________________________________________|
      ______________
     |              |
     |   MODS 3.7   |
     |______________|
+    Revision 1.210 - Corrected 1.194 and 1.201 by eliminiating recursive parameters and using dereferenced subfield. 20260324 cm3
     Revisoin 1.209 - Added 939 to capture historical "Sale Tape" dates. 20260206 cm3
     Revision 1.208 - If the salesTape subfield 'b' still contains the '00000000', then the current-date() is added in its place. 20260203 cm3
     Revision 1.207 - Moved 856/mods:location below local identifiers 20260203 cm3
@@ -25,15 +26,15 @@
     Revision 1.204 - Removed from "dx." and added "s" to "http" from/to doi links. 20260204 cm3 
     Revision 1.203 - Added if test around volume to prevent empty <number/> tags from displaying. 20260126 cm3
     Revision 1.202 - Corrected "role" template to call specific marc:subfield to avoid capturing the wrong metadata. 20260114 cm3
-    Revision 1.201 - Moved nameIdenftifers out of personal_name template. 2026-01-14
+    *Revision 1.201 - Moved nameIdenftifers out of personal_name template. 2026-01-14
     Revision 1.200 - subjectAuthority adds conditions for @ind2='7', NAL-IND records do not have $2 thus adds condition to template making the value "marcgt". 20250208 cm3
     Revision 1.199 - Added not(ends-with(http://)) to prevent empty urls feom being added and causing invalidation 20250206 cm3
 	Revision 1.198 - Addded support to viaf instances in nameIdentifier 20250117 cm3
 	Revision 1.197 - Added @775$d to existing @775$f preventin creation of empty <originInfo/> from appearing within <relateItem> 20250105 cm3
 	Revision 1.196 - Added support for @776$d and @787$d to prevent empty <originInfo/> from appearing within <relatedItem>. 20250104 cm3 
 	Revision 1.195 - Removed saxon:next-in-chain="fix_characters.xsl". Unnecessary processsing. 20250104 cm3
-	Revision 1.194 - Addd conditional test to check if nameIdentifier is empty, fail on true. 20250103 cm3
-	Revision 1.193 - Added real world object name identifier to personal_name template. 20240403 cm3
+	*Revision 1.194 - Add conditional test to check if nameIdentifier is empty, fail on true. 20250103 cm3
+	*Revision 1.193 - Added real world object name identifier to personal_name template. 20240403 cm3
 	Revision 1.192 - xlink:href instruction moved to first PI in createNameFrom100/700 templates to avoid error. 20240403 cm3
 	Revision 1.191 - 072_0 $a is a non-repeatable subfield. Corrects error and reports incorrect record #. 20240211 cm3 
 	Revision 1.190 - Reworked transliteration related templates to accomodate updates made for NAL. 20240206 cm3
@@ -2975,7 +2976,7 @@
             <recordOrigin>
                 <xsl:variable name="transform" select="string(tokenize(base-uri(document('')), '/')[last()])" as="xs:string"/>
                 <xsl:variable name="dateTime" select="format-dateTime(current-dateTime(), '[M01]/[D01]/[Y0001] at [h1]:[m01] [P]')"/>
-                <xsl:value-of select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.209 20260206 cm3),'))"/>
+                <xsl:value-of select="normalize-space(concat('Converted from MARCXML to MODS version 3.7 using', ' ', $transform, ' ', '(Revision 1.210 20260324 cm3),'))"/>
                 <xsl:text>&#xa0;</xsl:text>
                 <xsl:value-of select="normalize-space(concat('Transformed on: ', $dateTime))"/>
             </recordOrigin>
@@ -3124,39 +3125,26 @@
     </xsl:template>
     
     <xd:doc>
-        <xd:desc/>
-        <xd:param name="zero"/>
-        <xd:param name="one"/>
+        <xd:desc><xd:p>Name identifiers</xd:p>
+            <xd:ul>
+                <xd:li><xd:p>Subfield $0 contains the system control number of the related authority or classification record, or a standard identifier.</xd:p></xd:li>
+                <xd:li><xd:p>Subfield $1 contains a URI that identifies an entity, sometimes referred to as a Thing, a Real World Object or RWO, whether actual or conceptual.
+                        When dereferenced, the URI points to a description of that entity.</xd:p></xd:li> 
+            </xd:ul></xd:desc>
     </xd:doc>
     <xsl:template name="nameIdentifiers"><!--1.201 -->
-        <xsl:param name="zero">
-            <xsl:call-template name="subfieldSelect">
-                <xsl:with-param name="codes">0</xsl:with-param>
-            </xsl:call-template>
-        </xsl:param>
-        <xsl:param name="one">
-            <xsl:call-template name="subfieldSelect">
-                <xsl:with-param name="codes">1</xsl:with-param>
-            </xsl:call-template>
-        </xsl:param>
-        <!-- marc:subfield[@code = '0'] -->
-        <xsl:if test="$zero!=''">      <!-- 1.194 -->
-            <xsl:for-each select="$zero">
-                <nameIdentifier type="{f:nameIdentifier($zero)}">
-                    <!-- 1.198 -->
-                    <xsl:value-of select="$zero"/>    
-                </nameIdentifier>
-            </xsl:for-each> 
-        </xsl:if>
-        
-        <!--  marc:subfield[@code = '1']-->
-        <xsl:if test="$one!=''">    <!-- 1.194 -->
-            <xsl:for-each select="$one != ''">
-                <nameIdentifier type="{f:nameIdentifier($one)}">
-                    <xsl:value-of select="$one"/>
-                </nameIdentifier>
-            </xsl:for-each>
-        </xsl:if>        
+        <!--$0 - Authority record control number or standard number (R)-->        
+        <xsl:for-each select="marc:subfield[@code='0']">
+            <nameIdentifier type="{f:nameIdentifier(.)}">
+                <xsl:value-of select="."/>
+            </nameIdentifier>
+        </xsl:for-each>
+        <!-- $1 - Real World Object URI (R)--> <!-- 1.194 -->
+        <xsl:for-each select="marc:subfield[@code='1']">
+            <nameIdentifier type="{f:nameIdentifier(.)}">
+                <xsl:value-of select="."/>
+            </nameIdentifier>
+        </xsl:for-each>
     </xsl:template>
 
     <xd:doc id="part" scope="component">
