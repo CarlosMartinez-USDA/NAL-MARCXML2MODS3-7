@@ -58,9 +58,8 @@
             <xsl:text> </xsl:text>
         </xsl:param>
         <xsl:param name="subfields"/>
-        <xsl:choose>
             <!-- prefixed -->
-            <xsl:when test="marc:datafield">
+            <xsl:if test="marc:datafield | datafield">
                 <xsl:element name="marc:datafield">
                     <xsl:attribute name="tag">
                         <xsl:value-of select="$tag"/>
@@ -73,23 +72,7 @@
                     </xsl:attribute>
                     <xsl:copy-of select="$subfields"/>
                 </xsl:element>
-            </xsl:when>
-            <!-- non-prefixed-->
-            <xsl:otherwise>
-                <xsl:element name="datafield">
-                    <xsl:attribute name="tag">
-                        <xsl:value-of select="$tag"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="ind1">
-                        <xsl:value-of select="$ind1"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="ind2">
-                        <xsl:value-of select="$ind2"/>
-                    </xsl:attribute>
-                    <xsl:copy-of select="$subfields"/>
-                </xsl:element>
-            </xsl:otherwise>
-        </xsl:choose>
+            </xsl:if>
     </xsl:template>
     
     <!-- builds subfield select -->
@@ -103,27 +86,14 @@
         <xsl:param name="delimiter">
             <xsl:text> </xsl:text>
         </xsl:param>
-        <xsl:variable name="str">
-            <xsl:choose>                
-                <!-- prefixed -->
-                <xsl:when test="marc:subfield">
-                    <xsl:for-each select="marc:subfield">
-                        <xsl:if test="contains($codes, @code)">
-                            <xsl:value-of select="text()"/>
-                            <xsl:value-of select="$delimiter"/>
-                        </xsl:if>
-                    </xsl:for-each>
-                </xsl:when>
-                <xsl:otherwise>                    
-                    <!-- non-prefixed -->
-                    <xsl:for-each select="subfield">
-                        <xsl:if test="contains($codes, @code)">
-                            <xsl:value-of select="text()"/>
-                            <xsl:value-of select="$delimiter"/>
-                        </xsl:if>
-                    </xsl:for-each>
-                </xsl:otherwise>
-            </xsl:choose>
+        <xsl:variable name="str"><xsl:if test="marc:subfield | subfield">
+                <xsl:for-each select="marc:subfield">
+                    <xsl:if test="contains($codes, @code)">
+                        <xsl:value-of select="text()"/>
+                        <xsl:value-of select="$delimiter"/>
+                    </xsl:if>
+                </xsl:for-each>
+        </xsl:if>
         </xsl:variable>
         <xsl:value-of select="substring($str, 1, string-length($str) - string-length($delimiter))"/>
     </xsl:template>
@@ -786,7 +756,7 @@
                 "/>
     </xsl:function>
 
-    <!-- f:proper-case -->
+<!--    <!-\- f:proper-case -\->
     <xd:doc>
         <xd:desc>
             <xd:p><xd:b>Function: </xd:b>f:proper-case</xd:p>
@@ -806,17 +776,17 @@
         <xsl:param name="arg" as="xs:string?"/>
         <xsl:variable name="otherChars" as="item()*" select="f:substring-before-match($arg,'\-|[A-Z].[A-Z].|\s')"/>
         <xsl:variable name="white-space" as="xs:string" select="(' ')"/>
-        <xsl:variable name="substring-1a" select="substring-before($arg, $white-space)"/>
-        <xsl:variable name="substring-1b" select="substring-after($arg, $white-space)"/>
-        <xsl:variable name="substring-2a" select="substring-before($arg, $white-space)"/>
-        <xsl:variable name="substring-2b" select="substring-after($arg, $white-space)"/>
+        <xsl:variable name="substring-1a" select="substring-before(concat($arg, $white-space), ' ')"/>
+        <xsl:variable name="substring-1b" select="substring-after(concat($arg, $white-space), ' ')"/>
+        <xsl:variable name="substring-2a" select="substring-before(concat($arg, $white-space), ' ')"/>
+        <xsl:variable name="substring-2b" select="substring-after(concat($arg, $white-space), ' ')"/>
         <xsl:sequence select="
                 if (contains($arg, $otherChars))
                 then concat(f:sentence-case($substring-1a), ($otherChars), (f:sentence-case($substring-1b)))
                 else if (contains($arg, $white-space))
                 then concat(f:sentence-case($substring-2a), ($white-space), (f:sentence-case($substring-2b)))
                 else f:sentence-case($arg)"/>
-    </xsl:function>
+    </xsl:function>-->
 
     <!-- f:substring-before-match -->
     <xd:doc>
