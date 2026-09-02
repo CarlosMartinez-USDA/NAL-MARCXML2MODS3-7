@@ -1,282 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0" xmlns="http://www.loc.gov/mods/v3" xmlns:f="http://functions" xmlns:info="info:lc/xmlns/codelist-v1" xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:nalsubcat="http://nal-subject-category-codes" xmlns:saxon="http://saxon.sf.net/" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exclude-result-prefixes="f info marc nalsubcat saxon xd xs xsi">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0" xmlns="http://www.loc.gov/mods/v3" xmlns:f="http://functions" xmlns:info="info:lc/xmlns/codelist-v1" xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:nalsubcat="http://nal-subject-category-codes" xmlns:saxon="http://saxon.sf.net/" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exclude-result-prefixes="f info marc nalsubcat saxon xd xs xsi">
     <!-- includes -->
     <xsl:include href="NAL-MARC21slimUtils.xsl"/>
     <!-- outputs -->
     <xsl:output encoding="UTF-8" indent="yes" method="xml" name="original"/> <!--saxon:next-in-chain="fix_characters.xsl"/>-->
     <!-- whitespace control -->
-    <xsl:strip-space elements="*"/><xsl:variable name="revisionNumber" select="'1.218'"/>
-    <xsl:variable name="revisionDate" select="'202600901'"/>
-    
-    <!-- Maintenance note: For each revision, change the content of <recordInfo><recordOrigin> to reflect the new revision number.
-	NAL-MARC21slim2MODS3-7.xsl
-    ┌ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┐ 
-	│  NAL Revisions (Revision 1.218) 20260901    |    
-	└ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┘ 
-    ┌ ━ ━ ━ ━ ━ ┐ 
-	│ MODS 3.7 │  
-	└ ━ ━ ━ ━ ━ ┘
-	Revision 1.218 - If more than one award-id is provided by the same funder,individual award-id tags are given to each award-id; replacing the comma separated list of award-ids, 20260901 cm3
-	Revision 1.217 - only current agricola sale tape date is updated in subfield $b (date of insertion), historical dates remain the same. 20260901 cm3 
-	Revision 1.216 - award-group without an institution name is prevented from being created by adding extra $c predicate. 20260901 cm3
-	Revision 1.215 - Authority record looked up in attribute was redundant in nameIdentifier, thus a URI pointing to the RWO is generated as the name identifier. 20260804 cm3
-	Revision 1.214 - Comma separated values contained within 596$a (e.g. value1, value2) are tokenized and put into separate award-id tags. 20260701 cm3
-	Revision 1.213 - Revised 072 subject/topic conversion to exclude empty return values to avoid empty tags. 20260512 cm3 
-	Revision 1.212 - Tests if the subject term exists. 
-    Revision 1.211 - Corrected 1.194 and 1.201 by eliminiating recursive parameters and using dereferenced subfield. 20260324 cm3
-    Revisoin 1.209 - Added 939 to capture historical "Sale Tape" dates. 20260206 cm3
-    Revision 1.208 - If the salesTape subfield 'b' still contains the '00000000', then the current-date() is added in its place. 20260203 cm3
-    Revision 1.207 - Moved 856/mods:location below local identifiers 20260203 cm3
-    Revision 1.206 - Added funding-group information to be gathered from marc:datafield[@tag='596']. 20260203 cm3
-    Revision 1.205 - Reconfigured 506/mods:accessCondition to correctly segment both "use and reproductiton" and "access restriction" statementnts  20260203.
-    Revision 1.204 - Removed from "dx." and added "s" to "http" from/to doi links. 20260204 cm3 
-    Revision 1.203 - Added if test around volume to prevent empty <number/> tags from displaying. 20260126 cm3
-    Revision 1.202 - Corrected "role" template to call specific marc:subfield to avoid capturing the wrong metadata. 20260114 cm3
-   *Revision 1.201 - Moved nameIdenftifers out of personal_name template. 2026-01-14
-    Revision 1.200 - subjectAuthority adds conditions for @ind2='7', NAL-IND records do not have $2 thus adds condition to template making the value "marcgt". 20250208 cm3
-    Revision 1.199 - Added not(ends-with(http://)) to prevent empty urls feom being added and causing invalidation 20250206 cm3
-	Revision 1.198 - Addded support to viaf instances in nameIdentifier 20250117 cm3
-	Revision 1.197 - Added @775$d to existing @775$f preventin creation of empty <originInfo/> from appearing within <relateItem> 20250105 cm3
-	Revision 1.196 - Added support for @776$d and @787$d to prevent empty <originInfo/> from appearing within <relatedItem>. 20250104 cm3 
-	Revision 1.195 - Removed saxon:next-in-chain="fix_characters.xsl". Unnecessary processsing. 20250104 cm3
-   *Revision 1.194 - Add conditional test to check if nameIdentifier is empty, fail on true. 20250103 cm3
-   *Revision 1.193 - Added real world object name identifier to personal_name template. 20240403 cm3
-	Revision 1.192 - xlink:href instruction moved to first PI in createNameFrom100/700 templates to avoid error. 20240403 cm3
-	Revision 1.191 - 072_0 $a is a non-repeatable subfield. Corrects error and reports incorrect record #. 20240211 cm3 
-	Revision 1.190 - Reworked transliteration related templates to accomodate updates made for NAL. 20240206 cm3
-	Revision 1.189 - Called subjectAuthority template before the xxx880 to prevent attribute creation error. 20240202 cm3
-	Revision 1.188 - Created and added remove_ending_punctuation.xsl to produce a cleaner result document 20240202 cm3
-	Revision 1.187 - Revised custom function references authoritative resource https://www.loc.gov/standards/codelists/languages.xml. 20240201 cm3  
-	Revision 1.186 - Elsevier's electronic page numbers. 20240118 cm3
-	Revision 1.185 - Revised custom function f:decodeMARCCountry so that it references the authoritative resource https://www.loc.gov/standards/codelists/countries.xml. 20240102 cm3
-	Revision 1.184 - Percent encodes brackets. 20231222 cm3
-	Revision 1.183 - Reverted->An attribute node (displayLabel) cannot be created after a child of the containing elementResolved fatal error"Added . 20230615 cm3
-	Revision 1.182 - Reverted->An attribute node (nameTitleGroup) cannot be created after a child of the containing element. 20230615 cm3
-	Revision 1.181 - Simplified marcCountry and f:decodeMARCCountry functions. Regex updated. 20230615 cm3
-	Revision 1.180 - Added conditional statement to prevent physicalDescription from appearing in article records. 20230615 cm3
-	Revision 1.179 - Added conditional statement to prevent issuance from appearing in article records. 20230615 cm3
-	Revision 1.178 - Commented out because genre authority does not equal 7". 20230615 cm3 
-	Revision 1.177 - Added for-each-group to get publisher within originInfo. 20230615 cm3
-	Revision 1.176 - Addedif tests to text type date fields to avoid empty elements. 20230615 cm3
-	Revision 1.175 - Commented out LC's call-template, replaced with NAL's access condition statement (line 7004). 20230615 cm3
-	Revision 1.174 - Commented out marc encoded date because w3cdtf is preferred. 20230615 cm3
-	Revision 1.173 - Inserted NAL related part to parse out relatedpart info. 20230615 cm3
-	Revision 1.172 - Changed identifer configuration in order to match journal article representations. 20230123 cm3
-	Revision 1.171 - Added $controlField008-35-07 as alternative to language of cataloging. 20230123 cm3
-	Revision 1.170 - Added $controlField008-0-14 variable to get correct dates is "w3cdtf" format 20221123 cm3
-	Revision 1.169 - Added $this variables to <title>, <subtitle>, <abstract>, <relatedItem><title> , etc. (any lengthy text field to resolve MODS Schema whitespace error. 20230108 cm3
-	Revision 1.168 - Added conditional statement to get marc:datafield[@tag='914']/marc:subfield[@code='a'] when $w is not present. 20230108 cm3
-	Revision 1.167 - Deprecated-> Custom function f:decodeMARCCountry($marcCode) returns the country/state name. 20230108 cm3
-	Revision 1.166 - Filters 008 field for 2 or 3 letter country/state codes. 20230108 cm3
-	Revision 1.165 - Repurposed and renamed displayForm template to personal_name added specialSubfieldSelect from 1.164 as variable, parsed it as contributor name output. 20230106 cm3
-	Revision 1.164 - moved specialSubfieldSelect to NAL-MARC21slimUtils.xsl 20230106 cm3
-	Revision 1.163 - "agid:" mapped from createNoteFrom974 into local identifier; removed from extension. 20220105 cm3
-	Revision 1.162 - NAL control number mapped to local idenfifer. 20230105 cm3
-	Revision 1.161 - NAL Agricola accession number (e.g.,CAT87882125) mapped to local identifier. 20230105 cm3		
-	Revision 1.160 - NAL Classification number mapped to local identifier. 20230104 cm3
-	Revision 1.159 - Addedif test to prevent extra whitespace. 20221223 cm3
-	Revision 1.158 - Added conditional statement above issuance to focus on monographs, single part items and multipart monographs. 20221210 cm3
-	Revision 1.157 - Added condtional statement if agid:# is empty from 773, use 914 marc:subfield a. 20221209 cm3
-	Revision 1.156 - Added condtional statement if ISSN is empty from 773, use 914 marc:subfield b. 20221209 cm3
-	Revision 1.155 - Corrected "subjectAuthority" template corrected "nal" to "atg" (https://www.loc.gov/standards/sourcelist/subject.html#codes) 20221208 cm3
-	Revision 1.154 - Commented out conditional statements within issuance element for serials, continuing resources, and integrating resources. 20221208 cm3
-	Revision 1.153 - Used subtring-before function to get marc:subfield b (ie., publisher) and marc:subfield c (i.e., dateIssued). 20221208 cm3
-	Revision 1.152 - Added conditional statement outside of issuance element to allow monographs, multipart monographs, and single items only. 20221208 cm3 
-	Revision 1.151 - $controlField008-35-37replace, uses replace function and regex to capture 3 letter string. cm3 2022/12/05
-	Revision 1.150 - Updated recordOrigin to reflect the XSLT filename Used in transform. 20221208 cm3
-	Revision 1.150 - Addedif tests to originInfo producer elements to avoid empty tag. 20221110 cm3
-	Revision 1.149 - Used analyze-string function 008 to pull out 2-3 letter text and apply custom marc country conversion function. 20221110 cm3
-	Revision 1.148 - Removed prefix from XSLT to accomodate prefix-less elements from Alma. 20221110 cm3
-	Revision 1.147 - Added NAL subject code from 072, created custom function to convert 072 code into the subject term. 20221023 cm3 
-	Revision 1.146 - Reworked LC's MARC21slimUtils.xsl, created NAL-MARC21slimUtils.xsl to accomdate non-prefixed files. 20221017 cm3
-	Revision 1.145 - Includes functions.xsl and params.xsl and applied to output as needed. 20221016 cm3
-	Revision 1.144 - Upgraded stylesheet to use XSLT 2.0. 20221005 cm3 
-	Revision 1.143 - Fixed dateIssued to include year only date from the 008  20141216 JG
-	Revision 1.142 - Fixed dateIssued to include month and date from the 008  20140818 JG
-	Revision 1.141 - Added displayForm to 700 JG 2014/05/29
-	┌ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┐ 
-	│ NAL Staff Revisions Begin (Revision 1.141    |    
-	└ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┘ 	
-	┌ ━ ━ ━ ━ ━ ┐ 
-	│ MODS 3.6 │  
-	└ ━ ━ ━ ━ ━ ┘ 
-    
-	Revision 1.140 - Fixed admin metadata - XSLT was referencing MODS 3.6 - 2020/07/17 - tmee
-	Revision 1.139 - Update to MODS v.3.7 - 2020/02/13 ws
-	Revision 1.138 - Update output to notes fields for 500. - 2020/01/06 ws
-	Revision 1.137 - Add displayLabel to tableOfContents. - 2020/01/06 ws
-	Revision 1.136 - Update language objectPart to match mapping. - 2020/01/06 ws
-	Revision 1.135 - Add 588 to notes. - 2020/01/06 ws
-	Revision 1.134 - Update dates to match mapping. - 2020/01/06 ws
-	Revision 1.133 - Update placeTerm to match mapping. - 2020/01/06 ws
-	Revision 1.132 - Remove xlink from 655, icorrect mapping. - 2020/01/06 ws
-	Revision 1.131 - Fix bug in 730[@ind2!=2]/880[@ind2!=2] output . - 2020/01/06 ws
-	Revision 1.130 - Update originInfo altRepGroup and marc:subfields. - 2020/01/06 ws
-	Revision 1.129 - Update physicalDescription altRepGroup. - 2020/01/06 ws
-	Revision 1.128 - Bug fix for 260$c altRepGroup output, strip punctuation. - 2019/12/27 ws 
-	Revision 1.127 - Add 521 displayLabel based on mapping. - 2019/12/27 ws
-	Revision 1.126 - Consistent handling of punctiaion in name elements, 100/700/110/710 - 2019/12/02 ws 
-	Revision 1.125 - Correct partNumber output for 710,711,810,811 $n after $t  - 2019/11/22 ws
-	Revision 1.124 - Correct incorrect type attribute on 520/abstract. Should be @displayLabel, not @type. - 2019/11/22 ws
-	Revision 1.123 - Correct bugs in @nameTitleGroup - 2019/11/22 ws
-	Revision 1.122 - Add xlink for 6XX, 130, 240, 730, 100, 700, 110, 710, 111, 711, 655  - 2019/11/22 ws
-	Revision 1.121 - Update 880 marc:subfield 6 output to better reflect mapping. - 2019/11/20 ws
-	Revision 1.120 - Update relatedItems output to better match mapping. See specific changes below. - 2019/11/20 ws
-						1.120 - @76X-78X$g adds marc:subfield g as partNumber
-						1.120 - @76X-78X$z add isbn identifier
-						1.120 - @76X-78X$i add displayLabel
-						1.120 - @762@type fix 762 type
-						1.120 - @775@type test for ind2
-						1.120 - @777 add all fields for 777 relatedItem output
-						1.120 - @787 add all fields for 787 relatedItem output
-						1.120 - @800$0 add $0 xlink="contents of $0" as URI 800,810, 811, 830
-						1.120 - @800$v add partNumber 800,810, 811, 830 
-						1.120 - @711$v $v incorrectly added to title in 710,711 and 730
-						1.120 - @711$4 add role and roleTerm
-						1.120 - @510$ind1 add ind1 conditions
-						1.120 - @534$ind1 add ind1 conditions
-						1.120 - @440$ind1 add ind1 conditions
-						1.120 - @440$a$v fix marc:subfield output
-						1.120 - @440$a$v add conditions
-						1.120 - @490$ind1 add ind1 conditions
-						1.120 - @490$v add partNumber
-						1.120 - @830$v add partNumber
-						1.120 - @856@ind2=2$q added physicalDescription tag
-						1.120 - @245/@880$ind2 - fix nonSort bugs
-						1.120 - @246/ind2=1 fix type to translated
-						1.120 - @264/ind2 fix mapping
-						1.120 - @260$issuance make conditional so no empty issuance elements can be output
-	Revision 1.119 - Fixed 700 ind1=0 to transform - tmee 2018/06/21
-	Revision 1.118 - Fixed namePart termsOfAddress subelement order - 2018/01/31 tmee
-	Revision 1.117 - Fixed name="corporate" RE: MODS 3.6 - 2017/2/14 tmee
-	Revision 1.116 - Added nameIdentifier to 700/710/711/100/110/111 $0 RE: MODS 3.6 - 2016/3/15 ws
-	Revision 1.115 - Added @otherType for 7xx RE: MODS 3.6 - 2016/3/15 ws
-	Revision 1.114 - Added <itemIdentifier> for 852$p and <itemIdentifier > with type="copy number" for 852$t RE: MODS 3.6 - 2016/3/15 ws
-	Revision 1.113 - Added @valueURI="contents of $0" for 752/662 RE: MODS 3.6 - 2016/3/15 ws
-	Revision 1.112 - Added @xml:space="preserve" to title/nonSort on 245 and 242 RE: MODS 3.6 - 2016/3/15 ws
-	
-	Revision 1.111 - Added test to prevent empty authority attribute for 047 with no marc:subfield 2. - ws 2016/03/24
-	Revision 1.110 - Added test to prevent empty authority attribute for 336 with no marc:subfield 2. - ws 2016/03/24
-	Revision 1.109 - Added test to prevent empty authority attribute for 655 and use if ind2 if no marc:subfield 2 is available. - ws 2016/03/24
-	Revision 1.108 - Added filter to name templates to exclude names with title marc:subfields. - ws 2016/03/24
-	
-	Revision 1.107 - Added support for 024/@ind1=7 - ws 2016/1/7	
-	Revision 1.106 - Added a xsl:when to deal with '#' and ' ' in $marcLeader19 and $controlField008-18 - ws 2014/12/19		
-	Revision 1.105 - Add @unit to extent - ws 2014/11/20	
-	Revision 1.104 - Fixed 111$n and 711$n to reflect mapping to <namePart> tmee 20141112
-	Revision 1.103 - Fixed 008/28 to reflect revised mapping for government publication tmee 20141104	
-	Revision 1.102 - Fixed 240$s duplication tmee 20140812
-	Revision 1.101 - Fixed 130 tmee 20140806
-	Revision 1.100 - Fixed 245c tmee 20140804
-	Revision 1.99 - Fixed 240 issue tmee 20140804
-	Revision 1.98 - Fixed 336 mapping tmee 20140522
-	Revision 1.97 - Fixed 264 mapping tmee 20140521
-	Revision 1.96 - Fixed 310 and 321 and 008 frequency authority for marcfrequency tmee 2014/04/22
-	Revision 1.95 - Modified 035 to include identifier type (WlCaITV) tmee 2014/04/21	
-     ______________
-    |              |
-    |   MODS 3.5   |
-    |______________|
-	
-	Revision 1.95 - Added a xsl:when to deal with '#' and ' ' in $marcLeader19 and $controlField008-18 - ws 2014/12/19
-	Revision 1.94 - marc:leader 07 b mapping changed from "continuing" to "serial" tmee 2014/02/21
-	Revision 1.93 - Fixed personal name transform for ind1=0 tmee 2014/01/31
-	Revision 1.92 - Removed duplicate code for 856 1.51 tmee 2014/01/31
-	Revision 1.91 - Fixed createnameFrom720 duplication tmee 2014/01/31
-	Revision 1.90 - Fixed 520 displayLabel tmee tmee 2014/01/31
-	Revision 1.89 - Fixed 008-06 when value = 's' for cartographics tmee tmee 2014/01/31
-	Revision 1.88 - Fixed 510c mapping - tmee 2013/08/29
-	Revision 1.87 - Fixed expressions of <accessCondition> type values - tmee 2013/08/29
-	Revision 1.86 - Fixed 008 <frequency> marc:subfield to occur w/i <originiInfo> - tmee 2013/08/29
-	Revision 1.85 - Fixed 245$c - tmee 2013/03/07
-	Revision 1.84 - Fixed 1.35 and 1.36 date mapping for 008 when 008/06=e,p,r,s,t so only 008/07-10 displays, rather than 008/07-14 - tmee 2013/02/01   
-	Revision 1.83 - Deleted mapping for 534 to note - tmee 2013/01/18
-	Revision 1.82 - Added mapping for 264 ind 0,1,2,3 to originInfo - 2013/01/15 tmee
-	Revision 1.81 - Added mapping for 336$a$2, 337$a$2, 338$a$2 - 2012/12/03 tmee
-	Revision 1.80 - Added 100/700 mapping for "family" - 2012/09/10 tmee
-	Revision 1.79 - Added 245 $s mapping - 2012/07/11 tmee
-	Revision 1.78 - Fixed 852 mapping <shelfLocation> was changed to <shelfLocator> - 2012/05/07 tmee
-	Revision 1.77 - Fixed 008-06 when value = 's' - 2012/04/19 tmee
-	Revision 1.76 - Fixed 242 - 2012/02/01 tmee
-	Revision 1.75 - Fixed 653 - 2012/01/31 tmee
-	Revision 1.74 - Fixed 510 note - 2011/07/15 tmee
-	Revision 1.73 - Fixed 506 540 - 2011/07/11 tmee
-	Revision 1.72 - Fixed frequency error - 2011/07/07 and 2011/07/14 tmee
-	Revision 1.71 - Fixed subject titles for marc:subfields t - 2011/04/26 tmee 
-	Revision 1.70 - Added mapping for OCLC numbers in 035s to go into <identifier type="oclc"> 2011/02/27 - tmee 	
-	Revision 1.69 - Added mapping for untyped identifiers for 024 - 2011/02/27 tmee 
-	Revision 1.68 - Added <subject><titleInfo> mapping for 600/610/611 marc:subfields t,p,n - 2010/12/22 tmee
-	Revision 1.67 - Added frequency values and authority="marcfrequency" for 008/18 - 2010/12/09 tmee
-	Revision 1.66 - Fixed 008/06=c,d,i,m,k,u, from dateCreated to dateIssued - 2010/12/06 tmee
-	Revision 1.65 - Added back marcsmd and marccategory for 007 cr- 2010/12/06 tmee
-	Revision 1.64 - Fixed identifiers - removed isInvalid template - 2010/12/06 tmee
-	Revision 1.63 - Fixed descriptiveStandard value from aacr2 to aacr - 2010/12/06 tmee
-	Revision 1.62 - Fixed date mapping for 008/06=e,p,r,s,t - 2010/12/01 tmee
-	Revision 1.61 - Added 007 mappings for marccategory - 2010/11/12 tmee
-	Revision 1.60 - Added altRepGroups and 880 linkages for relevant fields, see mapping - 2010/11/26 tmee
-	Revision 1.59 - Added scriptTerm type=text to language for 546b and 066c - 2010/09/23 tmee
-	Revision 1.58 - Expanded script template to include code conversions for extended scripts - 2010/09/22 tmee
-	Revision 1.57 - Added Ldr/07 and Ldr/19 mappings - 2010/09/17 tmee
-	Revision 1.56 - Mapped 1xx usage="primary" - 2010/09/17 tmee
-	Revision 1.55 - Mapped UT 240/1xx nameTitleGroup - 2010/09/17 tmee
-     ______________
-    |              |
-    |   MODS 3.4   |
-    |______________|
-    
-	Revision 1.54 - Fixed 086 redundancy - 2010/07/27 tmee
-	Revision 1.53 - Added direct href for MARC21slimUtils - 2010/07/27 tmee
-	Revision 1.52 - Mapped 046 marc:subfields c,e,k,l - 2010/04/09 tmee
-	Revision 1.51 - Corrected 856 transform - 2010/01/29 tmee
-	Revision 1.50 - Added 210 $2 authority attribute in <titleInfo type=”abbreviated”> 2009/11/23 tmee
-	Revision 1.49 - Aquifer revision 1.14 - Added 240s (version) data to <titleInfo type="uniform"><xsl:variable name="this"> 2009/11/23 tmee
-	Revision 1.48 - Aquifer revision 1.27 - Added mapping of 242 second indicator (for nonfiling characters) to <titleInfo><nonSort > subelement  2007/08/08 tmee/dlf
-	Revision 1.47 - Aquifer revision 1.26 - Mapped 300 marc:subfield f (type of unit) - and g (size of unit) 2009 ntra
-	Revision 1.46 - Aquifer revision 1.25 - Changed mapping of 767 so that <type="otherVersion>  2009/11/20  tmee
-	Revision 1.45 - Aquifer revision 1.24 - Changed mapping of 765 so that <type="otherVersion>  2009/11/20  tmee 
-	Revision 1.44 - Added <recordInfo><recordOrigin> canned text about the version of this stylesheet 2009 ntra
-	Revision 1.43 - Mapped 351 marc:subfields a,b,c 2009/11/20 tmee
-	Revision 1.42 - Changed 856 second indicator=1 to go to <location><url displayLabel=”electronic resource”> instead of to <relatedItem type=”otherVersion”><url> 2009/11/20 tmee
-	Revision 1.41 - Aquifer revision 1.9 Added variable and choice protocol for adding usage=”primary display” 2009/11/19 tmee 
-	Revision 1.40 - Dropped <note> for 510 and added <relatedItem type="isReferencedBy"> for 510 2009/11/19 tmee
-	Revision 1.39 - Aquifer revision 1.23 Changed mapping for 762 (Subseries Entry) from <relatedItem type="series"> to <relatedItem type="constituent"> 2009/11/19 tmee
-	Revision 1.38 - Aquifer revision 1.29 Dropped 007s for electronic versions 2009/11/18 tmee
-	Revision 1.37 - Fixed date redundancy in output (with questionable dates) 2009/11/16 tmee
-	Revision 1.36 - If mss material (Ldr/06=d,p,f,t) map 008 dates and 260$c/$g dates to dateCreated 2009/11/24, otherwise map 008 and 260$c/$g to dateIssued 2010/01/08 tmee
-	Revision 1.35 - Mapped appended detailed dates from 008/07-10 and 008/11-14 to dateIssued or DateCreated w/encoding="marc" 2010/01/12 tmee
-	Revision 1.34 - Mapped 045b B.C. and C.E. date range info to iso8601-compliant dates in <subject><temporal> 2009/01/08 ntra
-	Revision 1.33 - Mapped Ldr/06 "o" to <typeOfResource>kit 2009/11/16 tmee
-	Revision 1.32 - Mapped specific note types from the MODS Note Type list <http://www.loc.gov/standards/mods/mods-notes.html> tmee 2009/11/17
-	Revision 1.31 - Mapped 540 to <accessCondition type="use and reproduction"> and 506 to <accessCondition type="restriction on access"> and delete mappings of 540 and 506 to <note>
-	Revision 1.30 - Mapped 037c to <identifier displayLabel=""> 2009/11/13 tmee
-	Revision 1.29 - Corrected schemaLocation to 3.3 2009/11/13 tmee
-	Revision 1.28 - Changed mapping from 752,662 g going to mods:hierarchicalGeographic/area instead of "region" 2009/07/30 ntra
-	Revision 1.27 - Mapped 648 to <subject> 2009/03/13 tmee
-	Revision 1.26 - Added marc:subfield $s mapping for 130/240/730  2008/10/16 tmee
-	Revision 1.25 - Mapped 040e to <descriptiveStandard> and /18 to <descriptive standard>aacr2  2008/09/18 tmee
-	Revision 1.24 - Mapped 852 marc:subfields $h, $i, $j, $k, $l, $m, $t to <shelfLocation> and 852 marc:subfield $u to <physicalLocation> with @xlink 2008/09/17 tmee
-	Revision 1.23 - Commented out xlink/uri for marc:subfield 0 for 130/240/730, 100/700, 110/710, 111/711 as these are currently unactionable  2008/09/17 tmee
-	Revision 1.22 - Mapped 022 marc:subfield $l to type "issn-l" marc:subfield $m to output identifier element with corresponding @type and @invalid eq 'yes'2008/09/17 tmee
-	Revision 1.21 - Mapped 856 ind2=1 or ind2=2 to <relatedItem><location><url>  2008/07/03 tmee
-	Revision 1.20 - Added genre w/@auth="contents of 2" and type= "musical composition"  2008/07/01 tmee
-	Revision 1.19 - Added genre offprint for 008/24+ BK code 2  2008/07/01  tmee
-	Revision 1.18 - Added xlink/uri for marc:subfield 0 for 130/240/730, 100/700, 110/710, 111/711  2008/06/26 tmee
-	Revision 1.17 - Added mapping of 662 2008/05/14 tmee	
-	Revision 1.16 - Changed @authority from "marc" to "marcgt" for 007 and 008 codes mapped to a term in <genre> 2007/07/10 tmee
-	Revision 1.15 - For field 630, moved call to part template outside title element  2007/07/10 tmee
-	Revision 1.14 - Fixed template isValid and fields 010, 020, 022, 024, 028, and 037 to output additional identifier elements with corresponding @type and @invalid eq 'yes' when marc:subfields z or y (in the case of 022) exist in the MARCXML ::: 2007/01/04 17:35:20 cred
-	Revision 1.13 - Changed order of output under cartographics to reflect schema  2006/11/28 tmee
-	Revision 1.12 - Updated to reflect MODS 3.2 Mapping  2006/10/11 tmee
-	Revision 1.11 - The attribute objectPart moved from <languageTerm> to <language>  2006/04/08  jrad
-	Revision 1.10 - MODS 3.1 revisions to language and classification elements (plus ability to find marc:collection embedded in wrapper elements such as SRU zs: wrappers)  2006/02/06  ggar
-	Revision 1.09 - marc:subfield $y was added to field 242 2004/09/02 10:57 jrad
-	Revision 1.08 - Subject chopPunctuation expanded and attribute fixes 2004/08/12 jrad
-	Revision 1.07 - 2004/03/25 08:29 jrad
-	Revision 1.06 - Various validation fixes 2004/02/20 ntra
-	Revision 1.05 - MODS2 to MODS3 updates, language unstacking and de-duping, chopPunctuation expanded  2003/10/02 16:18:58  ntra
-	Revision 1.03 - Additional Changes not related to MODS Version 2.0 by ntra
-	Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
--->
+    <xsl:strip-space elements="*"/>
+<xsl:variable name="revisionNumber" select="'1.214'"/>
+<xsl:variable name="revisionDate" select="'20260701'"/>
+<xsl:param name="collection" select="collection(hase-uri())"/>
     
 
     <xd:doc id="root" scope="stylesheet">
@@ -285,16 +17,15 @@
         <xd:param name="originalFile"/>
     </xd:doc>
     <xsl:template match="/">
-        <xsl:param name="originalFile" select="replace(base-uri(), '(.*/)(.*)(\.xml)', '$2')"/>
-        <xsl:param name="workingDirectory" select="substring-before(base-uri(), tokenize(base-uri(), '/')[last()])"/>
-        
-        <xsl:result-document encoding="UTF-8" version="1.0" method="xml" media-type="text/xml" indent="yes" format="original" exclude-result-prefixes="marc xsi" 
-            href="{$workingDirectory}/mods/N-{$originalFile}_{position()}.xml">
-            <xsl:choose>
-                <xsl:when test="marc:collection/marc:record">
+            <xsl:param name="originalFile" select="replace(base-uri(), '(.*/)(.*)(\.xml)', '$2')"/>
+            <xsl:param name="workingDirectory" select="substring-before(base-uri(), tokenize(base-uri(), '/')[last()])"/>
+            
+            <xsl:result-document encoding="UTF-8" version="1.0" method="xml" media-type="text/xml" indent="yes" format="original" href="{$workingDirectory}/mods/N-{replace($originalFile, '(.*/)(.*)(\.xml)', '$2')}_{position()}.xml">
+                <xsl:choose>
+                <xsl:when test="marc:collection">
                     <modsCollection xmlns="http://www.loc.gov/mods/v3" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                         <xsl:attribute name="xsi:schemaLocation" select="normalize-space('http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-7.xsd')"/>
-                        <xsl:for-each select="marc:collection/marc:record">
+                        <xsl:for-each select="marc:record">
                             <mods version="3.7">
                                 <xsl:call-template name="marcRecord"/>
                             </mods>
@@ -2732,7 +2463,7 @@
             <identifier type="sici">
                 <xsl:call-template name="subfieldSelect">
                     <xsl:with-param name="codes">ab</xsl:with-param>
-                </xsl:call-template>                                                          e>
+                </xsl:call-template>
             </identifier>
         </xsl:for-each>
 
@@ -2920,7 +2651,7 @@
                             <location>
                                 <xsl:call-template name="xxx880"/>
                                 <url>
-                                     <xsl:if test="marc:subfield[@code = 'y' or @code = '3']">
+                                    <xsl:if test="marc:subfield[@code = 'y' or @code = '3']">
                                         <xsl:attribute name="displayLabel">
                                             <xsl:call-template name="subfieldSelect">
                                                 <xsl:with-param name="codes">y3</xsl:with-param>
@@ -2963,22 +2694,11 @@
             <xsl:call-template name="createNoteFrom946"/>
             <!-- 1.206 -->
   
-         <!-- 
-             596 – Local Note
-                $$a – Award ID
-                $$b – Funding Source in Award Group (Project number)
-                $$c – Funding Institution (REQUIRED)
-                $$d – funder DOI
-                $$e – funder ROR
-                $$f – label for fn_p note
-                $$g – financial disclosure statement
-                $$0 – Funded article DOI
-                $$x – funding information
-          -->
+            <!-- Create the funding-group -->
             <xsl:if test="marc:datafield[@tag='596']">
              <funding-group>
                  <!-- Only process 596 fields that *have* an institution (subfield c) -->
-                 <xsl:for-each select="marc:datafield[@tag='596'][normalize-space(f:deSequencing-items(marc:subfield[@code='c'])) != '']">
+                 <xsl:for-each select="marc:datafield[@tag='596'][normalize-space(marc:subfield[@code='c']) != '']">
                      <award-group>
                          <funding-source>
                              <institution-wrap>
@@ -2987,14 +2707,9 @@
                                  </institution>
                              </institution-wrap>
                          </funding-source>
-                         
-                         <!-- Split subfield a values by comma 1.218-->
-                         <xsl:variable name="awards" select="marc:subfield[@code='a']"/>
-                         
-                         <xsl:call-template name="split-awards">
-                             <xsl:with-param name="text" select="$awards"/>
-                         </xsl:call-template>
-                         
+                         <award-id>
+                             <xsl:value-of select="marc:subfield[@code='a']"/>
+                         </award-id>
                      </award-group>
                  </xsl:for-each>
              </funding-group>
@@ -3021,6 +2736,7 @@
                     <xsl:value-of select="substring(., 1, 6)"/>
                 </recordCreationDate>
             </xsl:for-each>
+
             <xsl:for-each select="marc:controlfield[@tag = '005']">
                 <recordChangeDate encoding="iso8601">
                     <xsl:value-of select="."/>
@@ -3058,66 +2774,24 @@
     </xsl:template>
 
 <!--end marc:record template-->
- 
-    <xd:doc>                    
-        <xd:desc>
-            <xd:ul>
-            <xd:p><xd:b>596 – local note for funding information </xd:b></xd:p>
-                <xd:li><xd:p>$$a – award id</xd:p></xd:li>
-                <xd:li><xd:p>$$b – project number</xd:p></xd:li>
-                <xd:li><xd:p>$$c – institution</xd:p></xd:li>
-                <xd:li><xd:p>$$d –DOI</xd:p></xd:li>
-                <xd:li><xd:p>$$e –ROR</xd:p></xd:li>
-                <xd:li><xd:p>$$f – label for fn_p note</xd:p></xd:li>
-                <xd:li><xd:p>$$g – financial disclosure statement</xd:p></xd:li>
-                <xd:li><xd:p>$$0 – article DOI</xd:p></xd:li>
-                <xd:li><xd:p>$$x – funding information</xd:p></xd:li>
-        </xd:ul>
-        </xd:desc>
+
+    <xd:doc>
+        <xd:desc> award-group </xd:desc>
     </xd:doc>
-    <xsl:template match="marc:datafield[@tag='596'][marc:subfield[@code='c']]" mode="award-group">
-        <award-group>            
-            <funding-source>
-                <institution-wrap>
-                    <institution>
-                        <xsl:value-of select="marc:subfield[@code='c']"/>
-                    </institution>
-                </institution-wrap>
-            </funding-source>            
-            <!-- Split subfield a values by comma -->
-            <xsl:variable name="awards" select="marc:subfield[@code='a']"/>
-            <xsl:call-template name="split-awards">
-                <xsl:with-param name="text" select="$awards"/>
-            </xsl:call-template>            
-        </award-group>
+    <xsl:template match="//marc:datafield[@tag='596'][marc:subfield[@code='c']]" mode="award-group">      
+            <award-group>
+                <funding-source>
+                    <institution-wrap>
+                        <institution>
+                            <xsl:value-of select="//marc:subfield[@code='c']"/>
+                        </institution>
+                    </institution-wrap>
+                </funding-source>
+                <award-id>
+                    <xsl:value-of select="marc:subfield[@code='a']"/>
+                </award-id>
+            </award-group>
     </xsl:template>
-    
-        <xd:doc>
-        <xd:desc> Template to split comma-separated grant numbers </xd:desc>
-        <xd:param name="text"/>
-    </xd:doc>
-    <xsl:template name="split-awards">
-        <xsl:param name="text"/>
-        
-        <!-- Trim leading spaces -->
-        <xsl:variable name="trimmed" select="normalize-space(f:deSequencing-items($text))"/>        
-        <xsl:choose>
-            <xsl:when test="contains($trimmed, ',')">
-                <xsl:variable name="first" select="normalize-space(substring-before($trimmed, ','))"/>
-                <award-id><xsl:value-of select="$first"/></award-id>
-              
-                <xsl:call-template name="split-awards">
-                    <xsl:with-param name="text" select="substring-after($trimmed, ',')"/>
-                </xsl:call-template>
-            </xsl:when>
-            
-            <xsl:otherwise>
-                <!-- Last award -->
-                <award-id><xsl:value-of select="$trimmed"/></award-id>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-    
     
     <!-- 1.206 -->
     <xd:doc>
